@@ -1,6 +1,18 @@
 # 2025-group-29
 2025 COMSM0166 group 29
 
+| Name         | Email                 | GitHub Username |
+|--------------|-----------------------|------------------|
+| Weihao Zeng  | lh24059@bristol.ac.uk | Zengweihaooo     |
+| Lepeng Zhou  | wn24588@bristol.ac.uk | Lepengz233       |
+| Yichen Zhang | gd24475@bristol.ac.uk | Enderman928      |
+| Guojie Liu   | jy24369@bristol.ac.uk | henlandl         |
+| Mengqiu Yan  | zj24391@bristol.ac.uk | zj24391          |
+| Chen Zhang   | ov24336@bristol.ac.uk | ov24336          |
+
+![image](https://github.com/user-attachments/assets/9ebbb493-48c5-424e-82cb-62763bb76816)
+
+
 ## Your Game
 
 Link to your game [PLAY HERE](https://peteinfo.github.io/COMSM0166-project-template/)
