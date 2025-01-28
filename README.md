@@ -15,32 +15,37 @@
 
 
 
+## **Project Navigation**
+
+- **Homepage** ➡️ [Go to Homepage](docs/index.html)
+
 ## **Weekly Progress**
 
 ### **Week 1: Classic Game Analysis and Initial Ideas**  
 - **Analysis PDF** ➡️ [View Here (Figma)](https://www.figma.com/slides/f1M1Zu2uoP3gkdLxZZtYRE/Week-01-GameList?node-id=1-255&t=f9RxkCZ8keAuPQIM-1)  
-- **HTML Version** ➡️ [View Here](docs/slides/week01/)
+- **HTML Version** ➡️ [View Here](docs/slides/week01/index.html)
 
 ---
 
 ### **Week 2: Refining Game Selection & p5.js Practice (Drawing App)**  
 - **Analysis PDF** ➡️ [View Here (Figma)](https://www.figma.com/slides/GL5WkeOr3bmHTlFOqxXnN3/Week-02-Refining-Selection?node-id=2-434&t=niDbJlbZIOYoC30k-1)  
-- **HTML Version** ➡️ [View Here](docs/slides/week02/)
+- **HTML Version** ➡️ [View Here](docs/slides/week02/index.html)
 
 #### **Kanban Board**  
 - **Kanban Board (Figma)** ➡️ [View Here](https://www.figma.com/design/uZFMOPOv60n7bGkatZXVJs/Kanban-Board?node-id=0-1&t=1nYHQSl2tX5kk12n-1)  
 - **HTML Version** ➡️ [View Here](docs/kanban/week02.html)
 
 #### **Drawing App**  
-- **Try the App** ➡️ [Play Here](docs/games/week02_sketch/)
+- **Try the App** ➡️ [Play Here](docs/games/week02_sketch/index.html)
 
 ---
 
 ### **Week 3: Prototype Development**  
 - **Prototype Video** ➡️ [Watch Here](docs/media/week03_agario_prototype.mp4)  
-- **HTML Slides** ➡️ [View Here](docs/slides/week03/)
+- **HTML Slides** ➡️ [View Here](docs/slides/week03/index.html)
 
 ---
+
 
 
 ## Your Game
