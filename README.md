@@ -15,15 +15,32 @@
 
 
 
-## Weekly Progress
+## **Weekly Progress**
 
-### Week 1: Classic Game Analysis and Initial Ideas  
-Analysis PDF ➡️ [View Here](https://www.figma.com/slides/f1M1Zu2uoP3gkdLxZZtYRE/Week-01-GameList?node-id=1-255&t=f9RxkCZ8keAuPQIM-1)  
+### **Week 1: Classic Game Analysis and Initial Ideas**  
+- **Analysis PDF** ➡️ [View Here (Figma)](https://www.figma.com/slides/f1M1Zu2uoP3gkdLxZZtYRE/Week-01-GameList?node-id=1-255&t=f9RxkCZ8keAuPQIM-1)  
+- **HTML Version** ➡️ [View Here (GitHub Pages)](https://uob-comsm0166.github.io/2025-group-29/slides/week01/)
 
-### Week 2: Refining Game Selection & p5.js Practice (Drawing App)  
-Analysis PDF ➡️ [View Here](https://www.figma.com/slides/GL5WkeOr3bmHTlFOqxXnN3/Week-02-Refining-Selection?node-id=2-434&t=niDbJlbZIOYoC30k-1)  
-Drawing Kanban ➡️ [View Here](https://www.figma.com/design/uZFMOPOv60n7bGkatZXVJs/Kanban-Board?node-id=0-1&t=1nYHQSl2tX5kk12n-1)  
-Drawing App ➡️ [Try it here](https://uob-comsm0166.github.io/2025-group-29/)
+---
+
+### **Week 2: Refining Game Selection & p5.js Practice (Drawing App)**  
+- **Analysis PDF** ➡️ [View Here (Figma)](https://www.figma.com/slides/GL5WkeOr3bmHTlFOqxXnN3/Week-02-Refining-Selection?node-id=2-434&t=niDbJlbZIOYoC30k-1)  
+- **HTML Version** ➡️ [View Here (GitHub Pages)](https://uob-comsm0166.github.io/2025-group-29/slides/week02/)
+
+#### **Kanban Board**  
+- **Kanban Board (Figma)** ➡️ [View Here](https://www.figma.com/design/uZFMOPOv60n7bGkatZXVJs/Kanban-Board?node-id=0-1&t=1nYHQSl2tX5kk12n-1)  
+- **HTML Version** ➡️ [View Here (GitHub Pages)](https://uob-comsm0166.github.io/2025-group-29/kanban/week02.html)
+
+#### **Drawing App**  
+- **Try the App** ➡️ [Play Here (GitHub Pages)](https://uob-comsm0166.github.io/2025-group-29/games/week02_sketch/)
+
+---
+
+### **Week 3: Prototype Development**  
+- **Prototype Video** ➡️ [Watch Here (GitHub Pages)](https://uob-comsm0166.github.io/2025-group-29/media/week03_agario_prototype.mp4)  
+- **HTML Slides** ➡️ [View Here (GitHub Pages)](https://uob-comsm0166.github.io/2025-group-29/slides/week03/)
+
+---
 
 
 
