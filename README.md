@@ -13,6 +13,20 @@
 ![image](https://github.com/user-attachments/assets/9ebbb493-48c5-424e-82cb-62763bb76816)
 
 
+
+
+## Weekly Progress
+
+### Week 1: Classic Game Analysis and Initial Ideas  
+Analysis PDF ➡️ [View Here](https://www.figma.com/slides/f1M1Zu2uoP3gkdLxZZtYRE/Week-01-GameList?node-id=1-255&t=f9RxkCZ8keAuPQIM-1)  
+
+### Week 2: Refining Game Selection & p5.js Practice (Drawing App)  
+Analysis PDF ➡️ [View Here](https://www.figma.com/slides/GL5WkeOr3bmHTlFOqxXnN3/Week-02-Refining-Selection?node-id=2-434&t=niDbJlbZIOYoC30k-1)  
+Drawing Kanban ➡️ [View Here](https://www.figma.com/design/uZFMOPOv60n7bGkatZXVJs/Kanban-Board?node-id=0-1&t=1nYHQSl2tX5kk12n-1)  
+Drawing App ➡️ [Try it here](https://uob-comsm0166.github.io/2025-group-29/)
+
+
+
 ## Your Game
 
 Link to your game [PLAY HERE](https://peteinfo.github.io/COMSM0166-project-template/)
