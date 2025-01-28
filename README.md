@@ -25,12 +25,14 @@ Include a demo video of your game here (you don't have to wait until the end, yo
 
 Add a group photo here!
 
-- Group member 1, name, email, role
-- Group member 2, name, email, role
-- Group member 3, name, email, role
-- Group member 4, name, email, role
-- Group member 5, name, email, role
-- Group member 6, name, email, role
+| Name         | Email                 | GitHub Username |
+|--------------|-----------------------|------------------|
+| Weihao Zeng  | lh24059@bristol.ac.uk | Zengweihaooo     |
+| Lepeng Zhou  | wn24588@bristol.ac.uk | Lepengz233       |
+| Yichen Zhang | gd24475@bristol.ac.uk | Enderman928      |
+| Guojie Liu   | jy24369@bristol.ac.uk | henlandl         |
+| Mengqiu Yan  | zj24391@bristol.ac.uk | zj24391          |
+| Chen Zhang   | ov24336@bristol.ac.uk | ov24336          |
 
 ## Project Report
 
