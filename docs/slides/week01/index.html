@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 01 - Game List</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Week 01 - Game List</title>
+
+  <!-- Global base CSS for background and minimal styling -->
+  <link rel="stylesheet" href="global.css" />
+
+  <!-- Index-page-specific CSS -->
+  <link rel="stylesheet" href="styles/index.css" />
 </head>
 <body>
-    <div class="container">
-        <!-- Title Section -->
-        <div class="title">
-            <span class="group-title">{Group #29}</span>
-            <span class="game-list">Game List</span>
-        </div>
-
-        <!-- Footer Text -->
-        <div class="footer-text">
-            20 January 2025<br>Software Engineering Discipline and Practice
-        </div>
-
-        <!-- Decorative Circles -->
-        <div class="circle left"></div>
-        <div class="circle right"></div>
+  <div class="container">
+    <!-- Title Section -->
+    <div class="title">
+      <span class="group-title">{Group #29}</span>
+      <span class="game-list">Game List</span>
     </div>
 
-    <!-- Navigation Buttons -->
-    <button id="prevPage" class="nav-button left-btn"> < </button>
-    <button id="nextPage" class="nav-button right-btn"> > </button>
+    <!-- Footer Text -->
+    <div class="footer-text">
+      20 January 2025<br>Software Engineering Discipline and Practice
+    </div>
 
-    <script src="script.js"></script>
+    <!-- Decorative Circles -->
+    <div class="circle left"></div>
+    <div class="circle right"></div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <button id="prevPage" class="nav-button left-btn"> < </button>
+  <button id="nextPage" class="nav-button right-btn"> > </button>
+
+  <!-- Main script for page navigation -->
+  <script src="script.js"></script>
 </body>
 </html>

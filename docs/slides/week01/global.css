@@ -1,0 +1,27 @@
+/* global.css */
+/* 
+  This file only contains very basic, truly global rules:
+  - Removing default margin/padding
+  - Setting a universal background
+  - Setting a universal font family
+  - Basic body layout if desired
+*/
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    background: black;
+    font-family: "DM Sans", sans-serif;
+    /* If you want all pages to center their main container,
+       you can keep the following flex settings here: */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }

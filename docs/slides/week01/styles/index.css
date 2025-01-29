@@ -1,18 +1,10 @@
-/* Reset global styles */
-body {
-    background: black;
-    margin: 0;
-    padding: 0;
-    font-family: "DM Sans", sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-}
+/* styles/index.css */
+/*
+  This file is specific to the index.html page.
+  We keep all container, circles, buttons, etc. here.
+*/
 
-/* Container */
+/* Container styling */
 .container {
     position: relative;
     width: 90vw;
@@ -24,74 +16,71 @@ body {
     justify-content: space-between;
     padding: 5vh 5vw;
     box-sizing: border-box;
-}
-
-/* Align text with circles */
-.title,
-.footer-text {
+  }
+  
+  /* Title and footer text alignment */
+  .title,
+  .footer-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding-left: 0vw; /* Align with left circle */
-}
-
-/* Adjusted font sizes */
-.group-title {
+    padding-left: 0vw; /* Align with left circle if needed */
+  }
+  
+  /* Font sizes and colors for title text */
+  .group-title {
     color: #E1EEE6;
-    font-size: 8vw; /* Reduced size */
+    font-size: 8vw;
     font-weight: 700;
     line-height: 1;
     word-wrap: break-word;
-}
-
-.game-list {
+  }
+  .game-list {
     color: #00CE93;
-    font-size: 8vw; /* Reduced size */
+    font-size: 8vw;
     font-weight: 700;
     line-height: 1;
     word-wrap: break-word;
-}
-
-.footer-text {
+  }
+  
+  /* Footer text */
+  .footer-text {
     position: absolute;
     bottom: 15%;
     left: 2vw;
     color: #E1EEE6;
-    font-size: 2vw; /* Reduced size */
+    font-size: 2vw;
     font-weight: 400;
     line-height: 1.2;
-}
-
-/* Decorative circles */
-.circle {
+  }
+  
+  /* Decorative circles */
+  .circle {
     position: absolute;
     width: 5vw;
     height: 5vw;
     background: #E1EEE6;
     border-radius: 50%;
-}
-
-/* Position circles */
-.circle.left {
+  }
+  .circle.left {
     left: 2%;
     bottom: 2%;
-}
-
-.circle.right {
+  }
+  .circle.right {
     right: 2%;
     bottom: 2%;
-}
-
-/* Navigation Buttons (Circle Style) */
-.nav-button {
+  }
+  
+  /* Navigation Buttons (Circular Style) */
+  .nav-button {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     width: 4vw;
     height: 4vw;
-    font-size: 2vw; /* Adjusted size */
+    font-size: 2vw;
     font-weight: bold;
-    background-color: #B0B0B0; /* Gray color */
+    background-color: #B0B0B0;
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -101,20 +90,20 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-/* Left button */
-.left-btn {
+  }
+  
+  /* Left button */
+  .left-btn {
     left: 7%;
-}
-
-/* Right button */
-.right-btn {
+  }
+  
+  /* Right button */
+  .right-btn {
     right: 7%;
-}
-
-/* Increase opacity when hovering near the button */
-.nav-button:hover,
-.nav-button:focus {
+  }
+  
+  /* Increase button opacity on hover/focus */
+  .nav-button:hover,
+  .nav-button:focus {
     opacity: 1;
-}
+  }
