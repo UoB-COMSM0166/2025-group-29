@@ -1,0 +1,100 @@
+/* page01.css */
+
+/* General slide layout */
+.slide {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+  
+  /* Left block */
+  .left-block {
+    flex: 0 0 50%;
+    background: #E2E2E2; /* Left side background */
+    position: relative;
+  }
+  
+  /* Title in the top-left */
+  .title {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    color: black;
+    font-size: clamp(2rem, 10vw, 6rem); /* Scalable font size */
+    font-family: "DM Sans", sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  
+  /* Footer text on the bottom-left */
+  .footer-left,
+  .footer-right {
+    position: absolute;
+    color: black;
+    font-size: clamp(0.8rem, 1vw, 1.5rem); /* Smaller font size */
+    font-family: "DM Sans", sans-serif;
+    font-weight: 500;
+  }
+  
+  .footer-left {
+    bottom: 5%;
+    left: 5%;
+  }
+  
+  .footer-right {
+    bottom: 5%;
+    left: 55%;
+  }
+  
+  /* Right block */
+  .right-block {
+    flex: 1;
+    background: #E1EEE6; /* Right side background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Game list in the right block */
+  .game-list {
+    color: black;
+    font-size: clamp(1rem, 2vw, 2rem); /* Smaller font size */
+    font-family: "DM Sans", sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+  }
+  
+  /* Navigation buttons */
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    opacity: 0.2;
+  }
+  
+  .nav-button:hover {
+    opacity: 1;
+  }
+  
+  .left-button {
+    left: 1%;
+  }
+  
+  .right-button {
+    right: 1%;
+  }
