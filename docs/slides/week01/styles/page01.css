@@ -67,8 +67,8 @@
     text-align: center;
   }
   
-  /* Navigation buttons */
-  .nav-button {
+/* Navigation buttons */
+.nav-button {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
