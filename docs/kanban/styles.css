@@ -1,0 +1,20 @@
+/* Custom card animations */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Dragging state styling */
+.dragging {
+    opacity: 0.5;
+    transform: rotate(3deg);
+}
+
+/* Column minimum height */
+.column {
+    min-height: 500px;
+}
