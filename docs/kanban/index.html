@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Kanban Board</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>Group29 Kanban Board</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="bg-gray-100 min-h-screen p-8">
-    <div class="max-w-7xl mx-auto">
-        <div class="mb-6 flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-800">Team Kanban</h1>
-            <div class="text-sm text-gray-500" id="status"></div>
-        </div>
-        <div id="board" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+<body>
+  <h1>Group 29 Kanban Board</h1>
+  <div class="board">
+    <div class="column" id="todo-column">
+      <h2>Not Start</h2>
+      <div class="tasks" id="todo-tasks"></div>
+      <div class="input-area">
+        <input type="text" id="todo-input" placeholder="Add a new task..." />
+        <button id="add-todo-btn">Add</button>
+      </div>
     </div>
-
-    <!-- Loading overlay -->
-    <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="text-white text-xl">Loading Board...</div>
+    <div class="column" id="in-progress-column">
+      <h2>In Progress</h2>
+      <div class="tasks" id="in-progress-tasks"></div>
     </div>
+    <div class="column" id="parked-column">
+      <h2>Parked</h2>
+      <div class="tasks" id="parked-tasks"></div>
+    </div>
+    <div class="column" id="done-column">
+      <h2>Done</h2>
+      <div class="tasks" id="done-tasks"></div>
+    </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
