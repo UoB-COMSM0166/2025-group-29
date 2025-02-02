@@ -6,6 +6,23 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Username Modal -->
+  <div id="usernameModal" class="modal">
+    <div class="modal-content">
+      <h2>Select Your Username</h2>
+      <select id="usernameSelect">
+        <option value="Weihao Zeng">Weihao Zeng</option>
+        <option value="Lepeng Zhou">Lepeng Zhou</option>
+        <option value="Yichen Zhang">Yichen Zhang</option>
+        <option value="Guojie Liu">Guojie Liu</option>
+        <option value="Mengqiu">Mengqiu</option>
+        <option value="Chen Zhang">Chen Zhang</option>
+        <option value="Visitor">Visitor</option>
+      </select>
+      <button id="usernameSubmit">Submit</button>
+    </div>
+  </div>
+
   <h1>Group 29 Kanban Board</h1>
   <div class="board">
     <div class="column" id="todo-column">
@@ -13,6 +30,7 @@
       <div class="tasks" id="todo-tasks"></div>
       <div class="input-area">
         <input type="text" id="todo-input" placeholder="Add a new task..." />
+        <input type="date" id="deadline-input" />
         <button id="add-todo-btn">Add</button>
       </div>
     </div>
@@ -34,13 +52,13 @@
   <div class="instructions">
     <h2>How to Use the Kanban Board</h2>
     <p>
-      <strong>Add Task:</strong> Enter a task title in the input field under the "Not Start" column and click "Add".
+      <strong>Add Task:</strong> Enter a task title and select a deadline (dd/mm/yyyy) under the "Not Start" column and click "Add".
     </p>
     <p>
       <strong>Move Task:</strong> Drag and drop a task card from one column to another to update its status.
     </p>
     <p>
-      <strong>Delete Task:</strong> Click the "Delete" button (displayed on each task card) to remove the task.
+      <strong>Delete Task:</strong> Hover over a task card and click the "Delete" button to remove the task.
     </p>
     <p>
       <strong>Columns Explained:</strong> "Not Start" for tasks not yet begun, "In Progress" for ongoing tasks, "Parked" for tasks on hold, and "Done" for completed tasks.

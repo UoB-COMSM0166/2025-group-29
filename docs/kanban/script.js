@@ -1,20 +1,54 @@
 const SUPABASE_URL = 'https://rvehrbiucrilpuvvkjbs.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2ZWhyYml1Y3JpbHB1dnZramJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgyNzk5NTAsImV4cCI6MjA1Mzg1NTk1MH0.YKMde10eNdODGFjTSkhEFQD95LH7ChGcIVd_25g4odE';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('usernameSubmit').addEventListener('click', async () => {
+    currentUser = document.getElementById('usernameSelect').value;
+    document.getElementById('usernameModal').style.display = 'none';
+    initializeBoard();
+  });
+});
+
+function formatUKDate(dateInput) {
+  // Accepts a Date object or a string in "YYYY-MM-DD" format and returns "DD/MM/YYYY"
+  if (typeof dateInput === 'object') {
+    const d = dateInput;
+    const day = ('0' + d.getDate()).slice(-2);
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  } else if (typeof dateInput === 'string') {
+    const parts = dateInput.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+  }
+  return dateInput;
+}
+
+async function initializeBoard() {
   await fetchTasks();
   document.getElementById('add-todo-btn').addEventListener('click', async () => {
     const input = document.getElementById('todo-input');
+    const deadlineInput = document.getElementById('deadline-input');
     const title = input.value.trim();
+    let deadline = deadlineInput.value;
+    if (!deadline) {
+      deadline = formatUKDate(new Date());
+    } else {
+      deadline = formatUKDate(deadline);
+    }
     if (title) {
-      await addTask(title, 'todo');
+      await addTask(title, 'todo', deadline);
       input.value = '';
+      deadlineInput.value = '';
       await fetchTasks();
     }
   });
   initDragEvents();
-});
+}
 
 async function fetchTasks() {
   const { data, error } = await supabaseClient.from('Kanban').select('*');
@@ -29,10 +63,9 @@ function renderTasks(tasks) {
     const el = document.createElement('div');
     el.className = 'task';
     el.draggable = true;
-    el.textContent = columns.title;
+    const deadlineFormatted = columns.deadline ? formatUKDate(columns.deadline) : '';
+    el.innerHTML = `<div>${columns.title}</div><div class="task-info">${columns.author} | ${deadlineFormatted}</div>`;
     el.dataset.id = id;
-    
-    // Delete button
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Delete';
     delBtn.className = 'delete-btn';
@@ -41,13 +74,11 @@ function renderTasks(tasks) {
       await fetchTasks();
     });
     el.appendChild(delBtn);
-    
     const col = columns.status || 'todo';
     if (col === 'in-progress') document.getElementById('in-progress-tasks').appendChild(el);
     else if (col === 'parked') document.getElementById('parked-tasks').appendChild(el);
     else if (col === 'done') document.getElementById('done-tasks').appendChild(el);
     else document.getElementById('todo-tasks').appendChild(el);
-    
     el.addEventListener('dragstart', e => {
       el.classList.add('dragging');
       e.dataTransfer.setData('text/plain', id);
@@ -62,8 +93,8 @@ function clearColumns() {
   });
 }
 
-async function addTask(title, status) {
-  const { error } = await supabaseClient.from('Kanban').insert([{ columns: { title, status } }]);
+async function addTask(title, status, deadline) {
+  const { error } = await supabaseClient.from('Kanban').insert([{ columns: { title, status, author: currentUser, deadline } }]);
   if (error) console.error('Insert error:', error);
 }
 
@@ -86,10 +117,7 @@ async function updateTaskStatus(id, newStatus) {
 }
 
 async function deleteTask(id) {
-  const { error } = await supabaseClient
-    .from('Kanban')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabaseClient.from('Kanban').delete().eq('id', id);
   if (error) console.error('Delete error:', error);
 }
 
