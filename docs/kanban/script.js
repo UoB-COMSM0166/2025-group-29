@@ -1,7 +1,6 @@
 const SUPABASE_URL = 'https://rvehrbiucrilpuvvkjbs.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2ZWhyYml1Y3JpbHB1dnZramJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgyNzk5NTAsImV4cCI6MjA1Mzg1NTk1MH0.YKMde10eNdODGFjTSkhEFQD95LH7ChGcIVd_25g4odE';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2ZWhyYml1Y3JpbHB1dnZramJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgyNzk5NTAsImV4cCI6MjA1Mzg1NTk1MH0.YKMde10eNdODGFjTSkhEFQD95LH7ChGcIVd_25g4odE';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchTasks();
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function fetchTasks() {
-  const { data, error } = await supabase.from('kanban_tasks').select('*');
+  const { data, error } = await supabaseClient.from('Kanban').select('*');
   if (error) console.error('Fetch error:', error);
   renderTasks(data || []);
 }
@@ -26,7 +25,7 @@ async function fetchTasks() {
 function renderTasks(tasks) {
   clearColumns();
   tasks.forEach(({ id, columns }) => {
-    if (!columns) return;
+    if (!columns || !columns.title) return;
     const el = document.createElement('div');
     el.className = 'task';
     el.draggable = true;
@@ -52,13 +51,13 @@ function clearColumns() {
 }
 
 async function addTask(title, status) {
-  const { error } = await supabase.from('kanban_tasks').insert([{ columns: { title, status } }]);
+  const { error } = await supabaseClient.from('Kanban').insert([{ columns: { title, status } }]);
   if (error) console.error('Insert error:', error);
 }
 
 async function updateTaskStatus(id, newStatus) {
-  const { data, error: fetchErr } = await supabase
-    .from('kanban_tasks')
+  const { data, error: fetchErr } = await supabaseClient
+    .from('Kanban')
     .select('columns')
     .eq('id', id)
     .single();
@@ -67,8 +66,8 @@ async function updateTaskStatus(id, newStatus) {
     return;
   }
   const updated = { ...data.columns, status: newStatus };
-  const { error: updateErr } = await supabase
-    .from('kanban_tasks')
+  const { error: updateErr } = await supabaseClient
+    .from('Kanban')
     .update({ columns: updated })
     .eq('id', id);
   if (updateErr) console.error('Update error:', updateErr);
