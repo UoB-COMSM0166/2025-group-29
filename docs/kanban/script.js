@@ -31,11 +31,23 @@ function renderTasks(tasks) {
     el.draggable = true;
     el.textContent = columns.title;
     el.dataset.id = id;
+    
+    // Delete button
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.className = 'delete-btn';
+    delBtn.addEventListener('click', async () => {
+      await deleteTask(id);
+      await fetchTasks();
+    });
+    el.appendChild(delBtn);
+    
     const col = columns.status || 'todo';
     if (col === 'in-progress') document.getElementById('in-progress-tasks').appendChild(el);
     else if (col === 'parked') document.getElementById('parked-tasks').appendChild(el);
     else if (col === 'done') document.getElementById('done-tasks').appendChild(el);
     else document.getElementById('todo-tasks').appendChild(el);
+    
     el.addEventListener('dragstart', e => {
       el.classList.add('dragging');
       e.dataTransfer.setData('text/plain', id);
@@ -71,6 +83,14 @@ async function updateTaskStatus(id, newStatus) {
     .update({ columns: updated })
     .eq('id', id);
   if (updateErr) console.error('Update error:', updateErr);
+}
+
+async function deleteTask(id) {
+  const { error } = await supabaseClient
+    .from('Kanban')
+    .delete()
+    .eq('id', id);
+  if (error) console.error('Delete error:', error);
 }
 
 function initDragEvents() {
