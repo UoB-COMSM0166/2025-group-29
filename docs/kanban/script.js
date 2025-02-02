@@ -29,6 +29,10 @@ function formatUKDate(dateInput) {
 }
 
 async function initializeBoard() {
+  // Set default deadline value to today in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('deadline-input').value = today;
+
   await fetchTasks();
   document.getElementById('add-todo-btn').addEventListener('click', async () => {
     const input = document.getElementById('todo-input');
@@ -43,7 +47,7 @@ async function initializeBoard() {
     if (title) {
       await addTask(title, 'todo', deadline);
       input.value = '';
-      deadlineInput.value = '';
+      deadlineInput.value = today;
       await fetchTasks();
     }
   });
