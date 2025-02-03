@@ -55,30 +55,39 @@ h1 {
   padding: 10px;
   border: 1px solid #eee;
   background: #fafafa;
+  align-items: center;
 }
 
 .add-task-area input[type="text"] {
   flex: 2;
-  padding: 8px;
+  padding: 6px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.add-task-area label {
+  font-size: 0.9rem;
+  margin-right: 4px;
 }
 
 .add-task-area input[type="date"] {
   flex: 1;
-  padding: 8px;
+  padding: 4px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .add-task-area button {
   flex: 1;
-  padding: 8px 16px;
+  padding: 4px 8px;
   border: none;
   background: #2563eb;
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.9rem;
   transition: background 0.2s ease;
 }
 
@@ -171,4 +180,26 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   text-align: center;
+}
+
+/* Username Options */
+.username-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.username-btn {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fdfdfd;
+  cursor: pointer;
+}
+
+.username-btn:hover {
+  background: #eaeaea;
 }

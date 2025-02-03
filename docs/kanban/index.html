@@ -10,16 +10,19 @@
   <div id="usernameModal" class="modal">
     <div class="modal-content">
       <h2>Select Your Username</h2>
-      <select id="usernameSelect">
-        <option value="Weihao Zeng">Weihao Zeng</option>
-        <option value="Lepeng Zhou">Lepeng Zhou</option>
-        <option value="Yichen Zhang">Yichen Zhang</option>
-        <option value="Guojie Liu">Guojie Liu</option>
-        <option value="Mengqiu">Mengqiu</option>
-        <option value="Chen Zhang">Chen Zhang</option>
-        <option value="Visitor">Visitor</option>
-      </select>
-      <button id="usernameSubmit">Submit</button>
+      <div class="username-options">
+        <button class="username-btn" data-username="Weihao Zeng">Weihao Zeng</button>
+        <button class="username-btn" data-username="Lepeng Zhou">Lepeng Zhou</button>
+        <button class="username-btn" data-username="Yichen Zhang">Yichen Zhang</button>
+        <button class="username-btn" data-username="Guojie Liu">Guojie Liu</button>
+        <button class="username-btn" data-username="Mengqiu">Mengqiu</button>
+        <button class="username-btn" data-username="Chen Zhang">Chen Zhang</button>
+        <button class="username-btn" data-username="Visitor">Visitor</button>
+      </div>
+      <div id="visitor-input" style="display: none;">
+        <input type="text" id="customUsername" placeholder="Enter your name" />
+        <button id="visitorSubmit">Submit</button>
+      </div>
     </div>
   </div>
 
@@ -46,6 +49,7 @@
   <!-- Add Task Area -->
   <div class="add-task-area">
     <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <label for="deadline-input">Deadline:</label>
     <input type="date" id="deadline-input" />
     <button id="add-todo-btn">Add</button>
   </div>

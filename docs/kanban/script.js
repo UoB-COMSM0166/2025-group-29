@@ -4,10 +4,26 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('usernameSubmit').addEventListener('click', async () => {
-    currentUser = document.getElementById('usernameSelect').value;
-    document.getElementById('usernameModal').style.display = 'none';
-    initializeBoard();
+  const usernameButtons = document.querySelectorAll('.username-btn');
+  usernameButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const username = btn.getAttribute('data-username');
+      if (username === 'Visitor') {
+        document.getElementById('visitor-input').style.display = 'block';
+      } else {
+        currentUser = username;
+        document.getElementById('usernameModal').style.display = 'none';
+        initializeBoard();
+      }
+    });
+  });
+  document.getElementById('visitorSubmit').addEventListener('click', () => {
+    const customName = document.getElementById('customUsername').value.trim();
+    if (customName) {
+      currentUser = customName;
+      document.getElementById('usernameModal').style.display = 'none';
+      initializeBoard();
+    }
   });
 });
 
@@ -29,10 +45,8 @@ function formatUKDate(dateInput) {
 }
 
 async function initializeBoard() {
-  // Set default deadline to today (YYYY-MM-DD)
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('deadline-input').value = today;
-
   await fetchTasks();
   document.getElementById('add-todo-btn').addEventListener('click', async () => {
     const input = document.getElementById('todo-input');
