@@ -45,31 +45,33 @@ h1 {
   min-height: 200px;
 }
 
-/* Input area with three columns: title, date, and button */
-.input-area {
+/* Add Task Area styled as a separate region */
+.add-task-area {
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
   display: flex;
   flex-direction: row;
   gap: 6px;
   padding: 10px;
-  border-top: 1px solid #eee;
+  border: 1px solid #eee;
   background: #fafafa;
 }
 
-.input-area input[type="text"] {
+.add-task-area input[type="text"] {
   flex: 2;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-.input-area input[type="date"] {
+.add-task-area input[type="date"] {
   flex: 1;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
 
-.input-area button {
+.add-task-area button {
   flex: 1;
   padding: 8px 16px;
   border: none;
@@ -80,7 +82,7 @@ h1 {
   transition: background 0.2s ease;
 }
 
-.input-area button:hover {
+.add-task-area button:hover {
   background: #1e4bb8;
 }
 

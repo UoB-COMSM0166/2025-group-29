@@ -29,7 +29,7 @@ function formatUKDate(dateInput) {
 }
 
 async function initializeBoard() {
-  // Set default deadline value to today in YYYY-MM-DD format
+  // Set default deadline to today (YYYY-MM-DD)
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('deadline-input').value = today;
 

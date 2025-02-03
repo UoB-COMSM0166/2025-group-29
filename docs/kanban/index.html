@@ -28,11 +28,6 @@
     <div class="column" id="todo-column">
       <h2>Not Start</h2>
       <div class="tasks" id="todo-tasks"></div>
-      <div class="input-area">
-        <input type="text" id="todo-input" placeholder="Add a new task..." />
-        <input type="date" id="deadline-input" />
-        <button id="add-todo-btn">Add</button>
-      </div>
     </div>
     <div class="column" id="in-progress-column">
       <h2>In Progress</h2>
@@ -48,11 +43,18 @@
     </div>
   </div>
 
+  <!-- Add Task Area -->
+  <div class="add-task-area">
+    <input type="text" id="todo-input" placeholder="Add a new task..." />
+    <input type="date" id="deadline-input" />
+    <button id="add-todo-btn">Add</button>
+  </div>
+
   <!-- Instruction Section -->
   <div class="instructions">
     <h2>How to Use the Kanban Board</h2>
     <p>
-      <strong>Add Task:</strong> Enter a task title and select a deadline (dd/mm/yyyy) under the "Not Start" column and click "Add".
+      <strong>Add Task:</strong> Enter a task title and select a deadline (dd/mm/yyyy) in the add area and click "Add".
     </p>
     <p>
       <strong>Move Task:</strong> Drag and drop a task card from one column to another to update its status.
