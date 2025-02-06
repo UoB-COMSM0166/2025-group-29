@@ -26,52 +26,54 @@
     </div>
   </div>
 
-  <h1>Group 29 Kanban Board</h1>
-  <div class="board">
-    <div class="column" id="todo-column">
-      <h2>Not Start</h2>
-      <div class="tasks" id="todo-tasks"></div>
+  <div class="container">
+    <h1>Group 29 Kanban Board</h1>
+    <div class="board">
+      <div class="column" id="todo-column">
+        <h2>Not Start</h2>
+        <div class="tasks" id="todo-tasks"></div>
+      </div>
+      <div class="column" id="in-progress-column">
+        <h2>In Progress</h2>
+        <div class="tasks" id="in-progress-tasks"></div>
+      </div>
+      <div class="column" id="parked-column">
+        <h2>Parked</h2>
+        <div class="tasks" id="parked-tasks"></div>
+      </div>
+      <div class="column" id="done-column">
+        <h2>Done</h2>
+        <div class="tasks" id="done-tasks"></div>
+      </div>
     </div>
-    <div class="column" id="in-progress-column">
-      <h2>In Progress</h2>
-      <div class="tasks" id="in-progress-tasks"></div>
-    </div>
-    <div class="column" id="parked-column">
-      <h2>Parked</h2>
-      <div class="tasks" id="parked-tasks"></div>
-    </div>
-    <div class="column" id="done-column">
-      <h2>Done</h2>
-      <div class="tasks" id="done-tasks"></div>
-    </div>
-  </div>
 
-  <!-- Add Task Area -->
-  <div class="add-task-area">
-    <input type="text" id="todo-input" placeholder="Add a new task..." />
-    <label for="deadline-input">Deadline:</label>
-    <input type="date" id="deadline-input" />
-    <button id="add-todo-btn">Add</button>
-  </div>
+    <!-- Add Task Area -->
+    <div class="add-task-area">
+      <input type="text" id="todo-input" placeholder="Add a new task..." />
+      <label for="deadline-input">Deadline:</label>
+      <input type="date" id="deadline-input" />
+      <button id="add-todo-btn">Add</button>
+    </div>
 
-  <!-- Instruction Section -->
-  <div class="instructions">
-    <h2>How to Use the Kanban Board</h2>
-    <p>
-      <strong>Add Task:</strong> Enter a task title and select a deadline (dd/mm/yyyy) in the add area and click "Add".
-    </p>
-    <p>
-      <strong>Move Task:</strong> Drag and drop a task card from one column to another to update its status.
-    </p>
-    <p>
-      <strong>Delete Task:</strong> Hover over a task card and click the "Delete" button to remove the task.
-    </p>
-    <p>
-      <strong>Columns Explained:</strong> "Not Start" for tasks not yet begun, "In Progress" for ongoing tasks, "Parked" for tasks on hold, and "Done" for completed tasks.
-    </p>
-    <p>
-      Use this board to effectively manage your workflow and track your progress.
-    </p>
+    <!-- Instruction Section -->
+    <div class="instructions">
+      <h2>How to Use the Kanban Board</h2>
+      <p>
+        <strong>Add Task:</strong> Enter a task title and select a deadline (dd/mm/yyyy) in the add area and click "Add".
+      </p>
+      <p>
+        <strong>Move Task:</strong> Drag and drop a task card from one column to another to update its status.
+      </p>
+      <p>
+        <strong>Delete Task:</strong> Hover over a task card and click the "Delete" button to remove the task.
+      </p>
+      <p>
+        <strong>Columns Explained:</strong> "Not Start" for tasks not yet begun, "In Progress" for ongoing tasks, "Parked" for tasks on hold, and "Done" for completed tasks.
+      </p>
+      <p>
+        Use this board to effectively manage your workflow and track your progress.
+      </p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js" defer></script>

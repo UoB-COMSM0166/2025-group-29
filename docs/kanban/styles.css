@@ -5,6 +5,13 @@ body {
   background: linear-gradient(135deg, #dae2f8 0%, #d6a4a4 100%);
 }
 
+/* Container for strict alignment */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 /* Header */
 h1 {
   text-align: center;
@@ -17,9 +24,7 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 20px;
-  padding: 0 20px 40px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding-bottom: 40px;
 }
 
 /* Column Styles (MacOS style with frosted glass effect) */
@@ -53,8 +58,6 @@ h1 {
 
 /* Add Task Area */
 .add-task-area {
-  max-width: 1200px;
-  margin: 0 auto 20px auto;
   display: flex;
   flex-direction: row;
   gap: 6px;
@@ -64,6 +67,7 @@ h1 {
   backdrop-filter: blur(10px);
   align-items: center;
   border-radius: 12px;
+  margin-bottom: 20px;
 }
 
 .add-task-area input[type="text"] {
@@ -154,13 +158,12 @@ h1 {
 
 /* Instruction Section */
 .instructions {
-  margin: 20px auto;
-  max-width: 1200px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .instructions h2 {
