@@ -1,109 +1,66 @@
-/* styles/index.css */
-/*
-  This file is specific to the index.html page.
-  We keep all container, circles, buttons, etc. here.
-*/
-
 /* Container styling */
 .container {
-    position: relative;
-    width: 90vw;
-    max-width: 1840px;
-    height: 90vh;
-    max-height: 1000px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 5vh 5vw;
-    box-sizing: border-box;
-  }
-  
-  /* Title and footer text alignment */
-  .title,
-  .footer-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-left: 0vw; /* Align with left circle if needed */
-  }
-  
-  /* Font sizes and colors for title text */
-  .group-title {
-    color: #E1EEE6;
-    font-size: 8vw;
-    font-weight: 700;
-    line-height: 1;
-    word-wrap: break-word;
-  }
-  .game-list {
-    color: #00CE93;
-    font-size: 8vw;
-    font-weight: 700;
-    line-height: 1;
-    word-wrap: break-word;
-  }
-  
-  /* Footer text */
-  .footer-text {
-    position: absolute;
-    bottom: 15%;
-    left: 2vw;
-    color: #E1EEE6;
-    font-size: 2vw;
-    font-weight: 400;
-    line-height: 1.2;
-  }
-  
-  /* Decorative circles */
-  .circle {
-    position: absolute;
-    width: 5vw;
-    height: 5vw;
-    background: #E1EEE6;
-    border-radius: 50%;
-  }
-  .circle.left {
-    left: 2%;
-    bottom: 2%;
-  }
-  .circle.right {
-    right: 2%;
-    bottom: 2%;
-  }
-  
-  /* Navigation Buttons (Circular Style) */
-  .nav-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4vw;
-    height: 4vw;
-    font-size: 2vw;
-    font-weight: bold;
-    background-color: #B0B0B0;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    color: black;
-    opacity: 0.05; /* Default transparency */
-    transition: opacity 0.3s ease-in-out;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  /* Left button */
-  .left-btn {
-    left: 7%;
-  }
-  
-  /* Right button */
-  .right-btn {
-    right: 7%;
-  }
-  
-  /* Increase button opacity on hover/focus */
-  .nav-button:hover,
-  .nav-button:focus {
-    opacity: 1;
-  }
+  position: relative;
+  width: 90vw;
+  max-width: 1840px;
+  height: 90vh;
+  max-height: 1000px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5vh 7vw; 
+  box-sizing: border-box;
+}
+
+/* Title alignment */
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.group-title {
+  color: #E1EEE6;
+  font-size: 8vw;
+  font-weight: 700;
+  line-height: 1;
+  word-wrap: break-word;
+}
+
+.game-list {
+  color: #00CE93;
+  font-size: 8vw;
+  font-weight: 700;
+  line-height: 1;
+  word-wrap: break-word;
+}
+
+/* Footer text alignment */
+.footer-text {
+  position: absolute;
+  bottom: 15%;
+  left: 7vw;  
+  color: #E1EEE6;
+  font-size: 2vw;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* Decorative circles */
+.circle {
+  position: absolute;
+  width: 5vw;
+  height: 5vw;
+  background: #E1EEE6;
+  border-radius: 50%;
+}
+
+.circle.left {
+  left: 7%; 、
+  bottom: 2%;
+}
+
+.circle.right {
+  right: 7%; 
+  bottom: 2%;
+}

@@ -1,20 +1,41 @@
-/* global.css */
+/* Global base CSS */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  font-family: Arial, sans-serif;
+}
 
-html, body {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    background: black;
-    font-family: "DM Sans", sans-serif;
+/* Navigation Buttons (shared across pages) */
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4vw;
+  height: 4vw;
+  font-size: 2vw;
+  font-weight: bold;
+  background-color: #B0B0B0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: black;
+  opacity: 0.05;
+  transition: opacity 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    /* Center content */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-  }
+.left-btn {
+  left: 7%;
+}
+
+.right-btn {
+  right: 7%;
+}
+
+.nav-button:hover,
+.nav-button:focus {
+  opacity: 1;
+}
