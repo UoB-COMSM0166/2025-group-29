@@ -39,7 +39,7 @@
 .footer-text {
   position: absolute;
   bottom: 15%;
-  left: 7vw;  
+  left: 7vw;
   color: #E1EEE6;
   font-size: 2vw;
   font-weight: 400;
@@ -48,19 +48,18 @@
 
 /* Decorative circles */
 .circle {
-  position: absolute;
+  position: fixed; /* Changed to fixed for viewport alignment */
   width: 5vw;
   height: 5vw;
   background: #E1EEE6;
   border-radius: 50%;
+  bottom: 10%;
 }
 
 .circle.left {
-  left: 7%; 、
-  bottom: 2%;
+  left: 7%;
 }
 
 .circle.right {
-  right: 7%; 
-  bottom: 2%;
+  right: 7%;
 }
