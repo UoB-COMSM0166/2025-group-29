@@ -1,0 +1,282 @@
+/* Ensure page background is not pure black */
+body {
+    background-color: #E1EEE6 !important;
+  }
+  
+  /* Page02 Container */
+  .page02-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #E1EEE6;
+  }
+  
+  /* Title */
+  .page02-title {
+    position: absolute;
+    left: 2.1vw;       /* 40px -> ~2.1vw */
+    top: 2vh;          /* 20px -> ~2vh */
+    color: black;
+    font-size: 2.5vw;   /* 48px -> ~2.5vw */
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    line-height: 3vw;   /* 57.6px -> ~3vw */
+    word-wrap: break-word;
+  }
+  
+  /* Image Container 1 */
+  .page02-img-container1 {
+    position: absolute;
+    width: 15.2vw;     /* 291px -> ~15.2vw */
+    height: 15.2vw;
+    left: 1.9vw;       /* 36px -> ~1.9vw */
+    top: 22.9vh;       /* 247px -> ~22.9vh */
+    border-radius: 50%;
+    overflow: hidden;
+    background-image: url(https://via.placeholder.com/291x291);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .page02-img1 {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Caption 1 */
+  .page02-caption1 {
+    position: absolute;
+    width: 15.2vw;
+    left: 1.9vw;
+    top: 53.2vh;       /* 575px -> ~53.2vh */
+    text-align: center;
+    color: black;
+    font-size: 1.2vw;  /* 22px -> ~1.2vw */
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  /* Description 1 */
+  .page02-description1 {
+    position: absolute;
+    width: 15.2vw;
+    left: 1.9vw;
+    top: 62vh;         /* 669px -> ~62vh */
+    text-align: center;
+    color: black;
+    font-size: 1.3vw;  /* 24px -> ~1.3vw */
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.8vw;/* 33.6px -> ~1.8vw */
+    word-wrap: break-word;
+  }
+  
+  /* Image Container 2 */
+  .page02-img-container2 {
+    position: absolute;
+    width: 15.2vw;
+    height: 15.2vw;
+    left: 22.2vw;      /* 425.25px -> ~22.2vw */
+    top: 22.9vh;
+    border-radius: 50%;
+    overflow: hidden;
+    background-image: url(https://via.placeholder.com/291x291);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .page02-img2 {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Caption 2 */
+  .page02-caption2 {
+    position: absolute;
+    width: 15.2vw;
+    left: 22.2vw;
+    top: 53.2vh;
+    text-align: center;
+    color: black;
+    font-size: 1.2vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  /* Description 2 */
+  .page02-description2 {
+    position: absolute;
+    width: 15.2vw;
+    left: 22.2vw;
+    top: 62vh;
+    text-align: center;
+    color: black;
+    font-size: 1.3vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.8vw;
+    word-wrap: break-word;
+  }
+  
+  /* Image Container 3 */
+  .page02-img-container3 {
+    position: absolute;
+    width: 15.2vw;
+    height: 15.2vw;
+    left: 42.4vw;      /* 814.50px -> ~42.4vw */
+    top: 22.9vh;
+    border-radius: 50%;
+    overflow: hidden;
+    background-image: url(https://via.placeholder.com/291x291);
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .page02-img3 {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Caption 3 */
+  .page02-caption3 {
+    position: absolute;
+    width: 15.2vw;
+    left: 42.4vw;
+    top: 53.2vh;
+    text-align: center;
+    color: black;
+    font-size: 1.2vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  /* Description 3 */
+  .page02-description3 {
+    position: absolute;
+    width: 15.2vw;
+    left: 42.4vw;
+    top: 62vh;
+    text-align: center;
+    color: black;
+    font-size: 1.3vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.8vw;
+    word-wrap: break-word;
+  }
+  
+  /* Image Container 4 */
+  .page02-img-container4 {
+    position: absolute;
+    width: 15.2vw;
+    height: 15.2vw;
+    left: 62.7vw;      /* 1203.75px -> ~62.7vw */
+    top: 22.9vh;
+    border-radius: 50%;
+    overflow: hidden;
+    background-image: url(https://via.placeholder.com/291x291);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .page02-img4 {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Caption 4 */
+  .page02-caption4 {
+    position: absolute;
+    width: 15.2vw;
+    left: 62.7vw;
+    top: 53.2vh;
+    text-align: center;
+    color: black;
+    font-size: 1.2vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  /* Description 4 */
+  .page02-description4 {
+    position: absolute;
+    width: 15.2vw;
+    left: 62.7vw;
+    top: 62vh;
+    text-align: center;
+    color: black;
+    font-size: 1.3vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.8vw;
+    word-wrap: break-word;
+  }
+  
+  /* Image Container 5 */
+  .page02-img-container5 {
+    position: absolute;
+    width: 15.2vw;
+    height: 15.2vw;
+    left: 83.0vw;      /* 1593px -> ~83.0vw */
+    top: 22.9vh;
+    border-radius: 50%;
+    overflow: hidden;
+    background-image: url(https://via.placeholder.com/291x291);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .page02-img5 {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Caption 5 */
+  .page02-caption5 {
+    position: absolute;
+    width: 15.2vw;
+    left: 83.0vw;
+    top: 53.2vh;
+    text-align: center;
+    color: black;
+    font-size: 1.2vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  /* Description 5 */
+  .page02-description5 {
+    position: absolute;
+    width: 15.2vw;
+    left: 83.0vw;
+    top: 62vh;
+    text-align: center;
+    color: black;
+    font-size: 1.3vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.8vw;
+    word-wrap: break-word;
+  }
+  
+  /* Footer */
+  .page02-footer-left {
+    position: absolute;
+    left: 2.1vw;       /* 40px -> ~2.1vw */
+    top: 95.5vh;       /* 1031px -> ~95.5vh */
+    color: black;
+    font-size: 1.15vw; /* 22px -> ~1.15vw */
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  .page02-footer-right {
+    position: absolute;
+    left: 41.5vw;      /* 796px -> ~41.5vw */
+    top: 95.5vh;
+    color: black;
+    font-size: 1.15vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
