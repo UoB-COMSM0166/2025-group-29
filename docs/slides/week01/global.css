@@ -20,11 +20,12 @@ body {
   border-radius: 50%;
   cursor: pointer;
   color: black;
-  opacity: 0.05;
+  opacity: 0.2; /* 修改：默认透明度调整为 0.2 */
   transition: opacity 0.3s ease-in-out;
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .left-btn {
