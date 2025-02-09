@@ -1,9 +1,10 @@
+/* Ensure the page background is not pure black */
 body {
     background-color: #E1EEE6 !important;
   }
   
-  /* Page02 Container */
-  .page02-container {
+  /* Page03 Container */
+  .page03-container {
     width: 100%;
     height: 100%;
     position: relative;
@@ -11,86 +12,85 @@ body {
   }
   
   /* Title */
-  .page02-title {
+  .page03-title {
     position: absolute;
-    left: 2.1vw;       /* 40px -> ~2.1vw */
-    top: 2vh;          /* 20px -> ~2vh */
+    left: 2.1vw;       /* ~40px */
+    top: 2vh;          /* ~20px */
     color: black;
-    font-size: 2.5vw;   /* 48px -> ~2.5vw */
+    font-size: 2.5vw;   /* ~48px */
     font-family: 'DM Sans', sans-serif;
     font-weight: 700;
-    line-height: 3vw;   /* 57.6px -> ~3vw */
+    line-height: 3vw;   /* ~57.6px */
     word-wrap: break-word;
   }
   
   /* Image Container 1 */
-  .page02-img-container1 {
+  .page03-img-container1 {
     position: absolute;
-    width: 15.2vw;     /* 291px -> ~15.2vw */
+    width: 15.2vw;     /* ~291px */
     height: 15.2vw;
-    left: 1.9vw;       /* 36px -> ~1.9vw */
-    top: 22.9vh;       /* 247px -> ~22.9vh */
+    left: 1.9vw;       /* ~36px */
+    top: 22.9vh;       /* ~247px */
     border-radius: 50%;
     overflow: hidden;
-    background-image: url(https://via.placeholder.com/291x291);
+    background-image: url(https://via.placeholder.com/341x292);
     display: inline-flex;
     justify-content: center;
     align-items: center;
   }
-  .page02-img1 {
+  .page03-img1 {
     width: 100%;
     height: auto;
   }
   
-  /* Caption 1 */
-  .page02-caption1 {
+  /* Caption 1 and Description 1 */
+  .page03-caption1 {
     position: absolute;
     width: 15.2vw;
     left: 1.9vw;
-    top: 53.2vh;       /* 575px -> ~53.2vh */
+    top: 53.2vh;       /* ~575px */
     text-align: center;
     color: black;
-    font-size: 1.2vw;  /* 22px -> ~1.2vw */
+    font-size: 1.2vw;  /* ~22px */
     font-family: 'DM Sans', sans-serif;
     font-weight: 500;
     word-wrap: break-word;
   }
-  /* Description 1 */
-  .page02-description1 {
+  .page03-description1 {
     position: absolute;
     width: 15.2vw;
     left: 1.9vw;
-    top: 62vh;         /* 669px -> ~62vh */
+    top: 62vh;         /* ~669px */
     text-align: center;
     color: black;
-    font-size: 1.3vw;  
+    font-size: 1.3vw;  /* ~24px */
     font-family: 'DM Sans', sans-serif;
     font-weight: 400;
-    line-height: 1.8vw;
+    line-height: 1.8vw;/* ~33.6px */
     word-wrap: break-word;
   }
   
   /* Image Container 2 */
-  .page02-img-container2 {
+  .page03-img-container2 {
     position: absolute;
     width: 15.2vw;
     height: 15.2vw;
-    left: 22.2vw;      
+    left: 22.2vw;      /* ~425px */
     top: 22.9vh;
     border-radius: 50%;
     overflow: hidden;
-    background-image: url(https://via.placeholder.com/291x291);
+    background-image: url(https://via.placeholder.com/389x292);
     display: inline-flex;
     justify-content: center;
     align-items: center;
   }
-  .page02-img2 {
+  .page03-img2 {
     width: 100%;
     height: auto;
   }
   
-  /* Caption 2 */
-  .page02-caption2 {
+  /* Caption 2 and Description 2 */
+  .page03-caption2 {
     position: absolute;
     width: 15.2vw;
     left: 22.2vw;
@@ -102,8 +102,7 @@ body {
     font-weight: 500;
     word-wrap: break-word;
   }
-  /* Description 2 */
-  .page02-description2 {
+  .page03-description2 {
     position: absolute;
     width: 15.2vw;
     left: 22.2vw;
@@ -118,26 +117,26 @@ body {
   }
   
   /* Image Container 3 */
-  .page02-img-container3 {
+  .page03-img-container3 {
     position: absolute;
     width: 15.2vw;
     height: 15.2vw;
-    left: 42.4vw;     
+    left: 42.4vw;      /* ~814.5px */
     top: 22.9vh;
     border-radius: 50%;
     overflow: hidden;
-    background-image: url(https://via.placeholder.com/291x291);
+    background-image: url(https://via.placeholder.com/436x291);
     display: inline-flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
   }
-  .page02-img3 {
+  .page03-img3 {
     width: 100%;
     height: auto;
   }
   
-  /* Caption 3 */
-  .page02-caption3 {
+  /* Caption 3 and Description 3 */
+  .page03-caption3 {
     position: absolute;
     width: 15.2vw;
     left: 42.4vw;
@@ -149,8 +148,7 @@ body {
     font-weight: 500;
     word-wrap: break-word;
   }
-  /* Description 3 */
-  .page02-description3 {
+  .page03-description3 {
     position: absolute;
     width: 15.2vw;
     left: 42.4vw;
@@ -165,26 +163,26 @@ body {
   }
   
   /* Image Container 4 */
-  .page02-img-container4 {
+  .page03-img-container4 {
     position: absolute;
     width: 15.2vw;
     height: 15.2vw;
-    left: 62.7vw;     
+    left: 62.7vw;      /* ~1203.75px */
     top: 22.9vh;
     border-radius: 50%;
     overflow: hidden;
-    background-image: url(https://via.placeholder.com/291x291);
+    background-image: url(https://via.placeholder.com/515x289);
     display: inline-flex;
     justify-content: center;
     align-items: center;
   }
-  .page02-img4 {
+  .page03-img4 {
     width: 100%;
     height: auto;
   }
   
-  /* Caption 4 */
-  .page02-caption4 {
+  /* Caption 4 and Description 4 */
+  .page03-caption4 {
     position: absolute;
     width: 15.2vw;
     left: 62.7vw;
@@ -196,8 +194,7 @@ body {
     font-weight: 500;
     word-wrap: break-word;
   }
-  /* Description 4 */
-  .page02-description4 {
+  .page03-description4 {
     position: absolute;
     width: 15.2vw;
     left: 62.7vw;
@@ -212,11 +209,11 @@ body {
   }
   
   /* Image Container 5 */
-  .page02-img-container5 {
+  .page03-img-container5 {
     position: absolute;
     width: 15.2vw;
     height: 15.2vw;
-    left: 83.0vw;      
+    left: 83.0vw;      /* ~1593px */
     top: 22.9vh;
     border-radius: 50%;
     overflow: hidden;
@@ -225,13 +222,13 @@ body {
     justify-content: center;
     align-items: center;
   }
-  .page02-img5 {
+  .page03-img5 {
     width: 100%;
     height: auto;
   }
   
-  /* Caption 5 */
-  .page02-caption5 {
+  /* Caption 5 and Description 5 */
+  .page03-caption5 {
     position: absolute;
     width: 15.2vw;
     left: 83.0vw;
@@ -243,8 +240,7 @@ body {
     font-weight: 500;
     word-wrap: break-word;
   }
-  /* Description 5 */
-  .page02-description5 {
+  .page03-description5 {
     position: absolute;
     width: 15.2vw;
     left: 83.0vw;
@@ -259,19 +255,19 @@ body {
   }
   
   /* Footer */
-  .page02-footer-left {
+  .page03-footer-left {
     position: absolute;
-    left: 2.1vw;       
-    top: 95.5vh;       
+    left: 2.1vw;
+    top: 95.5vh;
     color: black;
-    font-size: 1.15vw; 
+    font-size: 1.15vw;
     font-family: 'DM Sans', sans-serif;
     font-weight: 500;
     word-wrap: break-word;
   }
-  .page02-footer-right {
+  .page03-footer-right {
     position: absolute;
-    left: 41.5vw;      
+    left: 41.5vw;
     top: 95.5vh;
     color: black;
     font-size: 1.15vw;
