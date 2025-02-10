@@ -76,8 +76,45 @@ Add a group photo here!
 
 ### Requirements 
 
-- 15% ~750 words
-- Use case diagrams, user stories. Early stages design. Ideation process. How did you decide as a team what to develop? 
+- **As a player**
+    
+    > “I want the game to have a skill tree system so that I can choose and upgrade skills according to my playstyle and enhance my character's abilities. “
+    > 
+    
+    > “I want the game to have a complete storyline so that I can immerse myself in the game world and enjoy a rich narrative experience. “
+    > 
+    
+    > “I want the game to have a skin system so that I can customize the appearance of my character or equipment for a more personalized experience. “
+    > 
+    
+    > “I want the game to have multiple playable characters, each with unique traits, so that I can choose the one that best fits my playstyle.  “
+    > 
+- **As a developer**
+    
+    > “I want players to enjoy our game.”
+    > 
+    
+    > “I want to gain development skills.”
+    > 
+    
+    > “I want to plan my time well and participate in quality teamworking.”
+    > 
+    
+    > “I want to be a positive role model for the next cohort. “
+    > 
+    
+    > “I want players to participate in early access testing for each version so that we can gather feedback and improve game balance patches.”
+    > 
+- **As a marker for this project,**
+    
+    > “I want to experience all core game mechanics in the shortest possible time.”
+    > 
+    
+    > “I want to see a game that has something new and innovative, not just a simple copy of an existing game.”
+    > 
+    
+    > “ I want to immerse myself in the game as quickly as possible after entering the main interface. “
+    >
 
 ### Design
 
