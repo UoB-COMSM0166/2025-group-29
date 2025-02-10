@@ -1,0 +1,78 @@
+body {
+    background-color: #E2E2E2 !important;
+  }
+  .page04-container {
+    position: relative;
+    width: 100vw;
+    height: calc(100vw * 1080 / 1920);
+    background: #E2E2E2;
+  }
+  .page04-title {
+    position: absolute;
+    left: 2.1vw;
+    top: 1.85vh;
+    width: 18.6vw;
+    color: black;
+    font-size: 2.5vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    line-height: 3vw;
+    word-wrap: break-word;
+  }
+  .page04-column {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 2.6vw;
+    width: 29.2vw;
+  }
+  .column1 {
+    left: 2vw;
+    top: 29.3vh;
+  }
+  .column2 {
+    left: 34.1vw;
+    top: 29.3vh;
+  }
+  .column3 {
+    left: 66.9vw;
+    top: 29.3vh;
+  }
+  .page04-challenge-title {
+    width: 100%;
+    color: black;
+    font-size: 2.5vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 3vw;
+    word-wrap: break-word;
+  }
+  .page04-challenge-desc {
+    width: 100%;
+    color: black;
+    font-size: 1.9vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 2.44vw;
+    word-wrap: break-word;
+  }
+  .page04-footer-left {
+    position: absolute;
+    left: 2.1vw;
+    top: 95.5vh;
+    color: black;
+    font-size: 1.15vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
+  .page04-footer-right {
+    position: absolute;
+    left: 41.5vw;
+    top: 95.5vh;
+    color: black;
+    font-size: 1.15vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+  }
