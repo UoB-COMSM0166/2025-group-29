@@ -1,0 +1,73 @@
+body {
+    background-color: black !important;
+  }
+  .page06-container {
+    position: relative;
+    width: 100vw;
+    height: calc(100vw * 1080 / 1920);
+    background: black;
+  }
+  .page06-logo-container {
+    position: absolute;
+    height: 4.95vw;
+    left: 60.52vw;
+    top: 68.84vh;
+    border-radius: 50%;
+    overflow: hidden;
+    background-image: url(https://placehold.co/95x95);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .page06-logo {
+    width: 8.8vw;
+    height: auto;
+  }
+  .page06-logo-caption {
+    position: absolute;
+    width: 30.31vw;
+    left: 66.56vw;
+    top: 67.87vh;
+    color: #E1EEE6;
+    font-size: 2.5vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 3vw;
+    word-wrap: break-word;
+    text-align: left;
+  }
+  .page06-quote {
+    position: absolute;
+    width: 91.67vw;
+    left: 4.17vw;
+    top: 1.85vh;
+    color: #E1EEE6;
+    font-size: 6.67vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    line-height: 8vw;
+    word-wrap: break-word;
+    text-align: left;
+  }
+  .page06-footer-left {
+    position: absolute;
+    left: 2.08vw;
+    top: 95.46vh;
+    color: black;
+    font-size: 1.15vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+    text-align: left;
+  }
+  .page06-footer-right {
+    position: absolute;
+    left: 41.46vw;
+    top: 95.46vh;
+    color: black;
+    font-size: 1.15vw;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    word-wrap: break-word;
+    text-align: left;
+  }
