@@ -33,7 +33,7 @@
 
 #### **Kanban Board**  
 - **Kanban Board (Figma)** ➡️ [View Here](https://www.figma.com/design/uZFMOPOv60n7bGkatZXVJs/Kanban-Board?node-id=0-1&t=1nYHQSl2tX5kk12n-1)  
-- **HTML Version** ➡️ [View Here](https://zengweihaooo.github.io/JavaScriptGame/kanban/week02.html)
+- **HTML Version** ➡️ [View Here](https://zengweihaooo.github.io/JavaScriptGame/kanban/index.html)
 
 #### **Drawing App**  
 - **Try the App** ➡️ [Play Here](https://zengweihaooo.github.io/JavaScriptGame/games/week02_sketch/index.html)
