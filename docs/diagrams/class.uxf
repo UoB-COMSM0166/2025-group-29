@@ -1,38 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="15.1">
-  <zoom_level>10</zoom_level>
-  <element>
-    <id>UMLActor</id>
-    <coordinates>
-      <x>440</x>
-      <y>300</y>
-      <w>60</w>
-      <h>110</h>
-    </coordinates>
-    <panel_attributes>Actor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>530</x>
-      <y>320</y>
-      <w>240</w>
-      <h>50</h>
-    </coordinates>
-    <panel_attributes>lt=.&gt;
-&lt;&lt;extends&gt;&gt;</panel_attributes>
-    <additional_attributes>134.0;10.0;10.0;30.0;220.0;20.0</additional_attributes>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>650</x>
-      <y>370</y>
-      <w>100</w>
-      <h>80</h>
-    </coordinates>
-    <panel_attributes>// Text Element
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLActor</id><coordinates><x>440</x><y>300</y><w>60</w><h>110</h></coordinates><panel_attributes>Actor</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>530</x><y>320</y><w>240</w><h>50</h></coordinates><panel_attributes>lt=.&gt;
+&lt;&lt;extends&gt;&gt;</panel_attributes><additional_attributes>134;10;10;30;220;20</additional_attributes></element><element><id>Text</id><coordinates><x>650</x><y>370</y><w>100</w><h>80</h></coordinates><panel_attributes>// Text Element
 // DB Symbol
 _umletcode=
 fg='black';
@@ -51,32 +18,4 @@ drawArc(0,height*1/5,width,height*2/5,180,180,true)  //Parameters (x, y, width, 
 drawArc(0,height*2/5,width,height*2/5,180,180,true)  //Parameters (x, y, width, height, start, extent, open)
 bg='#222222'
 drawArc(0,height*3/5,width,height*2/5,180,180,true)  //Parameters (x, y, width, height, start, extent, open)
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLActor</id>
-    <coordinates>
-      <x>800</x>
-      <y>280</y>
-      <w>60</w>
-      <h>110</h>
-    </coordinates>
-    <panel_attributes>Actor</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>150</x>
-      <y>240</y>
-      <w>210</w>
-      <h>70</h>
-    </coordinates>
-    <panel_attributes>_object: Class_
---
-id: Long="36548"
-[waiting for message]</panel_attributes>
-    <additional_attributes/>
-  </element>
-</diagram>
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLActor</id><coordinates><x>800</x><y>280</y><w>60</w><h>110</h></coordinates><panel_attributes>Actor</panel_attributes><additional_attributes></additional_attributes></element></diagram>
