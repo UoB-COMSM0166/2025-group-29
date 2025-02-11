@@ -1,1 +1,2 @@
-<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLActor</id><coordinates><x>440</x><y>300</y><w>60</w><h>110</h></coordinates><panel_attributes>Actor</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLActor</id><coordinates><x>440</x><y>300</y><w>60</w><h>110</h></coordinates><panel_attributes>Actor</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>530</x><y>320</y><w>240</w><h>50</h></coordinates><panel_attributes>lt=.&gt;
+&lt;&lt;extends&gt;&gt;</panel_attributes><additional_attributes>134;10;10;30;220;20</additional_attributes></element></diagram>
