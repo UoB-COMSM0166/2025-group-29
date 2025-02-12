@@ -18,4 +18,17 @@ drawArc(0,height*1/5,width,height*2/5,180,180,true)  //Parameters (x, y, width, 
 drawArc(0,height*2/5,width,height*2/5,180,180,true)  //Parameters (x, y, width, height, start, extent, open)
 bg='#222222'
 drawArc(0,height*3/5,width,height*2/5,180,180,true)  //Parameters (x, y, width, height, start, extent, open)
-</panel_attributes><additional_attributes></additional_attributes></element></diagram>
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>500</x><y>520</y><w>140</w><h>70</h></coordinates><panel_attributes>Package 1
+78
+558
+566995</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>640</x><y>520</y><w>140</w><h>70</h></coordinates><panel_attributes>Package 1
+--
+-Content 1
++Content 2
+bg=gray
+fg=red</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLPackage</id><coordinates><x>780</x><y>520</y><w>140</w><h>70</h></coordinates><panel_attributes>Package 1
+--
+-Content 1
++Content 2
+bg=gray
+fg=red</panel_attributes><additional_attributes></additional_attributes></element></diagram>
