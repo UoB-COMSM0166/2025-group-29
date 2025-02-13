@@ -1,0 +1,82 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>UI and Interaction</help_text><element><id>UMLClass</id><coordinates><x>550</x><y>40</y><w>300</w><h>120</h></coordinates><panel_attributes>Game
+--
+Cells; 
+Map; 
+Game Logic;
+Level Manager; 
+UI;
+--
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>510</x><y>210</y><w>210</w><h>150</h></coordinates><panel_attributes>Monsters
+--
+position(x,y)
+float size;
+float speed;
+
+--
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>250</x><y>370</y><w>140</w><h>130</h></coordinates><panel_attributes>PlayerMonsters
+--
+int points;
+int id;
+int ranking;
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>460</x><y>430</y><w>210</w><h>80</h></coordinates><panel_attributes>Enemy
+--
+
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>280</x><y>570</y><w>230</w><h>130</h></coordinates><panel_attributes>BossMonsters
+--
+int level;
+vector&lt;string&gt; abilities; #特殊技能列表
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>540</x><y>590</y><w>210</w><h>110</h></coordinates><panel_attributes>OtherPlayers
+--
+int points;
+int id;
+int ranking;
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>920</x><y>410</y><w>170</w><h>110</h></coordinates><panel_attributes>Food
+--
+point()
+skill()
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>960</x><y>560</y><w>110</w><h>70</h></coordinates><panel_attributes>NormalFood
+--
+
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>820</x><y>560</y><w>100</w><h>70</h></coordinates><panel_attributes>TrapFood
+--
+
+--
+reduceSpeed();
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1090</x><y>560</y><w>120</w><h>70</h></coordinates><panel_attributes>PowerFood
+--
+
+--
+BoostSpeed();</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>990</x><y>130</y><w>150</w><h>140</h></coordinates><panel_attributes>Map
+--
+width
+height
+--
+addObject();
+removeObject();</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>160</x><y>70</y><w>210</w><h>160</h></coordinates><panel_attributes>LevelManager
+--
+currentLevel();
+totalLevel();
+loadNextLevel();
+CheckWinCondition();
+CheckUnlockCondition();
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>530</y><w>210</w><h>110</h></coordinates><panel_attributes>Game Logic
+--
+AIController();
+PhysicsEngine();
+SplitCentreLocation();
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>380</x><y>330</y><w>140</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;120;10</additional_attributes></element><element><id>Relation</id><coordinates><x>600</x><y>360</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>370</x><y>510</y><w>120</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;100;10</additional_attributes></element><element><id>Relation</id><coordinates><x>580</x><y>520</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>840</x><y>500</y><w>90</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;70;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1000</x><y>510</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1090</x><y>500</y><w>80</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>60;50;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>20</x><y>270</y><w>210</w><h>70</h></coordinates><panel_attributes>UI 
+--
+displayPoints();
+displayLeaderboard();
+showGameOverScreen();
+</panel_attributes><additional_attributes></additional_attributes></element></diagram>
