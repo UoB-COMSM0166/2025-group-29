@@ -1,0 +1,29 @@
+20th Jan 2025 First Meeting - decide on the project
+
+What we have done:
+# list up the games we are interested in
+# choose the game - agar.io
+# research on all the games related to it
+# brainstorming on the improvement and adjustment about the game
+
+6th Feb 2025 Second Meeting - think of the outline of the project
+
+What we have done:
+# confirm the content of the game
+# sum up the class, method, attribute in the game
+# write and draw it in a sketch
+
+17th Feb 2025 Third Meeting - write the skeleton code
+
+What we have done:
+# the initialization of the game - create the player, food, and enemy
+# the background music
+# the view, the movement, the mechanism of eating
+
+22nd Feb 2025 Fourth Meeting - supplement and debug
+
+What we have done:
+# adjust zooming of the map
+# set the initialized position of the enemy far from the one of the player
+# correct the mistake to make sure the smaller one must only be preyed by the bigger one
+# set the direction of the enemy: when the enemy is smaller than the player, it would escape away from the player.
