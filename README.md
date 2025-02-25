@@ -17,7 +17,7 @@
 
 ## **Project Navigation**
 
-- **Homepage** ➡️ [Go to Homepage](https://zengweihaooo.github.io/JavaScriptGame/)
+- **Homepage** ➡️ [Go to Homepage](https://uob-comsm0166.github.io/2025-group-29/)
 
 ## **Weekly Progress**
 
