@@ -1,6 +1,8 @@
 # 2025-group-29
 2025 COMSM0166 group 29
 
+## **Try Our Latest Beta Version Here! [Click here](https://uob-comsm0166.github.io/2025-group-29/game_test/index.html)
+
 | Name         | Email                 | GitHub Username |
 |--------------|-----------------------|------------------|
 | Weihao Zeng  | lh24059@bristol.ac.uk | Zengweihaooo     |
