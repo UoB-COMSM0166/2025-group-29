@@ -27,3 +27,17 @@ What we have done:
 # set the initialized position of the enemy far from the one of the player
 # correct the mistake to make sure the smaller one must only be preyed by the bigger one
 # set the direction of the enemy: when the enemy is smaller than the player, it would escape away from the player.
+
+24th Feb 2025 Fifth Meeting - correction and perfection
+
+What we have done:
+# eliminate the inconsequence of the logic
+# confirm the underlying logic design
+# confirm the ending conditions: timing and records
+# debug the code
+
+25th Feb 2025 Sixth Meeting - addition of the functions
+# normal food: plus 10 points
+# trap food: minus 20 points + minus 15/s
+# power food: super defense for 10s
+# delete unnecessary notes
