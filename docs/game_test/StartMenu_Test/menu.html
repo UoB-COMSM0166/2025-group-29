@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixelated Space Background</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const textureLoader = new THREE.TextureLoader();
+        function loadTexture(url) {
+            const texture = textureLoader.load(url);
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            return texture;
+        }
+
+        function createPlanet(x, y, z, size, textureUrl) {
+            const geometry = new THREE.SphereGeometry(size, 8, 8);
+            const material = new THREE.MeshBasicMaterial({ map: loadTexture(textureUrl) });
+            const planet = new THREE.Mesh(geometry, material);
+            planet.position.set(x, y, z);
+            scene.add(planet);
+            return planet;
+        }
+
+        const planets = [
+            createPlanet(-10, 5, -30, 3, 'media/texture/planet_1.png'),
+            createPlanet(15, -3, -50, 4, 'media/texture/planet_2.png'),
+        ];
+
+        function createSpaceStation(x, y, z, textureUrl) {
+            const geometry = new THREE.BoxGeometry(5, 3, 3);
+            const material = new THREE.MeshBasicMaterial({ map: loadTexture(textureUrl) });
+            const station = new THREE.Mesh(geometry, material);
+            station.position.set(x, y, z);
+            scene.add(station);
+            return station;
+        }
+
+        const spaceStations = [
+            createSpaceStation(0, -8, -40, 'media/texture/space_station.png'),
+        ];
+
+        function createStar(x, y, z) {
+            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const star = new THREE.Mesh(geometry, material);
+            star.position.set(x, y, z);
+            scene.add(star);
+            return star;
+        }
+
+        const stars = [];
+        for (let i = 0; i < 100; i++) {
+            stars.push(createStar(
+                Math.random() * 100 - 50, 
+                Math.random() * 100 - 50, 
+                Math.random() * -100
+            ));
+        }
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            planets.forEach(planet => {
+                planet.rotation.y += 0.002;
+            });
+
+            spaceStations.forEach(station => {
+                station.rotation.y += 0.001;
+                station.position.x += Math.sin(Date.now() * 0.0003) * 0.02;
+            });
+
+            camera.position.x = Math.sin(Date.now() * 0.0005) * 10;
+            camera.position.z = Math.cos(Date.now() * 0.0005) * 10;
+            camera.lookAt(0, 0, -50);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
