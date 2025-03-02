@@ -5,40 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixelated Space Background</title>
     <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('/docs/media/font/minecraft.ttf') format('truetype');
+        }
+
         body {
             margin: 0;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: 'Minecraft', Arial, sans-serif;
         }
 
         canvas {
             display: block;
         }
 
-        #startButton {
+        #startButton, #finalStartButton {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            padding: 15px 30px;
-            font-size: 20px;
-            background: rgba(255, 255, 255, 0.8);
+            width: 200px;
+            height: 80px;
+            background: url('/docs/media/start_menu/start.png') no-repeat center center;
+            background-size: cover;
             border: none;
-            border-radius: 10px;
             cursor: pointer;
-            transition: 0.3s;
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            font-family: 'Minecraft', Arial, sans-serif;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             z-index: 3;
         }
 
-        #startButton:hover {
-            background: rgba(200, 200, 200, 0.9);
+        #startButton:hover, #finalStartButton:hover {
+            opacity: 0.8;
+        }
+
+        #selectionMenu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            font-family: 'Minecraft', Arial, sans-serif;
+            padding: 20px;
+            display: none;
+            z-index: 3;
+        }
+
+        #finalStartButton {
+            margin-top: 20px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <button id="startButton">Start Game</button>
+    <button id="startButton">Start</button>
+    <div id="selectionMenu">
+        <p>Select Your Options:</p>
+        <button id="finalStartButton">Start Game</button>
+    </div>
 
     <script>
         const scene = new THREE.Scene();
@@ -67,18 +105,32 @@
 
         camera.position.z = 5;
         let gameStarted = false;
-        let speed = 0.1;
+        let phase = 0;
+        let t = 0;
+        let flightDuration = 5;  // Extended flight duration (5 seconds per phase)
 
         function animate() {
             requestAnimationFrame(animate);
 
-            if (!gameStarted) {
+            if (phase === 0) {
                 camera.position.x = Math.sin(Date.now() * 0.0005) * 10;
                 camera.position.z = Math.cos(Date.now() * 0.0005) * 10;
                 camera.lookAt(0, 0, -50);
-            } else {
-                camera.position.z -= speed;
-                speed *= 1.015;
+            } else if (phase === 1) {
+                t += 1 / (flightDuration * 60);  // Slow down transition (frames)
+                let easedSpeed = easeInOutQuad(t) * 10;  // Lower max speed
+                camera.position.z -= easedSpeed;
+                if (t >= 1) {
+                    phase = 2;
+                    document.getElementById("selectionMenu").style.display = "block";
+                }
+            } else if (phase === 3) {
+                t += 1 / (flightDuration * 60);
+                let easedSpeed = easeInOutQuad(t) * 10;
+                camera.position.z -= easedSpeed;
+                if (t >= 1) {
+                    window.location.href = "../index.html";
+                }
             }
 
             renderer.render(scene, camera);
@@ -95,11 +147,19 @@
         document.getElementById("startButton").addEventListener("click", () => {
             document.getElementById("startButton").style.display = "none";
             gameStarted = true;
-
-            setTimeout(() => {
-                window.location.href = "../index.html";
-            }, 3000);
+            phase = 1;
+            t = 0;
         });
+
+        document.getElementById("finalStartButton").addEventListener("click", () => {
+            document.getElementById("selectionMenu").style.display = "none";
+            phase = 3;
+            t = 0;
+        });
+
+        function easeInOutQuad(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        }
     </script>
 
 </body>
