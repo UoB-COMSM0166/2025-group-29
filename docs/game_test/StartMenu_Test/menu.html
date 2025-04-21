@@ -9,62 +9,46 @@
             font-family: 'Minecraft';
             src: url('/docs/media/font/minecraft.ttf') format('truetype');
         }
-
         body {
             margin: 0;
             overflow: hidden;
             font-family: 'Minecraft', Arial, sans-serif;
         }
-
         canvas {
             display: block;
         }
-
-        /* 标题图片：居中，上方10%处 */
+        /* 标题图片：居中，上方10%，放大1.25倍 */
         #titleImage {
             position: absolute;
             top: 10%;
             left: 50%;
-            transform: translateX(-50%);
-            max-width: 400px; /* 根据需要可调 */
+            transform: translateX(-50%) scale(1.25);
+            max-width: 400px;
             z-index: 3;
+            mix-blend-mode: lighten;
+            will-change: transform;
         }
-
-        /* 第一个 Start 按钮 - 底部居中 20% */
-        #startButton {
+        /* 按任意键继续文本，字体略小、正常粗细 */
+        #continueText {
             position: absolute;
             bottom: 20%;
             left: 50%;
             transform: translateX(-50%);
-            width: 200px;
-            height: 80px;
-            background: url('/docs/media/start_menu/start.png') no-repeat center center;
-            background-size: cover;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            font-size: 36px;
-            font-weight: bold;
-            font-family: 'Minecraft', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: normal;
             color: white;
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Minecraft', Arial, sans-serif;
             z-index: 3;
+            will-change: transform;
         }
-        #startButton:hover {
-            opacity: 0.8;
-        }
-
         /* 选择菜单 - 居中显示 */
         #selectionMenu {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 400px;
-            min-height: 200px;
+            width: 300px;
             background: rgba(0, 0, 0, 0.8);
             color: white;
             text-align: center;
@@ -73,84 +57,48 @@
             padding: 20px;
             display: none;
             z-index: 3;
+            border-radius: 8px;
         }
-
-        /* 最终开始按钮 - 固定在窗口底部居中 */
-        #finalStartButton {
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 80px;
-            background: url('/docs/media/start_menu/start.png') no-repeat center center;
-            background-size: cover;
-            border: none;
-            cursor: pointer;
+        /* 按钮样式 */
+        .menuButton {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 4px;
+            font-size: 20px;
             font-family: 'Minecraft', Arial, sans-serif;
-            font-size: 36px;
-            font-weight: bold;
             color: white;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-            display: none; /* 初始不显示，待菜单出现后再显示 */
-            z-index: 3;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
         }
-        #finalStartButton:hover {
-            opacity: 0.8;
-        }
-
-        /* 难度 & 皮肤选择区域的小样式 */
-        .optionsArea {
-            margin-top: 10px;
-            font-size: 18px;
-        }
-        .optionsArea label {
-            margin-right: 10px;
+        .menuButton:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
         }
     </style>
     <!-- three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-
     <!-- 标题图片 -->
-    <img id="titleImage" src="/docs/media/start_menu/titled-1.png" alt="Title Image" />
-
-    <!-- 第一个按钮：开始游戏，触发相机移动到中间 -->
-    <button id="startButton">Start</button>
-
-    <!-- 选择菜单：显示难度、皮肤等选项 -->
+    <img id="titleImage" src="/docs/media/start_menu/titled-3.png" alt="Title Image" />
+    <!-- 按任意键继续文本 -->
+    <div id="continueText">Press any key to continue</div>
+    <!-- 选择菜单：读取存档 / 开始新游戏 / 退出游戏 -->
     <div id="selectionMenu">
-        <p>Select Your Options:</p>
-        <div class="optionsArea">
-            <p>Difficulty:</p>
-            <label><input type="radio" name="difficulty" value="1" checked> 1</label>
-            <label><input type="radio" name="difficulty" value="2"> 2</label>
-            <label><input type="radio" name="difficulty" value="3"> 3</label>
-        </div>
-        <div class="optionsArea">
-            <p>Skin:</p>
-            <label><input type="radio" name="skin" value="1" checked> 1</label>
-            <label><input type="radio" name="skin" value="2"> 2</label>
-        </div>
+        <button class="menuButton" id="loadButton">Load Game</button>
+        <button class="menuButton" id="newButton">Start New Game</button>
+        <button class="menuButton" id="exitButton">Exit Game</button>
     </div>
-
-    <!-- 最终开始按钮：固定在屏幕底部居中 -->
-    <button id="finalStartButton">Start Game</button>
-
     <script>
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            75, 
-            window.innerWidth / window.innerHeight, 
-            0.1, 
-            1000
-        );
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        // 创建星星 (将数量从 800 提升到 1500，以增大密度)
+        // 创建星星
         function createStar(x, y, z) {
             const geometry = new THREE.SphereGeometry(1, 12, 12);
             const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
@@ -159,78 +107,74 @@
             scene.add(star);
             return star;
         }
-
         const stars = [];
         for (let i = 0; i < 1500; i++) {
             stars.push(createStar(
-                Math.random() * 600 - 300, 
-                Math.random() * 600 - 300, 
+                Math.random() * 600 - 300,
+                Math.random() * 600 - 300,
                 Math.random() * -1200 - 50
             ));
         }
-
         camera.position.z = 5;
-
-        // 阶段：0 = 初始旋转, 1 = 飞行到中间, 2 = 显示菜单（停着）
         let phase = 0;
         let t = 0;
-        let flightDuration = 5;  // 5秒
+        const flightDuration = 5; // 5秒
         function animate() {
             requestAnimationFrame(animate);
-
             if (phase === 0) {
-                // 初始阶段：相机轻微旋转
                 camera.position.x = Math.sin(Date.now() * 0.0005) * 10;
                 camera.position.z = Math.cos(Date.now() * 0.0005) * 10;
                 camera.lookAt(0, 0, -50);
-
             } else if (phase === 1) {
-                // 相机直线飞行：以 easeInOutQuad 为速度曲线
                 t += 1 / (flightDuration * 60);
-                let easedSpeed = easeInOutQuad(t) * 10; 
-                // 保持原来的“z -= easedSpeed”逻辑
+                let easedSpeed = easeInOutQuad(t) * 10;
                 camera.position.z -= easedSpeed;
                 camera.lookAt(0, 0, -50);
-
                 if (t >= 1) {
-                    // 飞到中间后，进入选择菜单阶段
                     phase = 2;
-                    document.getElementById("selectionMenu").style.display = "block";
-                    document.getElementById("finalStartButton").style.display = "block";
+                    document.getElementById('selectionMenu').style.display = 'block';
                 }
-            } 
-            // phase=2 时相机保持在当前位置不动
-
+            }
             renderer.render(scene, camera);
         }
         animate();
-
-        // 窗口变化处理
         window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
         });
-
-        // 点击第一个 Start：开始相机飞行到中间
-        document.getElementById("startButton").addEventListener("click", () => {
-            document.getElementById("startButton").style.display = "none";
+        // 任意键继续：开始飞行到中间
+        window.addEventListener('keydown', () => {
+            document.getElementById('continueText').style.display = 'none';
             phase = 1;
             t = 0;
         });
-
-        // 点击底部 “Start Game”：直接跳转
-        document.getElementById("finalStartButton").addEventListener("click", () => {
-            // 这里可收集 difficulty、skin 等参数
-            window.location.href = "../index.html";
+        // 按钮事件
+        document.getElementById('loadButton').addEventListener('click', () => {
+            // TODO: 实现读取存档逻辑
+            console.log('Load Game clicked');
         });
-
-        // 缓动函数
+        document.getElementById('newButton').addEventListener('click', () => {
+            // TODO: 实现新游戏逻辑
+            window.location.href = '../index.html';
+        });
+        document.getElementById('exitButton').addEventListener('click', () => {
+            // 退出游戏：关闭窗口或返回上级
+            window.close();
+        });
         function easeInOutQuad(time) {
-            return (time < 0.5)
-                ? 2 * time * time
-                : -1 + (4 - 2 * time) * time;
+            return (time < 0.5) ? 2 * time * time : -1 + (4 - 2 * time) * time;
         }
+        // 视差效果
+        const titleImage = document.getElementById('titleImage');
+        const continueText = document.getElementById('continueText');
+        const parallaxRange = 20;
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX - window.innerWidth / 2) / window.innerWidth;
+            const y = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+            titleImage.style.transform = `translateX(calc(-50% + ${-x * parallaxRange}px)) translateY(${-y * parallaxRange}px) scale(1.25)`;
+            continueText.style.transform = `translateX(calc(-50% + ${x * parallaxRange * 1.5}px)) translateY(${y * parallaxRange * 1.5}px)`;
+        });
     </script>
 </body>
 </html>

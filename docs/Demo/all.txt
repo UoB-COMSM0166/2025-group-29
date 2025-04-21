@@ -1,0 +1,408 @@
+=== ./index.html ===
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pixelated Space Demo</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Three.js canvas 注入点 -->
+  <div id="canvas-container"></div>
+
+  <!-- 启动模块化应用 -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
+=== ./css/style.css ===
+@font-face {
+    font-family: 'Minecraft';
+    src: url('../assets/font/Minecraft.ttf') format('truetype');
+}
+
+/* 全局强制使用 Minecraft 字体 */
+* {
+    font-family: 'Minecraft', Arial, sans-serif !important;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Minecraft', Arial, sans-serif;
+}
+canvas {
+  display: block;
+}
+
+/* Intro Screen */
+#introScreen #titleImage {
+  position: absolute;
+  top: 10%; left: 50%;
+  transform: translateX(-50%) scale(1.25);
+  max-width: 400px;
+  mix-blend-mode: lighten;
+}
+#introScreen #continueText {
+  position: absolute;
+  bottom: 20%; left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: normal;
+  color: white;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+}
+
+/* Common Menu Styles */
+.menuContainer {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  text-align: center;
+  font-size: 24px;
+  padding: 20px;
+  border-radius: 8px;
+}
+.menuButton {
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px 0;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid #fff;
+  border-radius: 4px;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+}
+.menuButton:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.02);
+}
+
+/* Load / Save Lists */
+.menuList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.menuList li {
+  margin: 5px 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+.menuList li:hover { text-decoration: underline; }
+=== ./js/ui/introScreen.js ===
+import { advanceTo } from '../router.js';
+
+export const IntroScreen = {
+  el: null,
+  show() {
+    this.el = document.createElement('div');
+    this.el.id = 'introScreen';
+    this.el.innerHTML = `
+      <img id="titleImage" src="assets/media/titled-3.png" alt="Title Image" />
+      <div id="continueText">Press any key to continue</div>
+    `;
+    document.body.appendChild(this.el);
+    window.addEventListener('keydown', this.onKey);
+  },
+  hide() {
+    window.removeEventListener('keydown', this.onKey);
+    this.el.remove();
+  },
+  onKey() {
+    // 按任意键，先飞一小段，然后进主菜单
+    advanceTo('MAIN_MENU');
+  }
+};
+=== ./js/ui/exitConfirm.js ===
+import { switchTo } from '../router.js';
+
+export const ExitConfirm = {
+  el: null,
+  show() {
+    this.el = document.createElement('div');
+    this.el.className = 'menuContainer';
+    this.el.innerHTML = `
+      <h2>Are you sure you want to exit?</h2>
+      <button class="menuButton" id="yesExit">Yes</button>
+      <button class="menuButton" id="noExit">No</button>
+    `;
+    document.body.appendChild(this.el);
+    document.getElementById('yesExit').onclick = () => window.close();
+    document.getElementById('noExit').onclick  = () => switchTo('MAIN_MENU');
+  },
+  hide() {
+    this.el.remove();
+  }
+};
+=== ./js/ui/mainMenu.js ===
+import { advanceTo } from '../router.js';
+
+export const MainMenu = {
+  el: null,
+  show() {
+    this.el = document.createElement('div');
+    this.el.className = 'menuContainer';
+    this.el.innerHTML = `
+      <button class="menuButton" id="loadBtn">Load Game</button>
+      <button class="menuButton" id="newBtn">Start New Game</button>
+      <button class="menuButton" id="exitBtn">Exit Game</button>
+    `;
+    document.body.appendChild(this.el);
+    document.getElementById('loadBtn').onclick = () => advanceTo('LOAD_MENU');
+    document.getElementById('newBtn').onclick  = () => advanceTo('SAVE_MENU');
+    document.getElementById('exitBtn').onclick = () => advanceTo('EXIT_CONFIRM');
+  },
+  hide() {
+    this.el.remove();
+  }
+};
+=== ./js/ui/loadMenu.js ===
+import { advanceTo, switchTo } from '../router.js';
+
+export const LoadMenu = {
+  el: null,
+  show() {
+    this.el = document.createElement('div');
+    this.el.className = 'menuContainer';
+
+    // collect all keys starting with save_
+    const saves = Object.keys(localStorage)
+      .filter(key => key.startsWith('save_'))
+      .map(key => JSON.parse(localStorage.getItem(key)));
+
+    const listItems = saves.length
+      ? saves.map(s => `
+          <li data-key="save_${s.name}">
+            <strong>${s.name}</strong><br/>
+            Created: ${s.creationTime}<br/>
+            Level: ${s.currentLevel}   Difficulty: ${s.difficulty}
+          </li>
+        `).join('')
+      : '<li>(no saves found)</li>';
+
+    this.el.innerHTML = `
+      <h2>Load Game</h2>
+      <ul class="menuList">
+        ${listItems}
+      </ul>
+      <button class="menuButton" id="backFromLoad">Back</button>
+    `;
+    document.body.appendChild(this.el);
+
+    this.el.querySelectorAll('.menuList li[data-key]').forEach(li => {
+      li.addEventListener('click', () => {
+        const key = li.getAttribute('data-key');
+        const data = JSON.parse(localStorage.getItem(key));
+        console.log('Loaded save:', data);
+        // TODO: actually restore game state from data
+        advanceTo('MAIN_MENU');
+      });
+    });
+
+    document.getElementById('backFromLoad').onclick = () => switchTo('MAIN_MENU');
+  },
+  hide() {
+    this.el.remove();
+  }
+};
+=== ./js/ui/saveMenu.js ===
+import { advanceTo } from '../router.js';
+
+export const SaveMenu = {
+  el: null,
+  show() {
+    this.el = document.createElement('div');
+    this.el.className = 'menuContainer';
+    this.el.innerHTML = `
+      <h2>Create New Save</h2>
+      <div class="optionsArea">
+        <p>Save Name:</p>
+        <input type="text" id="saveNameInput" placeholder="Enter save name" />
+      </div>
+      <div class="optionsArea">
+        <p>Difficulty:</p>
+        <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
+        <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+      </div>
+      <button class="menuButton" id="confirmSave">Save</button>
+      <button class="menuButton" id="backFromSave">Back</button>
+    `;
+    document.body.appendChild(this.el);
+
+    document.getElementById('confirmSave').onclick = () => {
+      const name = document.getElementById('saveNameInput').value.trim();
+      if (!name) {
+        alert('Please enter a save name.');
+        return;
+      }
+      const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+      const saveData = {
+        name,
+        creationTime: new Date().toLocaleString(),
+        currentLevel: 1,   // TODO: replace with actual current level
+        difficulty
+      };
+      localStorage.setItem(`save_${name}`, JSON.stringify(saveData));
+      advanceTo('MAIN_MENU');
+    };
+
+    document.getElementById('backFromSave').onclick = () => advanceTo('MAIN_MENU');
+  },
+  hide() {
+    this.el.remove();
+  }
+};
+=== ./js/background.js ===
+// js/background.js
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js';
+
+let scene, camera, renderer, starGroup;
+// 环形转速
+const angularSpeed = 0.00005;
+// 相机推进参数
+const moveDuration = 1;      // 推进时长 (秒)
+const moveDistance = 375;        // 推进距离
+let moving = false;
+let moveStart = 0;
+let origCamZ = 0;
+
+export function initBackground(container) {
+  scene    = new THREE.Scene();
+  camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 0, 5);
+  camera.lookAt(0, 0, 0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
+
+  // 星星组
+  starGroup = new THREE.Group();
+  for (let i = 0; i < 1500; i++) {
+    const geo  = new THREE.SphereGeometry(1, 12, 12);
+    const mat  = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const star = new THREE.Mesh(geo, mat);
+    star.position.set(
+      Math.random() * 600 - 300,
+      Math.random() * 600 - 300,
+      Math.random() * -1200 - 50
+    );
+    starGroup.add(star);
+  }
+  scene.add(starGroup);
+
+  window.addEventListener('resize', onWindowResize);
+  window.addEventListener('mousemove', onMouseMove);
+  animate();
+}
+
+// 外部调用此接口触发相机短暂推进
+export function startFlight() {
+  if (!moving) {
+    moving    = true;
+    moveStart = performance.now();
+    origCamZ  = camera.position.z;
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  // 星云环形旋转
+  starGroup.rotation.y += angularSpeed;
+
+  // 相机短暂推进逻辑
+  if (moving) {
+    const elapsed = (performance.now() - moveStart) / 1000;
+    if (elapsed <= moveDuration) {
+      const t = elapsed / moveDuration; // 0→1
+      // 缓动推进距离
+      const delta = easeInOutQuad(t) * moveDistance;
+      camera.position.z = origCamZ - delta;
+    } else {
+      // 推进结束，恢复位置并触发路由事件
+      camera.position.z = origCamZ - moveDistance;
+      moving = false;
+      window.dispatchEvent(new Event('flightComplete'));
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+function onWindowResize() {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+}
+
+function onMouseMove(e) {
+  const x     = (e.clientX - window.innerWidth / 2)  / window.innerWidth;
+  const y     = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+  const range = 20;
+  const img   = document.getElementById('titleImage');
+  const txt   = document.getElementById('continueText');
+  if (img) img.style.transform =
+    `translateX(calc(-50% + ${-x*range}px)) translateY(${-y*range}px) scale(1.25)`;
+  if (txt) txt.style.transform =
+    `translateX(calc(-50% + ${ x*range*1.5 }px)) translateY(${ y*range*1.5 }px)`;
+}
+
+function easeInOutQuad(t) {
+  return t < 0.5
+    ? 2 * t * t
+    : -1 + (4 - 2 * t) * t;
+}
+=== ./js/router.js ===
+import { startFlight } from './background.js';
+import { IntroScreen } from './ui/introScreen.js';
+import { MainMenu    } from './ui/mainMenu.js';
+import { LoadMenu    } from './ui/loadMenu.js';
+import { SaveMenu    } from './ui/saveMenu.js';
+import { ExitConfirm } from './ui/exitConfirm.js';
+
+const modules = {
+  INTRO:        IntroScreen,
+  MAIN_MENU:    MainMenu,
+  LOAD_MENU:    LoadMenu,
+  SAVE_MENU:    SaveMenu,
+  EXIT_CONFIRM: ExitConfirm
+};
+let currentState = null;
+
+export function initRouter() {
+  switchTo('INTRO');
+}
+
+// 直接切 UI
+export function switchTo(state) {
+  if (currentState) modules[currentState].hide();
+  currentState = state;
+  modules[state].show();
+}
+
+// 触发一次“段落飞行”后再切 UI
+export function advanceTo(state) {
+  const handler = () => {
+    window.removeEventListener('flightComplete', handler);
+    switchTo(state);
+  };
+  window.addEventListener('flightComplete', handler);
+  startFlight();
+}
+=== ./js/app.js ===
+import { initRouter } from './router.js';
+import { initBackground } from './background.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initRouter();
+  initBackground(document.getElementById('canvas-container'));
+});
