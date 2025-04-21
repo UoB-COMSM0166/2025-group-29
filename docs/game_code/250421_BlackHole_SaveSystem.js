@@ -1,3 +1,69 @@
+let player;
+let enemies = [];
+
+let zoom = 1;
+let gameOver = false;
+let score = 0; // 记录得分
+let timer = 60; // 设定倒计时时间（秒）
+let startTime; // 记录游戏开始的时间
+
+let angle = 0;
+
+
+let dashActive = false; // 记录是否正在冲刺
+let dashEndTime = 0; // 记录冲刺结束时间
+let dashCooldownEndTime = 0; // 记录冷却结束时间
+let cooldownRemaining = 0;
+
+let powerMode = false;
+let powerModeEndTime = 0;
+let slowEffect = false;
+let slowEffectStartTime = 0;
+
+let warningMessage = "";
+let warningTimer = 0;
+
+let timeBonuses = [];
+
+
+let width = 2400;
+let height = 1500;
+
+let keys = {};
+
+let dashTrail = [];//拖影效果
+let maxDashTrailLength = 20;
+
+let n;
+let gamelevel;
+let skillSystem;//控制skill的类
+let skillIcons = {}; // 统一集中管理图标
+
+
+//弹幕
+let bulletEnemyImg;
+let bulletImg;
+let bulletReflectedImg; // 反弹贴图
+
+let bullets = []; // 所有子弹对象
+let bulletPatternType = 3; // 1=水平双发，2=四向，3=六向
+
+let collisionManager;
+//玩家贴图
+let playerIdleRightGif, playerIdleLeftGif;
+let playerAttackRightGif, playerAttackLeftGif;
+
+
+// 黑洞
+let blackHoles = [];
+
+// 存储进度
+let isPaused = false;
+let showPauseMenu = false;
+let saveSlots = [];
+
+
+
 function preload() {
   // 加载技能图标（统一管理）
   skillIcons["闪现"] = null;
