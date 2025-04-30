@@ -125,7 +125,8 @@ Add a group photo here!
 
 - 15% ~750 words
 
-- Describe implementation of your game, in particular highlighting the three areas of challenge in developing your game. 
+- Describe implementation of your game, in particular highlighting the three areas of challenge in developing your game.
+- 技能系统；存档系统；Boss战
 
 ### Evaluation
 
