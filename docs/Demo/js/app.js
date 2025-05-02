@@ -1,3 +1,4 @@
+// js/app.js
 import { initRouter } from './router.js';
 import { initBackground } from './background.js';
 

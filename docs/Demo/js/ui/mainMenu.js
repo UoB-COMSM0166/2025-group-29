@@ -1,3 +1,4 @@
+// js/ui/mainMenu.js
 import { advanceTo } from '../router.js';
 
 export const MainMenu = {

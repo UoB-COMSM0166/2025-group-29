@@ -1,3 +1,4 @@
+// js/ui/introScreen.js
 import { advanceTo } from '../router.js';
 
 export const IntroScreen = {
@@ -17,7 +18,6 @@ export const IntroScreen = {
     this.el.remove();
   },
   onKey() {
-    // 按任意键，先飞一小段，然后进主菜单
     advanceTo('MAIN_MENU');
   }
 };
