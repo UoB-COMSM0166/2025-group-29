@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop Page (Overlay Background)</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    /* iframe full-screen background */
+    #bgFrame {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      border: none;
+      z-index: 0;
+      pointer-events: none;
+    }
+    /* shop panel */
+    #shopPanel {
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 320px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      padding: 16px;
+      z-index: 1;
+    }
+    #header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    #header span { font-weight: bold; }
+    #header button {
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    #shop {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px;
+      background: #f9f9f9;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+    }
+    /* Attribute colors */
+    .column.agile    { border-color: blue; }
+    .column.tank     { border-color: orange; }
+    .column.strength { border-color: red; }
+    /* Active highlight */
+    .column.agile.active    { box-shadow: 0 0 8px rgba(0,0,255,0.5); }
+    .column.tank.active     { box-shadow: 0 0 8px rgba(255,165,0,0.5); }
+    .column.strength.active { box-shadow: 0 0 8px rgba(255,0,0,0.5); }
+    .item {
+      flex: 1;
+      padding: 6px;
+      text-align: center;
+      border: 1px solid #666;
+      border-radius: 4px;
+      background: #eee;
+      cursor: pointer;
+      user-select: none;
+    }
+    .item.disabled {
+      background: #ccc;
+      color: #777;
+      cursor: not-allowed;
+    }
+    #storedSection h3 {
+      margin: 0 0 6px;
+      font-size: 1em;
+    }
+    #storedList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9em;
+    }
+    #storedList li {
+      padding: 2px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    #storedList li:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- background in iframe -->
+  <iframe id="bgFrame" src="BG.html?auto=true"></iframe>
+
+  <!-- shop panel -->
+  <div id="shopPanel">
+    <div id="header">
+      <span id="levelDisplay">Level: 0</span>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div id="shop">
+      <div class="column agile"    data-col="0">
+        <div class="item" data-row="0">Agile – Skill 1</div>
+        <div class="item" data-row="1">Agile – Skill 2</div>
+        <div class="item" data-row="2">Agile – Passive</div>
+      </div>
+      <div class="column tank"     data-col="1">
+        <div class="item" data-row="0">Tank – Skill 1</div>
+        <div class="item" data-row="1">Tank – Skill 2</div>
+        <div class="item" data-row="2">Tank – Passive</div>
+      </div>
+      <div class="column strength" data-col="2">
+        <div class="item" data-row="0">Strength – Skill 1</div>
+        <div class="item" data-row="1">Strength – Skill 2</div>
+        <div class="item" data-row="2">Strength – Passive</div>
+      </div>
+    </div>
+    <div id="storedSection">
+      <h3>Stored (max 3)</h3>
+      <ul id="storedList"><li>None</li></ul>
+    </div>
+  </div>
+
+  <script>
+    // --- state ---
+    let level = 0;
+    let chosenCol = null;
+    const stored = [];
+    const MAX = 3;
+    const attrNames = ['Agile','Tank','Strength'];
+
+    // --- elements ---
+    const lvlDisplay = document.getElementById('levelDisplay');
+    const resetBtn    = document.getElementById('resetBtn');
+    const shop        = document.getElementById('shop');
+    const storedList  = document.getElementById('storedList');
+
+    // --- render stored list ---
+    function renderStored() {
+      storedList.innerHTML = '';
+      if (stored.length === 0) {
+        storedList.innerHTML = '<li>None</li>';
+      } else {
+        stored.forEach(name => {
+          const li = document.createElement('li');
+          li.textContent = name;
+          storedList.appendChild(li);
+        });
+      }
+    }
+
+    // --- update UI for all items ---
+    function updateUI() {
+      lvlDisplay.textContent = 'Level: ' + level;
+      document.querySelectorAll('.column').forEach(colEl => {
+        const col = +colEl.dataset.col;
+        const isChosen = (col === chosenCol);
+        colEl.classList.toggle('active', isChosen);
+
+        colEl.querySelectorAll('.item').forEach(item => {
+          const row = +item.dataset.row;
+          const name = item.textContent;
+          item.classList.remove('disabled');
+
+          // If level 2–4, all items are disabled
+          if (level >= 2) {
+            return item.classList.add('disabled');
+          }
+
+          // 1) already stored or at limit
+          if (stored.includes(name) || stored.length >= MAX) {
+            return item.classList.add('disabled');
+          }
+
+          // 2) Level 0: only row 0 allowed
+          if (level === 0) {
+            if (row !== 0) {
+              return item.classList.add('disabled');
+            }
+            return;
+          }
+
+          // 3) Level 1 logic
+          // row2 always disabled for manual
+          if (row === 2) {
+            return item.classList.add('disabled');
+          }
+
+          if (stored.length === 1) {
+            // second pick: allow specialization or one other
+            if (col !== chosenCol) {
+              const anyInThisCol = stored.some(n => n.startsWith(attrNames[col]));
+              if (anyInThisCol) {
+                return item.classList.add('disabled');
+              }
+            }
+          } else if (stored.length === 2) {
+            // third pick only for other attr not yet picked
+            if (col === chosenCol) {
+              return item.classList.add('disabled');
+            }
+            const anyInThisCol = stored.some(n => n.startsWith(attrNames[col]));
+            if (anyInThisCol) {
+              return item.classList.add('disabled');
+            }
+          }
+        });
+      });
+
+      renderStored();
+    }
+
+    // --- click handler ---
+    shop.addEventListener('click', e => {
+      const item = e.target.closest('.item');
+      if (!item || item.classList.contains('disabled')) return;
+
+      // Prevent clicks at levels 2–4
+      if (level >= 2) return;
+
+      const col = +item.parentElement.dataset.col;
+      const row = +item.dataset.row;
+      const name = item.textContent;
+
+      if (level === 0) {
+        // first pick
+        stored.push(name);
+        chosenCol = col;
+        level = 1;
+        alert(`Stored: ${name}`);
+        updateUI();
+        return;
+      }
+
+      if (level === 1) {
+        if (stored.length === 1 && col === chosenCol) {
+          // specialization branch
+          stored.push(name);
+          // auto-add passive
+          const passiveName = `${attrNames[col]} – Passive`;
+          stored.push(passiveName);
+          alert(`Specialized: ${name} + ${passiveName}`);
+          // after specialization, advance to level 2
+          level = 2;
+          updateUI();
+          return;
+        }
+        if (stored.length < MAX && col !== chosenCol) {
+          // other-attribute branch
+          stored.push(name);
+          alert(`Stored: ${name}`);
+          // after third pick, advance to level 2
+          if (stored.length === MAX) {
+            level = 2;
+          }
+          updateUI();
+          return;
+        }
+      }
+    });
+
+    // --- reset ---
+    resetBtn.addEventListener('click', () => {
+      level = 0;
+      chosenCol = null;
+      stored.length = 0;
+      updateUI();
+    });
+
+    // --- init ---
+    updateUI();
+  </script>
+</body>
+</html>
