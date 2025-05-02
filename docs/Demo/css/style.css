@@ -27,16 +27,38 @@ canvas {
     max-width: 400px;
     mix-blend-mode: lighten;
 }
+    /* 其余样式保持不变 */
+    animation: glow 2s ease-in-out infinite alternate;
+  
+  @keyframes glow {
+    from {
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
+    }
+    to {
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.9));
+    }
+
+}
 
 #introScreen #continueText {
     position: absolute;
-    bottom: 20%;
+    bottom: 10%;             /* 下移到离底部 10% */
     left: 50%;
     transform: translateX(-50%);
     font-size: 28px;
     font-weight: normal;
     color: white;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    animation: pulse 1.5s ease-in-out infinite; /* 添加放大缩小动画 */
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.2);
+    }
 }
 
 /* Common Menu Styles */

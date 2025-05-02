@@ -1,3 +1,4 @@
+// js/ui/saveMenu.js
 import { advanceTo } from '../router.js';
 
 export const SaveMenu = {
@@ -16,7 +17,7 @@ export const SaveMenu = {
         <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
         <label><input type="radio" name="difficulty" value="hard"> Hard</label>
       </div>
-      <button class="menuButton" id="confirmSave">Save</button>
+      <button class="menuButton" id="confirmSave">Save &amp; Play</button>
       <button class="menuButton" id="backFromSave">Back</button>
     `;
     document.body.appendChild(this.el);
@@ -35,7 +36,8 @@ export const SaveMenu = {
         difficulty
       };
       localStorage.setItem(`save_${name}`, JSON.stringify(saveData));
-      advanceTo('MAIN_MENU');
+      // 保存完毕后跳转到游戏页
+      window.location.href = 'game.html';
     };
 
     document.getElementById('backFromSave').onclick = () => advanceTo('MAIN_MENU');

@@ -3,13 +3,17 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.m
 
 let scene, camera, renderer, starGroup;
 // 环形转速
-const angularSpeed = 0.00005;
+const angularSpeed = 0.0005;
 // 相机推进参数
 const moveDuration = 1;      // 推进时长 (秒)
-const moveDistance = 375;        // 推进距离
+const moveDistance = 375;    // 推进距离
 let moving = false;
 let moveStart = 0;
 let origCamZ = 0;
+
+// 新增：用于正弦振荡的相位和最大角度（15°转换为弧度）
+let oscillationPhase = 0;
+const maxAngle = THREE.MathUtils.degToRad(15);
 
 export function initBackground(container) {
   scene    = new THREE.Scene();
@@ -53,8 +57,9 @@ export function startFlight() {
 function animate() {
   requestAnimationFrame(animate);
 
-  // 星云环形旋转
-  starGroup.rotation.y += angularSpeed;
+  // 星云环形振荡（0～15°往返）
+  oscillationPhase += angularSpeed;
+  starGroup.rotation.y = (Math.sin(oscillationPhase) + 1) / 2 * maxAngle;
 
   // 相机短暂推进逻辑
   if (moving) {
