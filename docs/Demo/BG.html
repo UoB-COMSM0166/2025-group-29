@@ -2,20 +2,17 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>随机旋转平铺背景 + WASD or 自动环形移动</title>
+  <title>随机旋转平铺背景 + 箭头键控制</title>
   <style>
-    /* 全屏黑色背景，无滚动条 */
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       overflow: hidden;
       background: #000;
       height: 100%;
     }
-    /* 画布无边框，块级显示 */
     #gameCanvas {
       display: block;
-      background: #000;
+      background: transparent; /* 透明保留父背景 */
       border: none;
     }
   </style>
@@ -25,19 +22,22 @@
 
   <script>
     const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    const ctx    = canvas.getContext('2d');
 
-    // 使 canvas 始终填满窗口
+    // 监听父页面转发的按键事件
+    const keys = {};
+    window.addEventListener('message', e => {
+      if (e.data.type === 'keydown')  keys[e.data.key] = true;
+      if (e.data.type === 'keyup')    keys[e.data.key] = false;
+    });
+
+    // 填满窗口
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
+      canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
-
-    // 检查 URL 参数决定是否自动模式
-    const params = new URLSearchParams(window.location.search);
-    const AUTO_MODE = params.get('auto') === 'true';
 
     // 加载贴图
     const img = new Image();
@@ -49,92 +49,56 @@
       return [0, 90, 180, 270][seed] * Math.PI / 180;
     }
 
-    // 根据 offset 绘制平铺背景
+    // 平铺背景绘制
     function drawBackground(offsetX, offsetY) {
       const tw = img.width, th = img.height;
-      const cols = Math.ceil(canvas.width / tw) + 2;
-      const rows = Math.ceil(canvas.height / th) + 2;
-      const startCol = Math.floor(offsetX / tw);
-      const startRow = Math.floor(offsetY / th);
+      const cols = Math.ceil(canvas.width/tw) + 2;
+      const rows = Math.ceil(canvas.height/th) + 2;
+      const startCol = Math.floor(offsetX/tw);
+      const startRow = Math.floor(offsetY/th);
 
-      for (let i = startCol; i < startCol + cols; i++) {
-        for (let j = startRow; j < startRow + rows; j++) {
-          const x = i * tw - offsetX;
-          const y = j * th - offsetY;
+      for (let i = startCol; i < startCol+cols; i++) {
+        for (let j = startRow; j < startRow+rows; j++) {
+          const x = i*tw - offsetX;
+          const y = j*th - offsetY;
           const angle = getRotationAngle(i, j);
-
           ctx.save();
-          ctx.translate(x + tw / 2, y + th / 2);
+          ctx.translate(x+tw/2, y+th/2);
           ctx.rotate(angle);
-          ctx.drawImage(img, -tw / 2, -th / 2);
+          ctx.drawImage(img, -tw/2, -th/2);
           ctx.restore();
         }
       }
     }
 
-    // 通用偏移量
+    // 控制偏移量
     let offsetX = 0, offsetY = 0;
+    const SPEED = 200;  // px/s
+    let lastTime = 0;
 
-    if (!AUTO_MODE) {
-      // —— 键盘控制模式 —— 
-      const SPEED = 200;  // px/s
-      const keys = {};
+    function loop(timestamp) {
+      const dt = (timestamp - lastTime)/1000;
+      lastTime = timestamp;
 
-      window.addEventListener('keydown', e => {
-        keys[e.key.toLowerCase()] = true;
-      });
-      window.addEventListener('keyup', e => {
-        keys[e.key.toLowerCase()] = false;
-      });
+      // 只支持箭头键 ↑↓←→
+      if (keys['ArrowUp'])    offsetY -= SPEED*dt;
+      if (keys['ArrowDown'])  offsetY += SPEED*dt;
+      if (keys['ArrowLeft'])  offsetX -= SPEED*dt;
+      if (keys['ArrowRight']) offsetX += SPEED*dt;
 
-      let lastTime = 0;
-      function loopKeys(timestamp) {
-        const dt = (timestamp - lastTime) / 1000;
-        lastTime = timestamp;
-
-        // W/↑ 向上，S/↓ 向下，A/← 向左，D/→ 向右
-        if (keys['w'] || keys['arrowup'])    offsetY -= SPEED * dt;
-        if (keys['s'] || keys['arrowdown'])  offsetY += SPEED * dt;
-        if (keys['a'] || keys['arrowleft'])  offsetX -= SPEED * dt;
-        if (keys['d'] || keys['arrowright']) offsetX += SPEED * dt;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (img.complete) {
-          drawBackground(offsetX, offsetY);
-        }
-        requestAnimationFrame(loopKeys);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if (img.complete) {
+        drawBackground(offsetX, offsetY);
       }
-
-      img.onload = () => {
-        requestAnimationFrame(loopKeys);
-      };
-    } else {
-      // —— 自动环形移动模式 —— 
-      const AUTO_SPEED = 50;      // px/s
-      const ANGULAR_SPEED = 0.05;  // rad/s
-
-      let autoAngle = 0;
-      let lastTime = 0;
-      function loopAuto(timestamp) {
-        const dt = (timestamp - lastTime) / 1000;
-        lastTime = timestamp;
-
-        autoAngle += ANGULAR_SPEED * dt;
-        // 环形分量
-        offsetX += AUTO_SPEED * Math.cos(autoAngle) * dt;
-        offsetY += AUTO_SPEED * Math.sin(autoAngle) * dt;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (img.complete) {
-          drawBackground(offsetX, offsetY);
-        }
-        requestAnimationFrame(loopAuto);
-      }
-
-      img.onload = () => {
-        requestAnimationFrame(loopAuto);
-      };
+      requestAnimationFrame(loop);
     }
+
+    img.onload = () => {
+      requestAnimationFrame(time => {
+        lastTime = time;
+        loop(time);
+      });
+    };
   </script>
 </body>
 </html>

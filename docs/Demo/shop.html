@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>Shop Page (Overlay Background)</title>
+  <link rel="stylesheet" href="css/style.css" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      font-family: sans-serif;
+      font-family: 'Minecraft', Arial, sans-serif;
+      background: #000;
     }
     /* iframe full-screen background */
     #bgFrame {
@@ -20,32 +22,15 @@
       z-index: 0;
       pointer-events: none;
     }
-    /* shop panel */
-    #shopPanel {
-      position: absolute;
-      top: 20px; right: 20px;
-      width: 320px;
-      background: rgba(255,255,255,0.95);
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      padding: 16px;
-      z-index: 1;
+    /* 额外调整：让 menuContainer 在小屏时也居中 */
+    .menuContainer {
+      max-width: 90%;
     }
-    #header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    #header span { font-weight: bold; }
-    #header button {
-      padding: 4px 8px;
-      cursor: pointer;
-    }
+    /* 调整 shop 内部布局 */
     #shop {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
+      margin: 12px 0;
     }
     .column {
       flex: 1;
@@ -57,14 +42,6 @@
       border: 2px solid #ccc;
       border-radius: 4px;
     }
-    /* Attribute colors */
-    .column.agile    { border-color: blue; }
-    .column.tank     { border-color: orange; }
-    .column.strength { border-color: red; }
-    /* Active highlight */
-    .column.agile.active    { box-shadow: 0 0 8px rgba(0,0,255,0.5); }
-    .column.tank.active     { box-shadow: 0 0 8px rgba(255,165,0,0.5); }
-    .column.strength.active { box-shadow: 0 0 8px rgba(255,0,0,0.5); }
     .item {
       flex: 1;
       padding: 6px;
@@ -74,15 +51,12 @@
       background: #eee;
       cursor: pointer;
       user-select: none;
+      font-family: inherit;
     }
     .item.disabled {
       background: #ccc;
       color: #777;
       cursor: not-allowed;
-    }
-    #storedSection h3 {
-      margin: 0 0 6px;
-      font-size: 1em;
     }
     #storedList {
       list-style: none;
@@ -100,15 +74,16 @@
   </style>
 </head>
 <body>
-  <!-- background in iframe -->
+  <!-- 背景动画 -->
   <iframe id="bgFrame" src="BG.html?auto=true"></iframe>
 
-  <!-- shop panel -->
-  <div id="shopPanel">
-    <div id="header">
+  <!-- 统一样式的商店面板 -->
+  <div id="shopPanel" class="menuContainer">
+    <div id="header" style="display:flex;justify-content:space-between;align-items:center;">
       <span id="levelDisplay">Level: 0</span>
-      <button id="resetBtn">Reset</button>
+      <button class="menuButton" id="resetBtn">Reset</button>
     </div>
+
     <div id="shop">
       <div class="column agile"    data-col="0">
         <div class="item" data-row="0">Agile – Skill 1</div>
@@ -126,8 +101,9 @@
         <div class="item" data-row="2">Strength – Passive</div>
       </div>
     </div>
+
     <div id="storedSection">
-      <h3>Stored (max 3)</h3>
+      <h3 style="text-align:center;">Stored (max 3)</h3>
       <ul id="storedList"><li>None</li></ul>
     </div>
   </div>
@@ -173,68 +149,49 @@
           const name = item.textContent;
           item.classList.remove('disabled');
 
-          // If level 2–4, all items are disabled
           if (level >= 2) {
             return item.classList.add('disabled');
           }
-
-          // 1) already stored or at limit
           if (stored.includes(name) || stored.length >= MAX) {
             return item.classList.add('disabled');
           }
-
-          // 2) Level 0: only row 0 allowed
-          if (level === 0) {
-            if (row !== 0) {
-              return item.classList.add('disabled');
-            }
-            return;
-          }
-
-          // 3) Level 1 logic
-          // row2 always disabled for manual
-          if (row === 2) {
+          if (level === 0 && row !== 0) {
             return item.classList.add('disabled');
           }
-
-          if (stored.length === 1) {
-            // second pick: allow specialization or one other
-            if (col !== chosenCol) {
+          if (level === 1) {
+            if (row === 2) {
+              return item.classList.add('disabled');
+            }
+            if (stored.length === 1 && col !== chosenCol) {
+              const anyInThisCol = stored.some(n => n.startsWith(attrNames[col]));
+              if (anyInThisCol) {
+                return item.classList.add('disabled');
+              }
+            } else if (stored.length === 2) {
+              if (col === chosenCol) {
+                return item.classList.add('disabled');
+              }
               const anyInThisCol = stored.some(n => n.startsWith(attrNames[col]));
               if (anyInThisCol) {
                 return item.classList.add('disabled');
               }
             }
-          } else if (stored.length === 2) {
-            // third pick only for other attr not yet picked
-            if (col === chosenCol) {
-              return item.classList.add('disabled');
-            }
-            const anyInThisCol = stored.some(n => n.startsWith(attrNames[col]));
-            if (anyInThisCol) {
-              return item.classList.add('disabled');
-            }
           }
         });
       });
-
       renderStored();
     }
 
     // --- click handler ---
     shop.addEventListener('click', e => {
       const item = e.target.closest('.item');
-      if (!item || item.classList.contains('disabled')) return;
-
-      // Prevent clicks at levels 2–4
-      if (level >= 2) return;
+      if (!item || item.classList.contains('disabled') || level >= 2) return;
 
       const col = +item.parentElement.dataset.col;
       const row = +item.dataset.row;
       const name = item.textContent;
 
       if (level === 0) {
-        // first pick
         stored.push(name);
         chosenCol = col;
         level = 1;
@@ -245,25 +202,18 @@
 
       if (level === 1) {
         if (stored.length === 1 && col === chosenCol) {
-          // specialization branch
           stored.push(name);
-          // auto-add passive
           const passiveName = `${attrNames[col]} – Passive`;
           stored.push(passiveName);
           alert(`Specialized: ${name} + ${passiveName}`);
-          // after specialization, advance to level 2
           level = 2;
           updateUI();
           return;
         }
         if (stored.length < MAX && col !== chosenCol) {
-          // other-attribute branch
           stored.push(name);
           alert(`Stored: ${name}`);
-          // after third pick, advance to level 2
-          if (stored.length === MAX) {
-            level = 2;
-          }
+          if (stored.length === MAX) level = 2;
           updateUI();
           return;
         }

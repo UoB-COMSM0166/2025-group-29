@@ -613,7 +613,7 @@ function updateTimer() {
 function updateCamera() {
   push();
   resetMatrix();
-  background(0);
+  clear();
   pop();
 
   let camX = constrain(player.pos.x, -width + windowWidth / 2, width - windowWidth / 2);
@@ -725,7 +725,7 @@ function drawInfo() {
 function showGameOverScreen() {
   push();
   resetMatrix(); // 取消 translate 变换，恢复默认坐标
-  background(0); // 确保整个屏幕填充黑色
+  clear(); // 确保整个屏幕填充黑色
 
   fill(255, 0, 0);
   textSize(50);
