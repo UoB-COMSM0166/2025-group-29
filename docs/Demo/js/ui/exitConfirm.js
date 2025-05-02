@@ -12,8 +12,16 @@ export const ExitConfirm = {
       <button class="menuButton" id="noExit">No</button>
     `;
     document.body.appendChild(this.el);
-    document.getElementById('yesExit').onclick = () => window.close();
+
+    // 点击 Yes 时刷新当前页面
+    document.getElementById('yesExit').onclick = () => {
+      window.location.reload();
+    };
+
+    // 点击 No 时回到主菜单
     document.getElementById('noExit').onclick  = () => switchTo('MAIN_MENU');
   },
-  hide() { this.el?.remove(); }
+  hide() {
+    this.el?.remove();
+  }
 };
