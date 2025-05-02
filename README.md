@@ -180,28 +180,28 @@ Add a group photo here!
 - We held daily stand-up meetings (mostly online due to availability constraints) where we discussed what each member had accomplished, their current blockers, and what they planned to tackle next. This kept everyone aligned and helped surface integration issues early.
 
 - Our roles were defined following Scrum best practices:
-	•	The Product Owner was responsible for articulating the vision of a fast-paced and visually rich combat experience, translating qualitative goals (like “the dash should feel punchy” or “skills must offer meaningful choices”) into concrete user stories and design priorities.
-	•	The Scrum Master facilitated team coordination, maintained a sustainable sprint pace, resolved merge conflicts, and organized retrospectives at the end of each sprint to help us reflect on what worked and what needed improvement.
-	•	All members acted as Developers and Testers, working in full-stack fashion across p5.js code, animations, mechanics, and system integration. We followed test-driven development principles in key modules such as the skill and collision systems.
+	- •	The Product Owner was responsible for articulating the vision of a fast-paced and visually rich combat experience, translating qualitative goals (like “the dash should feel punchy” or “skills must offer meaningful choices”) into concrete user stories and design priorities.
+	- •	The Scrum Master facilitated team coordination, maintained a sustainable sprint pace, resolved merge conflicts, and organized retrospectives at the end of each sprint to help us reflect on what worked and what needed improvement.
+	- •	All members acted as Developers and Testers, working in full-stack fashion across p5.js code, animations, mechanics, and system integration. We followed test-driven development principles in key modules such as the skill and collision systems.
 
 - Our main development tools included:
-	•	Git + GitHub for version control with clear branch naming conventions (feature/, bugfix/, refactor/) and Pull Requests with inline reviews;
-	•	Google Docs and Figma for collaborative specification of skills, enemy logic, damage values, and UI layout sketches;
-	•	Manual playtesting sessions, often recorded and shared within the team, to help us identify unexpected edge cases or balance problems.
+	- •	Git + GitHub for version control with clear branch naming conventions (feature/, bugfix/, refactor/) and Pull Requests with inline reviews;
+	- •	Google Docs and Figma for collaborative specification of skills, enemy logic, damage values, and UI layout sketches;
+	- •	Manual playtesting sessions, often recorded and shared within the team, to help us identify unexpected edge cases or balance problems.
 
 - Team responsibilities were distributed based on domain expertise and interest:
-	•	One member focused on the Player System, implementing Player, HPSystem, and MeleeAttack logic. They also designed the input system using WASD and directional keys, integrated player states like isAttacking and isCharging, and handled camera follow logic (updateCamera).
-	•	Another led the development of the Skill System, designing an abstract Skill class and implementing a polymorphic hierarchy for active (e.g., DashSkill, ReflectSkill) and passive skills (e.g., LifestealSkill, BloodFurySkill). This included cooldown management, input bindings, and cooldown visualization via drawIcon() overlays.
-	•	A third teammate focused on the Enemy System, coding multiple AI types with different behaviors: FollowEnemy for direct pursuit, AmbushEnemy for high-speed dashes, StealthEnemy for cloaked evasion, and BulletEnemy for ranged attacks. Each class had its own update logic and visual identity.
+	- •	One member focused on the Player System, implementing Player, HPSystem, and MeleeAttack logic. They also designed the input system using WASD and directional keys, integrated player states like isAttacking and isCharging, and handled camera follow logic (updateCamera).
+	- •	Another led the development of the Skill System, designing an abstract Skill class and implementing a polymorphic hierarchy for active (e.g., DashSkill, ReflectSkill) and passive skills (e.g., LifestealSkill, BloodFurySkill). This included cooldown management, input bindings, and cooldown visualization via drawIcon() overlays.
+	- •	A third teammate focused on the Enemy System, coding multiple AI types with different behaviors: FollowEnemy for direct pursuit, AmbushEnemy for high-speed dashes, StealthEnemy for cloaked evasion, and BulletEnemy for ranged attacks. Each class had its own update logic and visual identity.
 
 - One of our most integrated efforts was the design of the CollisionManager, which orchestrated real-time interaction between the player, enemies, bullets, and power-ups (TimeBonus). We defined a shared checkCollision() method that used consistent data formats (position vectors, radii) to simplify hit detection. Managing reflected bullets, dash hits, and passive effects like lifesteal all required careful coordination.
 
 - We also learned the importance of interface contracts. Early in development, multiple team members inadvertently modified shared state (such as bullets[] or player.selectedSkills), resulting in regressions and merge conflicts. To mitigate this, we clearly scoped access rules—e.g., all skills must be selected via SkillSystem, and only CollisionManager could remove bullets or resolve bonuses.
 
 - From a collaboration standpoint, we reflected on several key takeaways:
-	•	Strengths: Our communication was transparent and frequent. Everyone respected their scope while staying available for cross-support. We regularly reviewed each other’s pull requests and gave constructive feedback.
-	•	Improvements: Earlier in the project, some code lacked consistency in naming conventions or formatting, which caused confusion during integration. After Sprint 1, we agreed on shared style guidelines and inline documentation standards.
-	•	Growth: We developed a deeper appreciation for modularity and responsibility segregation. Refactoring the skill system into fully encapsulated classes not only reduced bugs but also allowed us to quickly add new functionality (like chaining SlowField with electric pulses via SlowFieldBonusDamage).
+	- •	Strengths: Our communication was transparent and frequent. Everyone respected their scope while staying available for cross-support. We regularly reviewed each other’s pull requests and gave constructive feedback.
+	- •	Improvements: Earlier in the project, some code lacked consistency in naming conventions or formatting, which caused confusion during integration. After Sprint 1, we agreed on shared style guidelines and inline documentation standards.
+	- •	Growth: We developed a deeper appreciation for modularity and responsibility segregation. Refactoring the skill system into fully encapsulated classes not only reduced bugs but also allowed us to quickly add new functionality (like chaining SlowField with electric pulses via SlowFieldBonusDamage).
 
 - Toward the final sprints, our workflow matured. New features became plug-and-play thanks to consistent interfaces and reusable components. Final sprint activities included difficulty balancing, particle optimization, and edge case testing—such as verifying that ReflectSkill and DashSkill didn’t conflict under high-intensity gameplay.
 
@@ -214,7 +214,7 @@ Add a group photo here!
 - Reflect on project as a whole. Lessons learned. Reflect on challenges. Future work.
 
 - 中文
-本次项目为我们团队带来了极大的成长，不仅锻炼了实际开发能力，更帮助我们理解了完整游戏系统背后的设计逻辑与用户体验。
+- 本次项目为我们团队带来了极大的成长，不仅锻炼了实际开发能力，更帮助我们理解了完整游戏系统背后的设计逻辑与用户体验。
 
 我们最大的收获之一，是对 系统解耦与模块化架构 的深刻理解。在项目初期，逻辑耦合较为严重，例如技能效果直接修改全局状态，导致调试复杂。后来我们将功能逐步拆分到各自类中，例如把攻击行为从 Player 中拆为 MeleeAttack 类，把技能逻辑抽象为 Skill 类，从而大幅提升了代码的复用性与可维护性。
 
@@ -236,22 +236,22 @@ p5.js 提供了灵活的图形接口，但对复杂状态控制和大规模对�
 - English
 - This project brought significant growth to our team, not only enhancing our practical development skills but also deepening our understanding of the underlying design logic and user experience of a complete game system.
 
-One of our greatest takeaways was the importance of system decoupling and modular architecture. In the early stages, we struggled with tightly coupled logic—for example, skill effects directly modified global states, making debugging difficult and error-prone. Over time, we refactored the system into clear, independent modules. We extracted melee behavior into a dedicated MeleeAttack class and abstracted all abilities into a base Skill class. These changes greatly improved the reusability and maintainability of our code, aligning with best practices in software engineering.
+- One of our greatest takeaways was the importance of system decoupling and modular architecture. In the early stages, we struggled with tightly coupled logic—for example, skill effects directly modified global states, making debugging difficult and error-prone. Over time, we refactored the system into clear, independent modules. We extracted melee behavior into a dedicated MeleeAttack class and abstracted all abilities into a base Skill class. These changes greatly improved the reusability and maintainability of our code, aligning with best practices in software engineering.
 
-We also learned how to perform game balancing and playability tuning. During internal playtests, we discovered that combining ReflectSkill and LifestealSkill made the player nearly invincible. To address this, we tweaked cooldown durations and effect times, and limited the number of equippable skills to preserve the game’s challenge and fairness. Meanwhile, we used components like HPSystem, CooldownSystem, and DashResetSkill to precisely manage numerical interactions, allowing us to create strategic skill synergies rather than brute-force power stacking.
+- We also learned how to perform game balancing and playability tuning. During internal playtests, we discovered that combining ReflectSkill and LifestealSkill made the player nearly invincible. To address this, we tweaked cooldown durations and effect times, and limited the number of equippable skills to preserve the game’s challenge and fairness. Meanwhile, we used components like HPSystem, CooldownSystem, and DashResetSkill to precisely manage numerical interactions, allowing us to create strategic skill synergies rather than brute-force power stacking.
 
-Several technical challenges emerged as well. For instance, the ChargeStrikeSkill failed to properly reset the isCharging state after activation, preventing the player from moving. We resolved this by introducing time-based state transitions and synchronizing conditions in the update() method. This taught us how to design real-time, state-driven systems that are both responsive and robust.
+- Several technical challenges emerged as well. For instance, the ChargeStrikeSkill failed to properly reset the isCharging state after activation, preventing the player from moving. We resolved this by introducing time-based state transitions and synchronizing conditions in the update() method. This taught us how to design real-time, state-driven systems that are both responsive and robust.
 
-Though p5.js offered flexible rendering and graphics capabilities, it did not provide built-in solutions for advanced state management or performance handling. As a result, we designed supporting modules such as CollisionManager, DamageCalculator, PixelExplosion, and SkillSystem. These custom tools significantly improved both the maintainability and runtime performance of our game, and allowed us to better handle concurrent game objects and effects.
+- Though p5.js offered flexible rendering and graphics capabilities, it did not provide built-in solutions for advanced state management or performance handling. As a result, we designed supporting modules such as CollisionManager, DamageCalculator, PixelExplosion, and SkillSystem. These custom tools significantly improved both the maintainability and runtime performance of our game, and allowed us to better handle concurrent game objects and effects.
 
-Looking forward, we have several goals to further evolve this project:
-	•	Introduce wave-based or level progression systems to create a dynamic difficulty curve.
-	•	Add more skills and an upgrade tree, enabling players to develop personalized strategies.
-	•	Integrate environmental elements such as obstacles, traps, and destructible terrain for gameplay variety.
-	•	Explore local co-op or PvP modes, allowing multiplayer interaction and competition.
-	•	Build a leaderboard system to track high scores and survival times for long-term player motivation.
+- Looking forward, we have several goals to further evolve this project:
+	- •	Introduce wave-based or level progression systems to create a dynamic difficulty curve.
+	- •	Add more skills and an upgrade tree, enabling players to develop personalized strategies.
+	- •	Integrate environmental elements such as obstacles, traps, and destructible terrain for gameplay variety.
+	- •	Explore local co-op or PvP modes, allowing multiplayer interaction and competition.
+	- •	Build a leaderboard system to track high scores and survival times for long-term player motivation.
 
-In summary, this project not only helped us develop a functionally rich and structurally complex game, but also gave us a deeper appreciation for design patterns, collaboration practices, technical precision, and iterative UX improvement. It served as a comprehensive training ground for large-scale system development and has prepared us well for future projects in software and game development alike.
+- In summary, this project not only helped us develop a functionally rich and structurally complex game, but also gave us a deeper appreciation for design patterns, collaboration practices, technical precision, and iterative UX improvement. It served as a comprehensive training ground for large-scale system development and has prepared us well for future projects in software and game development alike.
 
 ### Contribution Statement
 
