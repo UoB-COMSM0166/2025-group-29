@@ -1,16 +1,49 @@
-<!-- project-root/game.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My P5 Game</title>
-  <!-- 引入 p5.js -->
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+    }
+    /* 背景 iframe */
+    #bgFrame {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      border: none;
+      z-index: 0;
+      /* 鼠标事件都穿透到上层 canvas */
+      pointer-events: none;
+    }
+    /* p5.js 的画布 */
+    canvas {
+      position: absolute !important;
+      top: 0 !important; left: 0 !important;
+      z-index: 1 !important;
+      background: transparent !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 去掉 ?auto=true，改成手动模式 -->
+  <iframe id="bgFrame" src="BG.html"></iframe>
+
+  <!-- p5.js 库 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
   <!-- 你的游戏逻辑 -->
   <script src="GameFile.js"></script>
-</head>
-<body>
-  <!-- p5.js 会自动把 canvas 插入到 body 中 -->
+
+  <!-- 2. 在父页面监听键盘，转发给 BG.html -->
+  <script>
+    const bg = document.getElementById('bgFrame');
+    window.addEventListener('keydown',   e => bg.contentWindow.postMessage({ type: 'keydown', key: e.key }, '*'));
+    window.addEventListener('keyup',     e => bg.contentWindow.postMessage({ type: 'keyup',   key: e.key }, '*'));
+  </script>
 </body>
 </html>

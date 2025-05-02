@@ -1,9 +1,10 @@
+// js/router.js
 import { startFlight } from './background.js';
-import { IntroScreen } from './ui/introScreen.js';
-import { MainMenu    } from './ui/mainMenu.js';
-import { LoadMenu    } from './ui/loadMenu.js';
-import { SaveMenu    } from './ui/saveMenu.js';
-import { ExitConfirm } from './ui/exitConfirm.js';
+import { IntroScreen }   from './ui/introScreen.js';
+import { MainMenu }      from './ui/mainMenu.js';
+import { LoadMenu }      from './ui/loadMenu.js';
+import { SaveMenu }      from './ui/saveMenu.js';
+import { ExitConfirm }   from './ui/exitConfirm.js';
 
 const modules = {
   INTRO:        IntroScreen,
@@ -12,20 +13,19 @@ const modules = {
   SAVE_MENU:    SaveMenu,
   EXIT_CONFIRM: ExitConfirm
 };
+
 let currentState = null;
 
 export function initRouter() {
   switchTo('INTRO');
 }
 
-// 直接切 UI
 export function switchTo(state) {
   if (currentState) modules[currentState].hide();
   currentState = state;
   modules[state].show();
 }
 
-// 触发一次“段落飞行”后再切 UI
 export function advanceTo(state) {
   const handler = () => {
     window.removeEventListener('flightComplete', handler);

@@ -2,18 +2,11 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js';
 
 let scene, camera, renderer, starGroup;
-// 环形转速
 const angularSpeed = 0.0005;
-// 相机推进参数
-const moveDuration = 1;      // 推进时长 (秒)
-const moveDistance = 375;    // 推进距离
-let moving = false;
-let moveStart = 0;
-let origCamZ = 0;
-
-// 新增：用于正弦振荡的相位和最大角度（15°转换为弧度）
-let oscillationPhase = 0;
-const maxAngle = THREE.MathUtils.degToRad(15);
+const moveDuration = 1;
+const moveDistance = 375;
+let moving = false, moveStart = 0, origCamZ = 0;
+let oscillationPhase = 0, maxAngle = THREE.MathUtils.degToRad(15);
 
 export function initBackground(container) {
   scene    = new THREE.Scene();
@@ -25,11 +18,10 @@ export function initBackground(container) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
 
-  // 星星组
   starGroup = new THREE.Group();
   for (let i = 0; i < 1500; i++) {
-    const geo  = new THREE.SphereGeometry(1, 12, 12);
-    const mat  = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const geo = new THREE.SphereGeometry(1, 12, 12);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const star = new THREE.Mesh(geo, mat);
     star.position.set(
       Math.random() * 600 - 300,
@@ -45,32 +37,28 @@ export function initBackground(container) {
   animate();
 }
 
-// 外部调用此接口触发相机短暂推进
 export function startFlight() {
   if (!moving) {
-    moving    = true;
+    moving = true;
     moveStart = performance.now();
-    origCamZ  = camera.position.z;
+    origCamZ = camera.position.z;
   }
 }
 
 function animate() {
   requestAnimationFrame(animate);
 
-  // 星云环形振荡（0～15°往返）
+  // 星云环形振荡
   oscillationPhase += angularSpeed;
-  starGroup.rotation.y = (Math.sin(oscillationPhase) + 1) / 2 * maxAngle;
+  starGroup.rotation.y = (Math.sin(oscillationPhase) + 1)/2 * maxAngle;
 
-  // 相机短暂推进逻辑
   if (moving) {
     const elapsed = (performance.now() - moveStart) / 1000;
     if (elapsed <= moveDuration) {
-      const t = elapsed / moveDuration; // 0→1
-      // 缓动推进距离
+      const t = elapsed / moveDuration;
       const delta = easeInOutQuad(t) * moveDistance;
       camera.position.z = origCamZ - delta;
     } else {
-      // 推进结束，恢复位置并触发路由事件
       camera.position.z = origCamZ - moveDistance;
       moving = false;
       window.dispatchEvent(new Event('flightComplete'));
@@ -87,11 +75,11 @@ function onWindowResize() {
 }
 
 function onMouseMove(e) {
-  const x     = (e.clientX - window.innerWidth / 2)  / window.innerWidth;
-  const y     = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+  const x = (e.clientX - innerWidth/2) / innerWidth;
+  const y = (e.clientY - innerHeight/2) / innerHeight;
   const range = 20;
-  const img   = document.getElementById('titleImage');
-  const txt   = document.getElementById('continueText');
+  const img = document.getElementById('titleImage');
+  const txt = document.getElementById('continueText');
   if (img) img.style.transform =
     `translateX(calc(-50% + ${-x*range}px)) translateY(${-y*range}px) scale(1.25)`;
   if (txt) txt.style.transform =
@@ -100,6 +88,6 @@ function onMouseMove(e) {
 
 function easeInOutQuad(t) {
   return t < 0.5
-    ? 2 * t * t
-    : -1 + (4 - 2 * t) * t;
+    ? 2*t*t
+    : -1 + (4 - 2*t)*t;
 }

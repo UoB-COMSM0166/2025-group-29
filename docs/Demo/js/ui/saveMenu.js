@@ -1,5 +1,6 @@
 // js/ui/saveMenu.js
-import { advanceTo } from '../router.js';
+import { supabase } from '../supabase.js';
+import { switchTo } from '../router.js';
 
 export const SaveMenu = {
   el: null,
@@ -13,36 +14,43 @@ export const SaveMenu = {
         <input type="text" id="saveNameInput" placeholder="Enter save name" />
       </div>
       <div class="optionsArea">
-        <p>Difficulty:</p>
-        <label><input type="radio" name="difficulty" value="easy" checked> Easy</label>
-        <label><input type="radio" name="difficulty" value="hard"> Hard</label>
+        <p>Mode:</p>
+        <label><input type="radio" name="mode" value="easy" checked> Easy</label>
+        <label><input type="radio" name="mode" value="hard"> Hard</label>
       </div>
-      <button class="menuButton" id="confirmSave">Save &amp; Play</button>
+      <button class="menuButton" id="confirmSave">Save & Play</button>
+      <button class="menuButton" id="deleteSave">Delete Save</button>
       <button class="menuButton" id="backFromSave">Back</button>
     `;
     document.body.appendChild(this.el);
 
-    document.getElementById('confirmSave').onclick = () => {
+    // 插入新存档
+    document.getElementById('confirmSave').onclick = async () => {
       const name = document.getElementById('saveNameInput').value.trim();
-      if (!name) {
-        alert('Please enter a save name.');
-        return;
-      }
-      const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
-      const saveData = {
-        name,
-        creationTime: new Date().toLocaleString(),
-        currentLevel: 1,   // TODO: 用实际关卡数据替换
-        difficulty
-      };
-      localStorage.setItem(`save_${name}`, JSON.stringify(saveData));
-      // 保存完毕后跳转到游戏页
-      window.location.href = 'game.html';
+      if (!name) return alert('Please enter a save name.');
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const { data, error } = await supabase
+        .from('saves')
+        .insert([{ name, current_level: 1, mode }])
+        .select();
+      if (error) return alert('Save failed: ' + error.message);
+      const saveId = data[0].id;
+      window.location.href = `game.html?saveId=${saveId}`;
     };
 
-    document.getElementById('backFromSave').onclick = () => advanceTo('MAIN_MENU');
+    // 按名称删除
+    document.getElementById('deleteSave').onclick = async () => {
+      const name = document.getElementById('saveNameInput').value.trim();
+      if (!name) return alert('Enter the save name to delete.');
+      const { error } = await supabase.from('saves').delete().eq('name', name);
+      if (error) return alert('Delete failed: ' + error.message);
+      alert(`Save '${name}' deleted.`);
+      document.getElementById('saveNameInput').value = '';
+    };
+
+    document.getElementById('backFromSave').onclick = () => switchTo('MAIN_MENU');
   },
   hide() {
-    this.el.remove();
+    if (this.el) this.el.remove();
   }
 };
