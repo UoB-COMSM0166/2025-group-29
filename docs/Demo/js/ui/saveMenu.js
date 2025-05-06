@@ -24,14 +24,19 @@ export const SaveMenu = {
     `;
     document.body.appendChild(this.el);
 
-    // 插入新存档
+    // 插入新存档，初始化 skills 为空数组
     document.getElementById('confirmSave').onclick = async () => {
       const name = document.getElementById('saveNameInput').value.trim();
       if (!name) return alert('Please enter a save name.');
       const mode = document.querySelector('input[name="mode"]:checked').value;
       const { data, error } = await supabase
         .from('saves')
-        .insert([{ name, current_level: 1, mode }])
+        .insert([{
+          name,
+          current_level: 1,
+          mode,
+          skills: []      // 初始化为空数组
+        }])
         .select();
       if (error) return alert('Save failed: ' + error.message);
       const saveId = data[0].id;
