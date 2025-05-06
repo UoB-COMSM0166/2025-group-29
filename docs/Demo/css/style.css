@@ -1,0 +1,150 @@
+@font-face {
+    font-family: 'Minecraft';
+    src: url('../assets/font/Minecraft.ttf') format('truetype');
+}
+
+/* Force all elements to use Minecraft font */
+* {
+    font-family: 'Minecraft', Arial, sans-serif !important;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Minecraft', Arial, sans-serif;
+}
+
+canvas {
+    display: block;
+}
+
+/* Intro Screen */
+#introScreen #titleImage {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%) scale(1.25);
+    max-width: 400px;
+    mix-blend-mode: lighten;
+}
+    /* 其余样式保持不变 */
+    animation: glow 2s ease-in-out infinite alternate;
+  
+  @keyframes glow {
+    from {
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
+    }
+    to {
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.9));
+    }
+
+}
+
+#introScreen #continueText {
+    position: absolute;
+    bottom: 10%;             /* 下移到离底部 10% */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    font-weight: normal;
+    color: white;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    animation: pulse 1.5s ease-in-out infinite; /* 添加放大缩小动画 */
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.2);
+    }
+}
+
+/* Common Menu Styles */
+.menuContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.menuButton {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px 0;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid #fff;
+    border-radius: 4px;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s;
+}
+
+.menuButton:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.02);
+}
+
+/* Load / Save Lists */
+.menuList {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.menuList li {
+    margin: 5px 0;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.menuList li:hover {
+    text-decoration: underline;
+}
+
+/* Load container full-width and scrollable */
+.loadContainer {
+    position: absolute;
+    top: 5%;               /* title nearer to top */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;            /* nearly full width */
+    max-height: 90vh;      /* vertical scroll area */
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+    overflow-y: auto;      /* vertical scroll */
+}
+
+/* Table wrapper */
+.tableContainer {
+    width: 100%;
+    overflow-y: auto;
+}
+
+/* Load Game Table Styles */
+.loadTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+.loadTable th,
+.loadTable td {
+    border: 1px solid #fff;
+    padding: 8px;
+    text-align: center;
+    color: #fff;
+}
+.loadTable th {
+    background: rgba(255, 255, 255, 0.1);
+}

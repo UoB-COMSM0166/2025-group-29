@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My P5 Game</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+    }
+    /* 背景 iframe */
+    #bgFrame {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      border: none;
+      z-index: 0;
+      pointer-events: none;
+    }
+    /* p5.js 的画布 */
+    canvas {
+      position: absolute !important;
+      top: 0 !important; left: 0 !important;
+      z-index: 1 !important;
+      background: transparent !important;
+    }
+  </style>
+
+  <!-- 1. 拿 URL 中的 saveId -->
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const saveId = params.get('saveId');
+    if (!saveId) {
+      console.error('Missing saveId in URL');
+      alert('存档 ID 缺失，无法继续');
+    }
+    window.APP_SAVE_ID = saveId;
+  </script>
+
+  <!-- 2. p5.js 与游戏脚本 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <script src="GameFile.js"></script>
+
+</head>
+<body>
+
+  <iframe id="bgFrame" src="BG.html"></iframe>
+
+  <!-- 3. 父页面键盘事件转发给背景 -->
+  <script>
+    const bg = document.getElementById('bgFrame');
+    window.addEventListener('keydown', e => {
+      bg.contentWindow.postMessage({ type: 'keydown', key: e.key }, '*');
+    });
+    window.addEventListener('keyup', e => {
+      bg.contentWindow.postMessage({ type: 'keyup', key: e.key }, '*');
+    });
+  </script>
+</body>
+</html>
