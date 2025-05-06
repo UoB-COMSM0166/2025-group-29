@@ -38,17 +38,36 @@ let skillIcons = {}; // 统一集中管理图标
 //弹幕
 let bulletEnemyImg;
 let bulletImg;
-let bulletReflectedImg; // 反弹贴图
+
+let bulletReflectedImg;         // 反弹子弹
+//let playerReflectGif   = null;  // 反弹状态下的玩家 GIF
 
 let bullets = []; // 所有子弹对象
 let bulletPatternType = 3; // 1=水平双发，2=四向，3=六向
 
 let collisionManager;
 //玩家贴图
-let playerIdleRightGif, playerIdleLeftGif;
-let playerAttackRightGif, playerAttackLeftGif;
+//let playerIdleRightGif, playerIdleLeftGif;
+//let playerAttackRightGif, playerAttackLeftGif;
 
+let boss = null;
+
+// 黑洞
+let blackHoles = [];
+
+//关卡管理
 let levelManager;
+let gamePaused = false;
+
+const GIF_POOL = {
+  normal: { idle:{}, attack:{} },
+  agile : { idle:{}, attack:{} },
+  power : { idle:{}, attack:{} },
+  tank  : { idle:{}, attack:{} }
+};
+
+
+
 
 
 
@@ -66,61 +85,139 @@ function preload() {
   //loadImage("弹幕1.gif");
   //这里的注释是为了测试方便，加载图片不是必须的，传入null可以只测试代码功能。
   bulletReflectedImg = null;
+  //playerReflectGif   = null;          // or loadImage("player-reflect.gif");
   //玩家贴图
-  playerIdleRightGif  = null;
+  //playerIdleRightGif  = null;
   //loadImage("精灵-0001.gif");
-  playerAttackRightGif= null;
+  //playerAttackRightGif= null;
   //loadImage("精灵-0002.gif");
+
+  GIF_POOL.normal.idle.base   = null;
+  GIF_POOL.normal.idle.dash   = loadImage("normalidledash.gif");
+  GIF_POOL.normal.idle.boost  = null;
+  GIF_POOL.normal.idle.steal  = null;
+  GIF_POOL.normal.idle.charge = loadImage("normalidlecharge.gif");
+  GIF_POOL.normal.idle.shield = null;
+  GIF_POOL.normal.attack.base   = loadImage("normalattackbase.gif");
+  GIF_POOL.normal.attack.dash   = null;//没用
+  GIF_POOL.normal.attack.boost  = null;
+  GIF_POOL.normal.attack.steal  = null;
+  GIF_POOL.normal.attack.charge = null;//没用
+  GIF_POOL.normal.attack.shield = null;
+  GIF_POOL.agile.idle.base   = null;
+  GIF_POOL.agile.idle.dash   = null;
+  GIF_POOL.agile.idle.boost  = null;
+  GIF_POOL.agile.attack.base  = null;
+  GIF_POOL.agile.attack.dash  = null;//没用
+  GIF_POOL.agile.attack.boost = null;
+  GIF_POOL.power.idle.base   = loadImage("power-idle-base.gif");
+  GIF_POOL.power.idle.steal  = loadImage("power-idle-steal.gif");
+  GIF_POOL.power.idle.charge = loadImage("power-idle-charge.gif");
+  GIF_POOL.power.attack.base   = loadImage("power-attack-base.gif");
+  GIF_POOL.power.attack.steal  = loadImage("power-attack-steal.gif");
+  GIF_POOL.power.attack.charge = null;//没用
+  GIF_POOL.tank.idle.base   = loadImage("tankidlebase.gif");
+  GIF_POOL.tank.idle.shield = loadImage("tankidleshield.gif");
+  GIF_POOL.tank.attack.base   = loadImage("tankattackbase.gif");
+  GIF_POOL.tank.attack.shield = loadImage("tankattackshield.gif");
+
+
+}
+
+function applyFactionFromSkills() {
+  const sel = skillSystem.selectedSkills;
+
+  // ─── ① 用 instanceof 判定具体被动 ───
+  const hasAgile = sel.some(s => s instanceof DashResetSkill);
+  const hasPower = sel.some(s => s instanceof BloodFurySkill);
+  const hasTank  = sel.some(s => s instanceof SlowFieldBonusDamage);
+
+  // ─── ② 决定流派并写回 player.faction ───
+  if (hasAgile)        player.faction = "agile";
+else if (hasPower)   player.faction = "power";
+else if (hasTank)    player.faction = "tank";
+else                  player.faction = "normal";
 }
 
 
 
 function setup() {
+  
+  
+  if (!dataLoaded) {
+    noLoop();
+    const check = setInterval(() => {
+      if (dataLoaded) {
+        clearInterval(check);
+        initGame();
+        loop();
+      }
+    }, 50);
+    return;
+  }
+
+  initGame();
+  
+
+
+
+}
+
+function initGame() {
   createCanvas(windowWidth, windowHeight);
   console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
-  
 
-  //设置玩家
+  // 设置关卡
+  gamelevel = savedLevel || 1;
+  currentMode = savedMode || "normal"; // 如果你有 currentMode 的概念
+
+  // 玩家和系统初始化
   setPlayer();
-  //设置技能系统
-  setSkillSystem();
-
-  // 初始化关卡系统
+  setSkillSystem(savedSkills); // ✅ 传入读取到的技能数组
   levelManager = new LevelManager();
   levelManager.addLevel(new Level1());
-  // 这里可以继续 addLevel(new Level2()), ... 以后加
+  levelManager.addLevel(new Level2());
 
+  setTimeBonuses();
+  collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
+  player.meleeAttack = new MeleeAttack(player, enemies);
+  applyFactionFromSkills();
 
-
-  
-  // 设置敌人
-  // setEnemies();
-
-
-
-  // 吞食逻辑未完成
-  // setTimeBonuses();
-
-  levelManager.loadLevel(0);
-
-
-
+  levelManager.loadLevel(gamelevel - 1); // 因为关卡数组从 0 开始
 }
   
-function setSkillSystem() {
+function setSkillSystem(savedSkills = null) {
   skillSystem = new SkillSystem();
-  
-  skillSystem.addSkill(new DashSkill(player, enemies)); 
-  skillSystem.addSkill(new AttackBoostSkill(player)); 
-  skillSystem.addSkill(new DashResetSkill(player,skillSystem.selectedSkills)); 
+  const slowField   = new SlowFieldSkill(player, enemies);
+  const fieldShock  = new SlowFieldBonusDamage(player, enemies, slowField);
 
-  skillSystem.selectSkill(skillSystem.allSkills[0]);
-  skillSystem.selectSkill(skillSystem.allSkills[1]);
-  skillSystem.selectSkill(skillSystem.allSkills[2]);
+  skillSystem.addSkill(new DashSkill(player, enemies));
+  skillSystem.addSkill(new AttackBoostSkill(player));
+  skillSystem.addSkill(new DashResetSkill(player, skillSystem.selectedSkills));
+  skillSystem.addSkill(new LifestealSkill(player));
+  skillSystem.addSkill(new ChargeStrikeSkill(player, enemies));
+  skillSystem.addSkill(new BloodFurySkill(player));
+  skillSystem.addSkill(new ReflectSkill(player));
+  skillSystem.addSkill(slowField);
+  skillSystem.addSkill(fieldShock);
+
+  skillSystem.selectedSkills = [];
+
+  if (savedSkills) {
+    // 使用存档中的技能名选择技能
+    for (let name of savedSkills) {
+      let skill = skillSystem.allSkills.find(s => s.name === name);
+      if (skill) skillSystem.selectSkill(skill);
+    }
+  } 
+  
+ /*skillSystem.selectSkill(skillSystem.allSkills[6]);
+ skillSystem.selectSkill(skillSystem.allSkills[7]);
+ skillSystem.selectSkill(skillSystem.allSkills[8]);*/
 
   player.selectedSkills = skillSystem.selectedSkills;
-
 }
+
 
 
 function setPlayer() {
@@ -146,7 +243,7 @@ function setEnemies() {
     }
   
     // **隐形敌人
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 30; i++) {
       let stealthPos = generateValidEnemyPosition(minSpawnDistance);
       enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y, 40));
     }
@@ -177,21 +274,53 @@ function setEnemies() {
 
 
 
-function draw() {
 
-if (checkGameOver()) return;
+
+
+
+function draw() {
+ // 只修正四个方向键的状态
+keys["ArrowUp"]    = keyIsDown(UP_ARROW);
+keys["ArrowDown"]  = keyIsDown(DOWN_ARROW);
+keys["ArrowLeft"]  = keyIsDown(LEFT_ARROW);
+keys["ArrowRight"] = keyIsDown(RIGHT_ARROW);
+
+// 死亡优先级最高，优先处理
+if (gameOver) {
+  showGameOverScreen();
+  return;
+}
+
+
+
+// 检查暂停状态
+if (typeof gamePaused !== 'undefined' && gamePaused) {
+  background(0); // 保持黑色背景
+  if (levelManager && levelManager.currentLevel) {
+    levelManager.currentLevel.draw();  // 显示关卡的提示语
+  }
+  drawInfo();  // 分数、时间、技能 HUD
+  return;  // 提前退出，避免更新其他逻辑
+}
 
 // 只有在关卡没结束时更新倒计时
 if (!levelManager.currentLevel.finished) {
   updateTimer();
 }
-// updateTimer();
+
+
+
 updateCamera();
+ 
 drawMapBorder();
 
-// updateTimeBonuses();
-// updateEnemies();
-// updateBullets();
+//updateTimeBonuses();
+
+//updateEnemies();
+
+//updateBoss();
+
+//updateBullets()
 
 // 让 LevelManager 自主管理更新 & 渲染
 if (levelManager) {
@@ -203,7 +332,6 @@ if (levelManager) {
 
   levelManager.draw();    // 渲染提示、关卡 UI
 }
-
 // 玩家和碰撞检测只在关卡没结束时更新
 if (!levelManager.currentLevel.finished) {
   updatePlayer();
@@ -211,13 +339,20 @@ if (!levelManager.currentLevel.finished) {
   collisionManager.update();
 }
 
+/*updatePlayer();
+    // … 更新、绘制玩家后 …
+player.meleeAttack.update();
+collisionManager.update();*/
 
 // HUD & 碰撞
 drawInfo();
 
-
+// 最后再叠加 Game Over 界面**
+if (gameOver) {
+  showGameOverScreen();
 }
 
+}
 
 // 关卡管理
 class LevelManager {
@@ -244,6 +379,21 @@ class LevelManager {
     player.meleeAttack = new MeleeAttack(player, enemies);
   }
 
+  loadNextLevel() {
+    if (!this.currentLevel) {
+        console.warn("当前没有加载任何关卡，无法跳转下一关");
+        return;
+    }
+    const currentIndex = this.levels.indexOf(this.currentLevel);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= this.levels.length) {
+        console.log("🎉 已经完成所有关卡！");
+        this.currentLevel = null;
+    } else {
+        this.loadLevel(nextIndex);
+    }
+  }
+
   update() {
     if (this.currentLevel && typeof this.currentLevel.update === 'function') {
       this.currentLevel.update();
@@ -259,7 +409,8 @@ class LevelManager {
 
 
 
-class BaseLevel {
+class 
+BaseLevel {
   constructor(name) {
     this.name = name;
     this.baseScore = 0;
@@ -275,6 +426,7 @@ class BaseLevel {
 
   start() {
     console.log(`开始关卡: ${this.name}`);
+    player.hp.currentHP = player.hp.maxHP;  // 每关开始时HP回复满
     // 初始化关卡数据（如敌人、道具等）
   }
 
@@ -372,10 +524,34 @@ class BaseLevel {
 
   const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  
+  // 获取玩家基础状态
+  const playerHP = player.hp.currentHP;
+  const skills = player.selectedSkills.map(s => s.name);  // 技能名数组
+  const skillsJson = JSON.stringify(skills);
+
 
   const sql = `
-  INSERT INTO saves (slot_number, player_id, level_number, save_date, save_time )
-  VALUES (${slot},'${playerId}', ${levelNumber}, '${dateStr}', '${timeStr}' );
+  INSERT INTO saves (
+    player_id,
+    level_number,
+    save_date,
+    save_time,
+    slot_number,
+    player_hp,
+    total_score,
+    selected_skills
+)
+VALUES (
+    '${playerId}',
+    ${levelNumber},
+    '${dateStr}',
+    '${timeStr}',
+    ${slot},
+    ${playerHP},
+    ${score},
+    '${skillsJson}'
+);
 `;
 
   // 下载为 .sql 文件
@@ -393,13 +569,125 @@ class BaseLevel {
 }
 
 
-  isCompleted() {
-    // 默认 false，子类可以重写，判断通关条件
-    return false;
+
+handleKeyPressed(key) {
+  if (this.finished) {
+      if (this.postGameStage === 0) {
+          // 玩家按任意键继续
+          this.postGameStage = 1;
+      }
+      else if (this.postGameStage === 1) {
+          if (key === 'S' || key === 's') {
+              // 进入存档界面
+              this.postGameStage = 2;
+          }
+          else if (key === 'C' || key === 'c') {
+              // 🚀 直接进入下一关
+              console.log("玩家选择继续下一关");
+              levelManager.loadNextLevel();
+          }
+      }
+      else if (this.postGameStage === 2) {
+          // 在存档界面时，用 ↑ ↓ 选择槽，用 Enter 存档
+          if (keyCode === UP_ARROW) {
+              this.selectedSlotIndex = (this.selectedSlotIndex - 1 + this.saveSlots.length) % this.saveSlots.length;
+          }
+          else if (keyCode === DOWN_ARROW) {
+              this.selectedSlotIndex = (this.selectedSlotIndex + 1) % this.saveSlots.length;
+          }
+          else if (keyCode === ENTER) {
+              const selectedSlot = this.saveSlots[this.selectedSlotIndex];
+              console.log(`保存到槽 ${selectedSlot}`);
+              this.saveProgress(selectedSlot);
+
+              // 存档完毕，自动进入下一关
+              levelManager.loadNextLevel();
+          }
+      }
   }
 }
 
 
+  isCompleted() {
+    // 默认 false，子类可以重写，判断通关条件
+    return false;
+  }
+
+
+
+}
+
+
+function triggerLoadSQLFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.sql';
+
+  input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = event => {
+          const sqlContent = event.target.result;
+          console.log("已读取 SQL 文件:", sqlContent);
+          parseSaveFileAndLoad(sqlContent);
+      };
+      reader.readAsText(file);
+  };
+
+  input.click();
+}
+
+
+function parseSaveFileAndLoad(sqlContent) {
+  const match = sqlContent.match(/\(([^)]+)\);/);
+  if (!match) {
+      alert("无法解析存档文件");
+      return;
+  }
+
+  const values = match[1].split(',').map(s => s.trim());
+
+  const playerId = values[0].replace(/['"]/g, '');
+  const levelNumber = parseInt(values[1]);  // 已完成的关卡编号
+  const saveDate = values[2].replace(/['"]/g, '');
+  const saveTime = values[3].replace(/['"]/g, '');
+  const slotNumber = parseInt(values[4]);
+  const playerHP = parseInt(values[5]);
+  const savedScore = parseInt(values[6]);
+  const skillsJson = JSON.parse(values[7].replace(/['"]/g, ''));
+
+  console.log("解析出的存档数据:", {
+      playerId, levelNumber, saveDate, saveTime, slotNumber,
+      playerHP, savedScore, skillsJson
+  });
+
+  // 加载“下一关”
+  const nextLevelIndex = levelNumber;  // 因为 LevelManager.levels 是从0开始的
+  if (nextLevelIndex >= levelManager.levels.length) {
+      alert("🎉 你已完成所有关卡！");
+      return;
+  }
+
+  console.log(`正在加载关卡 ${nextLevelIndex + 1}...`);
+  levelManager.loadLevel(nextLevelIndex);
+
+  // 延时恢复基础状态（等 Level 初始化好）
+  setTimeout(() => {
+      console.log("恢复玩家进度...");
+      player.hp.currentHP = playerHP;
+      score = savedScore;
+
+      // ✅ 直接调用技能系统加载函数
+      setSkillSystem(skillsJson);
+      
+      console.log("进度恢复完成 ✅");
+  }, 100);
+}
+
+
+// 第1关
 class Level1 extends BaseLevel {
   constructor() {
     super("Level 1");
@@ -519,11 +807,16 @@ class Level1 extends BaseLevel {
 
 
   // 提供给外部的事件监听方法
-  handleKeyPressed() {
+  handleKeyPressed(key) {
     if (this.stage === 0) {
       this.stage = 1;
       this.tip = "Use the arrow keys to move";
-    }
+    }else {
+      // 默认的处理交给 BaseLevel
+      super.handleKeyPressed(key);
+  }
+
+    
   }
 
   handlePlayerMoved() {
@@ -595,9 +888,179 @@ class Level1 extends BaseLevel {
 
 }
 
+// 第2关
+class Level2 extends BaseLevel {
+  constructor() {
+      super("Level 2");
+      this.levelNumber = 2;
+
+      // 阶段控制：
+      // 0: 初始提示
+      // 1: 生存战中
+      // 2: 完成
+      this.stage = 0;
+
+      this.tip = "特殊敌人出现！警惕";
+      this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+      this.finished = false;
+
+      this.blackHoles = [];
+
+      // this.pauseTimer = millis() + 10000;  // 10秒后触发暂停提示
+      this.pauseShown = false;
+      this.pausedForBlackHoleTip = false;
+
+      this.postGameStage = 0;
+  }
+  start() {
+    super.start();
+    console.log("Level2 已开始");
+
+    // 玩家归位
+    player.pos.set(0, 0);
+
+    // 清空数组
+    enemies.length = 0;
+    bullets.length = 0;
+    timeBonuses.length = 0;
+
+    // 刷敌人（正常血量）
+    let minSpawnDistance = player.r * 10;
+
+    this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
+
+    // AmbushEnemy
+    for (let i = 0; i < 4; i++) {
+        let ambushPos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
+    }
+
+    // StealthEnemy
+    for (let i = 0; i < 4; i++) {
+        let stealthPos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
+    }
+
+    // FollowEnemy
+    for (let i = 0; i < 5; i++) {
+        let followPos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new FollowEnemy(followPos.x, followPos.y));
+    }
+
+    // CommonEnemy
+    for (let i = 0; i < 8; i++) {
+        let pos = generateOutsideViewPosition();
+        enemies.push(new CommonEnemy(pos.x, pos.y));
+    }
+
+    // 刷黑洞
+    for (let i = 0; i < 2; i++) {
+        let pos = generateValidEnemyPosition(300);
+        this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
+    }
+    let healPos = generateValidEnemyPosition(300);
+    this.blackHoles.push(new BlackHole(healPos.x, healPos.y, "heal"));
+
+    // 设置倒计时
+    timer = 60;
+    startTime = millis();
+
+    this.stage = 1;  // 切换到正式战斗阶段
+  }
+
+  update() {
+    if (this.stage === 1) {
+        // 检查黑洞提示是否触发
+        if (!this.pauseShown && millis() > this.pauseTimer) {
+            gamePaused = true;
+            this.tip = "尝试寻找地图中的黑洞，看看会有什么效果！（但不会尽如人意…）";
+            this.pauseShown = true;
+            this.pausedForBlackHoleTip = true;
+            this.tipExpireTime = null;  // 让它一直显示，直到按键继续
+        }
+
+        // 检查完成
+        if (!this.finished && remainingTime <= 0) {
+            this.stage = 2;
+            this.tip = "Finished！";
+            this.finished = true;
+
+            // 结算分数
+            this.finalizeScore();
+        }
+
+        // 更新奖励物
+        for (let i = timeBonuses.length - 1; i >= 0; i--) {
+            timeBonuses[i].show();
+        }
+
+        // 更新黑洞
+        for (let bh of this.blackHoles) {
+            bh.update(player);
+            bh.show();
+        }
+
+        // 更新敌人
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            enemy.update();
+            enemy.show();
+
+            if (enemy.isExplosionFinished()) {
+                if (enemy instanceof CommonEnemy) {
+                    let pos = generateOutsideViewPosition();
+                    enemies.push(new CommonEnemy(pos.x, pos.y));
+                }
+                enemies.splice(i, 1);
+            }
+        }
+
+        // 更新子弹
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            bullets[i].update();
+            bullets[i].show();
+            if (!bullets[i].alive) {
+                bullets.splice(i, 1);
+            }
+        }
+    }
+}
+  
+  
+draw() {
+  push();
+  resetMatrix();
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(28);
+
+  // 判断是否过期：只有未过期时显示
+  if (!this.tipExpireTime || millis() < this.tipExpireTime) {
+      text(this.tip, windowWidth / 2, 80);
+  }
+
+  if (this.finished) {
+      this.showSummaryScreen();
+  }
+
+  pop();
+}
+
+// 外部事件监听
+handleKeyPressed(key) {
+  // 黑洞提示暂停状态，按任意键继续
+  if (this.pausedForBlackHoleTip) {
+      gamePaused = false;
+      this.tip = "";
+      this.pausedForBlackHoleTip = false;
+  } else {
+    // 其他按键转发给 BaseLevel，处理 Save / Continue 等逻辑
+    super.handleKeyPressed(key);
+}
+}
 
 
-
+}
 
 
 
@@ -613,7 +1076,7 @@ function updateTimer() {
 function updateCamera() {
   push();
   resetMatrix();
-  clear();
+  background(0);
   pop();
 
   let camX = constrain(player.pos.x, -width + windowWidth / 2, width - windowWidth / 2);
@@ -645,7 +1108,7 @@ function updateEnemies() {
     enemy.update();       // 控制逻辑（会设置死亡、生成爆炸对象）
     enemy.show();         // 必须调用！让它画出爆炸/尸体
 
-    // 最后判断是否爆炸动画也结束了
+    // ❗最后判断是否爆炸动画也结束了
     if (enemy.isExplosionFinished()) {
       // 如果是 CommonEnemy，就补充一个新的
       if (enemy instanceof CommonEnemy) {
@@ -676,6 +1139,12 @@ function updatePlayer() {
   player.show();
 }
 
+function updateBoss(){
+  
+    boss.update();
+    boss.show();
+  
+}
 
 function drawInfo() {
   // *** 重要：绘制分数和倒计时，不受 translate 影响 ***
@@ -704,6 +1173,12 @@ function drawInfo() {
   textAlign(LEFT, TOP);
   text(`Player X: ${floor(player.pos.x)}`, 20, 50);
   text(`Player Y: ${floor(player.pos.y)}`, 20, 80);
+
+  // 显示玩家 HP 信息
+  fill(255);
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text(`Player HP: ${player.hp.currentHP} / ${player.hp.maxHP}`, 20, 110);
   
   
 
@@ -725,7 +1200,7 @@ function drawInfo() {
 function showGameOverScreen() {
   push();
   resetMatrix(); // 取消 translate 变换，恢复默认坐标
-  clear(); // 确保整个屏幕填充黑色
+  background(0); // 确保整个屏幕填充黑色
 
   fill(255, 0, 0);
   textSize(50);
@@ -749,10 +1224,7 @@ function keyPressed() {
     restartGame();
   }
 
-  // 阶段推进（Level1 专用）
-  if (levelManager && levelManager.currentLevel instanceof Level1) {
-    levelManager.currentLevel.handleKeyPressed();
-  }
+
 
   if (key == '1'){
     gamelevel = 1;
@@ -763,50 +1235,29 @@ function keyPressed() {
   }
   
   if (key.toLowerCase() === 'a') {
-    player.meleeAttack.trigger();
+    if (!player.isCharging) { // ✅ 正在蓄力时不能普攻
+      player.meleeAttack.trigger();
+    } else {
+      console.log("⚠️ 当前为蓄力攻击状态，禁止普通攻击");
+    }
 
-  // 告诉 Level1 玩家攻击了
+    // 告诉 Level1 玩家攻击了
   if (levelManager && levelManager.currentLevel instanceof Level1) {
-      levelManager.currentLevel.handlePlayerAttack();
-  }
+    levelManager.currentLevel.handlePlayerAttack();
+}
   }
 
-  // 在结算界面时响应按键
-  if (levelManager.currentLevel instanceof Level1 && levelManager.currentLevel.finished) {
-    let currentLevel = levelManager.currentLevel;
+  if (key.toLowerCase() === 'l') {
+    console.log("请选择存档文件...");
+    triggerLoadSQLFile();
+}
+
+  // 让当前关卡处理按键
+  if (levelManager && levelManager.currentLevel) {
+    levelManager.currentLevel.handleKeyPressed(key);
+}
   
-    if (currentLevel.postGameStage === 0) {
-        currentLevel.postGameStage = 1;  // 任意键切到保存/继续界面
-    }
-    else if (currentLevel.postGameStage === 1) {
-        if (key.toLowerCase() === 's') {
-            currentLevel.postGameStage = 2;  // 进入存档界面
-        }
-        else if (key.toLowerCase() === 'c') {
-            console.log("进入下一关...");
-            // levelManager.loadLevel(1);  // 假设下一关是 Level2
-        }
-    }
-    else if (currentLevel.postGameStage === 2) {
-      if (keyCode === UP_ARROW) {
-        currentLevel.selectedSlotIndex--;
-        if (currentLevel.selectedSlotIndex < 0) {
-            currentLevel.selectedSlotIndex = currentLevel.saveSlots.length - 1;
-        }
-    } 
-    else if (keyCode === DOWN_ARROW) {
-        currentLevel.selectedSlotIndex++;
-        if (currentLevel.selectedSlotIndex >= currentLevel.saveSlots.length) {
-            currentLevel.selectedSlotIndex = 0;
-        }
-    }
-    else if (keyCode === ENTER) {
-        let slot = currentLevel.saveSlots[currentLevel.selectedSlotIndex];
-        console.log(`正在存档到槽 ${slot}...`);
-        currentLevel.saveProgress(slot);
-    }
-    }
-  }
+  
 
   skillSystem.tryActivateSkill(key); // 让技能系统处理按键
   
@@ -858,16 +1309,25 @@ function checkGameOver() {
 
 
  //重新开始
-function restartGame() {
+ function restartGame() {
   gameOver = false;
-  score = 0;
+  player.hp.currentHP = player.hp.maxHP;  // 复活时满血（保险）
+  player.hp.isDead = false; // 重置死亡状态
+  score = 0;                               // 保留分数 or 重置，看需要
   startTime = millis();
-  
 
-  dashActive = false;  // 停止冲刺状态
-  dashCooldownEndTime = millis();  // 立即结束冷却
-  dashEndTime = 0; // 确保冲刺不会在新游戏开始后生效
-  setup();
+  player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
+
+
+  // 获取当前关卡索引
+  const currentIndex = levelManager.levels.indexOf(levelManager.currentLevel);
+  if (currentIndex >= 0) {
+      console.log(`重新加载当前关卡 Level ${currentIndex + 1}`);
+      levelManager.loadLevel(currentIndex);
+  } else {
+      console.warn("未找到当前关卡索引，默认回到第1关");
+      levelManager.loadLevel(0);
+  }
 }
 
 function generateValidEnemyPosition(minDistance) {
@@ -921,10 +1381,8 @@ class Player {
     this.r = 35;
     this.speed = 4;
     
-    this.hp = new HPSystem(100); // 初始血量100
+    this.hp = new HPSystem(1000); // 初始血量100
     
-    this.lastHitTime = 0; // 
-    this.hitCooldown = 500; // 500ms 冷却时间
 
     this.baseAttack = 15;  // 原本的基础攻击力
     this.attackPower = this.baseAttack; // 当前生效的攻击力（默认 = 基础）
@@ -937,6 +1395,13 @@ class Player {
   this.lastDirection = "right";  // 记录朝向
   this.isAttacking   = false;    // 攻击动画中
   this.attackImage   = null;     // 当前播放的 gif
+
+  this.isCharging = false;
+  this.damageMultiplier = 1; // 默认受伤为100%
+  
+  //新增流派系统
+  this.faction   = "normal";              // <- 初始流派
+  this.spriteMgr = new SpriteManager(this);
 
   }
 
@@ -955,6 +1420,10 @@ class Player {
 
 
   update() {
+    this.updateSkills(); // 更新技能状态
+    
+    if (this.isCharging) return; // ✅ 蓄力中，完全不能移动
+    
     let move = createVector(0, 0);
 
     // **检测按键输入，调整移动方向**
@@ -978,8 +1447,7 @@ class Player {
     if (move.mag() > 0) {
       move.setMag(this.speed);
       this.pos.add(move);
-
-      // 告诉 Level1 玩家移动了
+    // 告诉 Level1 玩家移动了
     if (levelManager && levelManager.currentLevel instanceof Level1) {
       levelManager.currentLevel.handlePlayerMoved();
     }
@@ -991,7 +1459,9 @@ class Player {
     this.pos.y = constrain(this.pos.y, -height + this.r, height - this.r);
     
     
-  this.updateSkills(); // 更新技能状态
+ 
+    
+    
     
     
   
@@ -1005,7 +1475,6 @@ class Player {
     }
   }
   
-
   
   show() {
     // ✅ 先画拖影
@@ -1017,9 +1486,7 @@ class Player {
     
     //加载玩家贴图
      // 1️⃣ 选 GIF，不要再读 this.attackImage 了，直接用右向资源
-  let gifToDraw = this.isAttacking
-    ? playerAttackRightGif
-    : playerIdleRightGif;
+     const gifToDraw = this.spriteMgr.chooseGif();         // ← 调用上面的函数流派系统修改        // ← 调用上面的函数
 
   // 2️⃣ 判断是否要水平翻转
   let flip = this.lastDirection === "left";
@@ -1037,17 +1504,31 @@ class Player {
     );
     pop();
   } else {
-    // GIF 未加载时的备用圆
     push();
-    fill(this.isAttacking ? [255,255,0] : [0,255,0]);
-    ellipse(this.pos.x, this.pos.y, this.r*2);
-    pop();
+  fill(255, 255, 0);   // ⬅️ 统一用状态色
+  ellipse(this.pos.x, this.pos.y, this.r * 2);
+  pop();
   }
     
     this.hp.draw(this.pos.x, this.pos.y, this.r);
 
   }
+
+  receiveDamage(rawDamage) {
+    if (this.isInvincible) return;
   
+    let damage = floor(rawDamage * this.damageMultiplier); // 支持减伤
+    this.hp.takeDamage(damage);
+    console.log(`玩家受到 ${damage} 点伤害`);
+  
+    if (!this.hp.isAlive()) {
+      gameOver = true;
+      console.log("玩家死亡！");
+    }
+  }
+  
+
+
 
 
 }
@@ -1065,9 +1546,17 @@ class Enemy {
   
     this.exploding = false; // ✅ 是否在播放死亡特效
     this.explodeStartTime = 0; // ✅ 记录开始时间
-    this.explodeDuration = 500; // 毫秒
+    this.explodeDuration = 1000; // 毫秒
 
     this.explosion = null;
+
+     // ✅ 每个敌人自己有攻击冷却时间
+     this.nextHitTime = 0;
+     this.hitCooldown = 500; // 500ms
+
+     this.contactDamage = 10; // ✅ 默认接触伤害
+  
+  
   }
 
  
@@ -1081,7 +1570,8 @@ class Enemy {
   }
 
   onDeath() {
-    console.log("敌人死亡");
+    score += 10;
+    console.log("敌人死亡 +10 分");
 
     this.exploding = true;
     this.explodeStartTime = millis();
@@ -1100,6 +1590,7 @@ class Enemy {
   
 
   update() {
+    
     this.updateDeath(); // ✅ 父类负责统一的“死亡检测逻辑”
   }
 
@@ -1123,15 +1614,46 @@ class FollowEnemy extends Enemy {
     super(x, y);
     this.r = 35;
     this.speed = 3; // 速度稍慢于玩家 
+
+    this.contactDamage = 15; // 接触伤害
   }
 
   update() {
-    // 实时追踪玩家
-    let dir = p5.Vector.sub(player.pos, this.pos);
-    dir.setMag(this.speed);
-    this.pos.add(dir);
+    this.applySeparation(enemies); // 防止敌人之间重叠
 
-    super.update(); // ✅ 继续执行父类的死亡检测逻辑
+    const distanceToPlayer = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
+    const stopDistance = this.r + player.r;
+
+    if (distanceToPlayer > stopDistance) {
+      let dir = p5.Vector.sub(player.pos, this.pos);
+      dir.setMag(this.speed);
+      this.pos.add(dir);
+    }
+
+    super.update(); // 死亡检测等
+  }
+
+  applySeparation(others) {
+    let separationForce = createVector(0, 0);
+    let desiredSeparation = this.r * 2;
+    let count = 0;
+
+    for (let other of others) {
+      if (other === this || !other.hp.isAlive()) continue;
+
+      let d = p5.Vector.dist(this.pos, other.pos);
+      if (d < desiredSeparation && d > 0) {
+        let diff = p5.Vector.sub(this.pos, other.pos).normalize().div(d);
+        separationForce.add(diff);
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      separationForce.div(count);
+      separationForce.setMag(1.5);
+      this.pos.add(separationForce);
+    }
   }
 
   show() { 
@@ -1144,13 +1666,6 @@ class FollowEnemy extends Enemy {
     ellipse(this.pos.x, this.pos.y, this.r * 2);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
   }
-
-  onDeath() {
-    score += 15;
-    console.log("FollowEnemy 死亡 +15 分");
-    super.onDeath();
-}
-
 }
 
 
@@ -1161,6 +1676,7 @@ class AmbushEnemy extends Enemy {
     super(x, y); // ✅ 删除 r 和 mode 参数
     this.r = 40; // ✅ 设置自己的半径
     this.hp = new HPSystem(40); // ✅ 设置自己的血量（可选）
+    this.contactDamage = 15; // 接触伤害
 
     this.isChasing = false;
     this.isDashing = false;
@@ -1219,13 +1735,6 @@ class AmbushEnemy extends Enemy {
     this.hp.draw(this.pos.x, this.pos.y, this.r);
     
   }
-
-  onDeath() {
-    score += 30;
-    console.log("AmbushEnemy 死亡 +30 分");
-    super.onDeath();
-}
-
 }
 
 class StealthEnemy extends Enemy {
@@ -1233,11 +1742,12 @@ class StealthEnemy extends Enemy {
     super(x, y); // ✅ 简化构造函数
     this.r = 35;
     this.hp = new HPSystem(25);
+    this.contactDamage = 20; // 接触伤害
 
     this.visibility = 0;
-    this.detectRange = 200;
-    this.chaseRange = 150;
-    this.hideRange = 250;
+    this.detectRange = 300;
+    this.chaseRange = 200;
+    this.hideRange = 350;
     this.isChasing = false;
     this.stealthspeed = 2;
     this.speed = 1.5;
@@ -1245,6 +1755,8 @@ class StealthEnemy extends Enemy {
   }
 
   update() {
+    this.applySeparation(enemies); // 加入防重叠行为
+
     let distance = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
 
     if (distance < this.chaseRange) {
@@ -1260,18 +1772,45 @@ class StealthEnemy extends Enemy {
 
     let dir;
     if (this.isChasing) {
-      dir = p5.Vector.sub(player.pos, this.pos);
-      dir.setMag(this.stealthspeed);
+      const stopDistance = this.r + player.r;
+      if (distance > stopDistance) {
+        dir = p5.Vector.sub(player.pos, this.pos);
+        dir.setMag(this.stealthspeed);
+        this.pos.add(dir);
+      }
     } else {
       if (frameCount % 60 === 0) {
         this.target = createVector(random(width * 2) - width, random(height * 2) - height);
       }
       dir = p5.Vector.sub(this.target, this.pos);
       dir.setMag(this.speed);
+      this.pos.add(dir);
     }
 
-    this.pos.add(dir);
-    super.update();// ✅ 死亡判定
+    super.update(); // 死亡检测
+  }
+
+  applySeparation(others) {
+    let separationForce = createVector(0, 0);
+    let desiredSeparation = this.r * 2;
+    let count = 0;
+
+    for (let other of others) {
+      if (other === this || !other.hp.isAlive()) continue;
+
+      let d = p5.Vector.dist(this.pos, other.pos);
+      if (d < desiredSeparation && d > 0) {
+        let diff = p5.Vector.sub(this.pos, other.pos).normalize().div(d);
+        separationForce.add(diff);
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      separationForce.div(count);
+      separationForce.setMag(1.5);
+      this.pos.add(separationForce);
+    }
   }
 
   
@@ -1297,13 +1836,6 @@ class StealthEnemy extends Enemy {
     
       pop();
     }
-
-    onDeath() {
-      score += 50;
-      console.log("StealthEnemy 死亡 +50 分");
-      super.onDeath();
-  }
-  
     
 }
 
@@ -1374,13 +1906,6 @@ class BulletEnemy extends Enemy {
 
 
   }
-
-  onDeath() {
-    score += 80;
-    console.log("BulletEnemy 死亡 +80 分");
-    super.onDeath();
-}
-
 }
 
 class CommonEnemy extends Enemy {
@@ -1392,12 +1917,41 @@ class CommonEnemy extends Enemy {
   }
 
   update() {
-    // 实时追踪玩家
-    let dir = p5.Vector.sub(player.pos, this.pos);
-    dir.setMag(this.speed);
-    this.pos.add(dir);
+    this.applySeparation(enemies); // 防止敌人之间重叠
 
-    super.update(); // 触发死亡/爆炸
+    const distanceToPlayer = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
+    const stopDistance = this.r + player.r;
+
+    if (distanceToPlayer > stopDistance) {
+      let dir = p5.Vector.sub(player.pos, this.pos);
+      dir.setMag(this.speed);
+      this.pos.add(dir);
+    }
+
+    super.update(); // 死亡检测等
+  }
+
+  applySeparation(others) {
+    let separationForce = createVector(0, 0);
+    let desiredSeparation = this.r * 2;
+    let count = 0;
+
+    for (let other of others) {
+      if (other === this || !other.hp.isAlive()) continue;
+
+      let d = p5.Vector.dist(this.pos, other.pos);
+      if (d < desiredSeparation && d > 0) {
+        let diff = p5.Vector.sub(this.pos, other.pos).normalize().div(d);
+        separationForce.add(diff);
+        count++;
+      }
+    }
+
+    if (count > 0) {
+      separationForce.div(count);
+      separationForce.setMag(1.5);
+      this.pos.add(separationForce);
+    }
   }
 
   show() {
@@ -1410,14 +1964,78 @@ class CommonEnemy extends Enemy {
     ellipse(this.pos.x, this.pos.y, this.r * 2);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
   }
-
-  onDeath() {
-    score += 10;
-    console.log("CommonEnemy 死亡 +10 分");
-    super.onDeath();
 }
 
+class Boss extends Enemy {
+  constructor(x, y) {
+    super(x, y); // 调用 Enemy 构造函数
+    this.r = 50;
+    this.hp = new HPSystem(1000); // Boss血量比普通敌人多
+    this.stage = 1;
+    this.contactDamage = 25; // ✅ Boss 攻击更痛
+
+    this.actions = []; // ✅ 当前阶段动作池
+    this.lastActionTime = 0;
+    
+    this.setStageActions(); // 初始化阶段行为
+  }
+
+  update() {
+    super.update();
+    if (!this.hp.isAlive()) return;
+
+    this.checkStageTransition();
+
+    for (let action of this.actions) {
+      if (action.canTrigger()) {
+        action.trigger();
+        break; // 每帧只执行一个行为
+      }
+    }
+  }
+
+  checkStageTransition() {
+    const hp = this.hp.currentHP;
+
+    if (this.stage === 1 && hp <= 700) {
+      this.stage = 2;
+      this.setStageActions();
+      console.log("⚠️ Boss 进入第二阶段！");
+    } else if (this.stage === 2 && hp <= 300) {
+      this.stage = 3;
+      this.setStageActions();
+      console.log("🚨 Boss 进入第三阶段！");
+    }
+  }
+
+  setStageActions() {
+    this.actions = [];
+
+    if (this.stage === 1) {
+      this.actions.push(new SummonAction(this));
+      this.actions.push(new LaserAction(this));
+    } else if (this.stage === 2) {
+      this.actions.push(new BulletAction(this));
+      this.actions.push(new LaserAction(this));
+      this.actions.push(new ChargeAction(this));
+    } else if (this.stage === 3) {
+      this.actions.push(new BulletAction(this));
+      this.actions.push(new ChargeAction(this));
+    }
+  }
+
+  show() {
+    if (this.exploding && this.explosion) {
+      super.show(); // 播放爆炸动画
+      return;
+    }
+
+    fill(255, 140, 0);
+    ellipse(this.pos.x, this.pos.y, this.r * 2.5);
+    this.hp.draw(this.pos.x, this.pos.y, this.r);
+  }
 }
+
 
 
 
@@ -1578,6 +2196,7 @@ class AttackBoostSkill extends Skill {
       this.player.attackPower = player.baseAttack; // 3秒后恢复原来的基础攻击
       console.log("攻击加成结束，恢复基础伤害");
     }, 3000);
+    this.player.spriteMgr.request("boost", 3000, 1);
   }
 
   
@@ -1586,7 +2205,7 @@ class AttackBoostSkill extends Skill {
 
 class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("冲刺", "", 10); // 冲刺技能冷却2秒
+    super("冲刺", "", 1); // 冲刺技能冷却2秒
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
@@ -1598,6 +2217,8 @@ class DashSkill extends Skill {
 
     this.player = player; 
     this.enemies = enemies; // 保存敌人列表
+
+    this.totalDamage = 0; // 累积冲刺造成的伤害
   }
 
   castSkillEffect() {
@@ -1611,6 +2232,7 @@ class DashSkill extends Skill {
     this.player.isInvincible = true; // 开启无敌
 
     this.dashEndTime = millis() + 500; // 冲刺持续0.5秒
+    this.player.spriteMgr.request("dash", 500, 1);
   }
 
   update() {
@@ -1652,27 +2274,66 @@ class DashSkill extends Skill {
   checkDashDamage() {
     for (let enemy of this.enemies) {
       if (!enemy.hp || !enemy.hp.isAlive()) continue;
-      if (this.dashedEnemies.includes(enemy)) continue; // 已经撞过就跳过
-
+      if (this.dashedEnemies.includes(enemy)) continue;
+  
       let d = dist(this.player.pos.x, this.player.pos.y, enemy.pos.x, enemy.pos.y);
       if (d < this.player.r + enemy.r) {
-        enemy.hp.takeDamage(this.dashDamage);
+        const attackInfo = {
+          source: "dash",
+          player: this.player,
+          baseDamage: this.dashDamage,
+          target: enemy
+        };
+  
+        let damageDone = DamageCalculator.calculate(attackInfo);
+        this.totalDamage += damageDone; // ✅ 统计冲刺总伤害
         this.dashedEnemies.push(enemy);
-        console.log("冲刺撞击敌人，造成" + this.dashDamage + "点伤害！");
+  
+        console.log(`冲刺撞击敌人，造成 ${damageDone} 点伤害`);
       }
     }
   }
+  
 
-  endDash() {
+  /*endDash() {
     console.log("冲刺结束，恢复速度");
     this.isDashing = false;
     this.player.speed = this.originalSpeed;
-    this.player.isInvincible = false; // 冲刺结束后关闭无敌
-
+    this.player.isInvincible = false;
+  
+    for (let skill of this.player.selectedSkills) {
+      if (skill instanceof LifestealSkill) {
+        skill.onDamageDealt(totalDamage, "dash"); // 或 "melee"、"charged"
+      }
+    }
     
-    this.dashTrail = []; // 清空拖影
+  
+    this.totalDamage = 0;
+    this.dashTrail = [];
     this.dashedEnemies = [];
-  }
+  }*/
+
+
+    endDash() {
+      console.log("冲刺结束，恢复速度");
+      this.isDashing = false;
+      this.player.speed = this.originalSpeed;
+      this.player.isInvincible = false;
+    
+      if (this.totalDamage > 0) {
+        for (let skill of this.player.selectedSkills) {
+          if (skill instanceof LifestealSkill) {
+            skill.onDamageDealt(this.totalDamage, "dash");
+          }
+        }
+      }
+    
+      this.totalDamage = 0; // 重置
+      this.dashTrail = [];
+      this.dashedEnemies = [];
+    }
+    
+  
 }
 
 
@@ -1702,6 +2363,183 @@ class DashResetSkill extends Skill {
   }
 }
 
+class ChargeStrikeSkill extends Skill {
+  constructor(player, enemies) {
+    super("蓄力攻击", "", 3); // 技能名称，按键X，冷却8秒
+    this.player = player;
+    this.enemies = enemies;
+
+    this.isCharging = false;
+    this.startTime = 0;
+    this.chargeDuration = 2000; // 1秒蓄力
+    this.attackPower = 30;      // 高额范围伤害
+    this.range = 100;           // 攻击范围半径
+  }
+
+  castSkillEffect() {
+    console.log("⚡ 蓄力攻击启动：玩家进入蓄力状态");
+
+    this.isCharging = true;
+    this.startTime = millis();
+
+    // ✅ 设置玩家状态
+    this.player.isCharging = true;         // 禁止移动（在 player.update 中处理）
+    this.player.damageMultiplier = 0.5;    // 减伤50%
+    this.player.spriteMgr.request("charge", 2000, 1);
+  }
+
+  update() {
+    super.update();
+
+    if (this.isCharging && millis() - this.startTime >= this.chargeDuration) {
+      this.releaseExplosion();             // 造成范围伤害
+      this.isCharging = false;
+
+      // ✅ 恢复玩家状态
+      this.player.isCharging = false;
+      this.player.damageMultiplier = 1;
+      console.log("✅ 蓄力攻击完成，状态恢复");
+    }
+  }
+
+  releaseExplosion() {
+    console.log("💥 蓄力完成，释放360°范围攻击！");
+  
+    let totalDamage = 0; // ✅ 累计总伤害
+  
+    for (let enemy of this.enemies) {
+      if (!enemy.hp || !enemy.hp.isAlive()) continue;
+  
+      let d = dist(this.player.pos.x, this.player.pos.y, enemy.pos.x, enemy.pos.y);
+      if (d <= this.range + enemy.r) {
+        const attackInfo = {
+          source: "charged",
+          player: this.player,
+          baseDamage: this.attackPower,
+          target: enemy
+        };
+  
+        let damageDone = DamageCalculator.calculate(attackInfo);
+        totalDamage += damageDone;
+  
+        console.log(`命中敌人，造成 ${damageDone} 点伤害`);
+      }
+    }
+  
+    if (totalDamage > 0) {
+      console.log(`✅ 蓄力攻击总伤害: ${totalDamage}`);
+  
+      for (let skill of this.player.selectedSkills) {
+        if (skill instanceof LifestealSkill) {
+          skill.onDamageDealt(totalDamage, "dash"); // 或 "melee"、"charged"
+        }
+      }
+      
+    }
+
+    // 👉 可以在这里加入爆炸粒子特效等
+  }
+}
+
+
+
+class LifestealSkill extends Skill {
+  constructor(player) {
+    super("吸血", "", 6); // 技能名称、按键、冷却秒数
+    this.player = player;
+    this.lifestealRatio = 0.3; // 吸血比例
+    this.duration = 5000; // 持续时间（毫秒）
+    this.active = false;
+    this.endTime = 0;
+  }
+
+  castSkillEffect() {
+    console.log("🩸 吸血技能启动！未来5秒内造成的伤害可吸血");
+    this.active = true;
+    this.endTime = millis() + this.duration;
+    this.player.spriteMgr.request("steal", 5000, 1);
+  }
+
+  update() {
+    super.update();
+    if (this.active && millis() > this.endTime) {
+      this.active = false;
+      console.log("🩸 吸血效果结束");
+    }
+  }
+
+  /**
+   * 玩家造成一次伤害后由技能系统调用，统一吸血入口
+   * @param {number} totalDamage - 本次攻击造成的总伤害
+   * @param {string} source - 攻击来源，例如 "melee"、"charged"、"dash"
+   */
+  onDamageDealt(totalDamage, source) {
+    if (!this.active || totalDamage <= 0) return;
+
+    let healAmount = floor(totalDamage * this.lifestealRatio);
+    this.player.hp.heal(healAmount);
+
+    console.log(`[吸血] 来源: ${source}，伤害: ${totalDamage}，回血: ${healAmount}`);
+  }
+}
+
+class BloodFurySkill extends Skill {
+  constructor(player) {
+    super("血怒", "", 0); // 被动技能，无需冷却
+    this.player = player;
+    this.isBoosting = false;
+  }
+
+  update() {
+    let hpRatio = this.player.hp.currentHP / this.player.hp.maxHP;
+
+    if (!this.isBoosting && hpRatio <= 0.2) {
+      this.player.attackPower = 30;
+      this.isBoosting = true;
+      console.log("🩸 血怒发动！攻击力提升至30");
+    }
+
+    if (this.isBoosting && hpRatio > 0.2) {
+      this.player.attackPower = this.player.baseAttack;
+      this.isBoosting = false;
+      console.log("🩸 血怒结束，攻击力恢复基础值");
+    }
+  }
+
+  castSkillEffect() {
+    // 被动技能无需手动触发
+  }
+}
+
+class ReflectSkill extends Skill {
+  constructor(player) {
+    super("反弹", "", 5);     // 名称、按键占位、冷却 12 s
+    this.player   = player;
+    this.duration = 4 * 1000;  // 4 秒持续
+    this.endTime  = 0;
+  }
+
+  /* ① 真正的效果写在这里，供父类 trigger() 调用 */
+  castSkillEffect() {
+    this.player.isReflecting = true;       // 开启反弹状态
+    this.endTime = millis() + this.duration;
+    console.log("⚡ 反弹开启（4 s）");
+    this.player.spriteMgr.request("shield", 4000, 1);
+  }
+
+  /* ② 持续检查时间，自动关掉反弹 */
+  update() {
+    super.update();                         // 先递减冷却
+    if ( this.player.isReflecting &&
+         millis() > this.endTime ) {
+      this.player.isReflecting = false;
+      console.log("⚡ 反弹结束");
+    }
+  }
+}
+
+
+
 
 
 
@@ -1724,27 +2562,6 @@ class Bullet {
     if (this.pos.x < -width || this.pos.x > width ||
         this.pos.y < -height || this.pos.y > height) {
       this.alive = false;
-    }
-
-    if (!this.isReflected) {
-      // 玩家碰撞检测
-      if (dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y) < this.r + player.r) {
-        this.alive = false;
-        console.log("玩家被击中！预留扣血逻辑");
-      }
-    } else {
-      // 反弹状态下：伤害第一个敌人
-      for (let e of enemies) {
-        if (!(e instanceof BulletEnemy)) {
-          let d = dist(this.pos.x, this.pos.y, e.pos.x, e.pos.y);
-          if (d < this.r + e.r) {
-            console.log("敌人被反弹击中！");
-            e.r = 0; // 或者加血、死亡等逻辑
-            this.alive = false;
-            break;
-          }
-        }
-      }
     }
   }
 
@@ -1811,7 +2628,7 @@ class HPSystem {
 
 
 class CollisionManager {
-  constructor(player, enemies) {
+  constructor(player, enemies, bullets) {
     this.player = player;
     this.enemies = enemies;
     this.bullets = bullets;
@@ -1827,49 +2644,47 @@ class CollisionManager {
 
   handlePlayerEnemyCollision() {
     let now = millis();
-    
-      for (let enemy of this.enemies) {
-      if (!enemy.hp || !enemy.hp.isAlive()) continue;
-      if (this.checkCollision(this.player, enemy)) {
-        
-        if (!this.player.isInvincible && (now - this.player.lastHitTime > this.player.hitCooldown)) {
-          this.player.hp.takeDamage(10);
-          this.player.lastHitTime = now;
-          console.log("玩家撞到敌人！扣10血");
   
-          if (!this.player.hp.isAlive()) {
-            gameOver = true;
-            console.log("玩家死亡！");
-          }
+    for (let enemy of this.enemies) {
+      if (!enemy.hp || !enemy.hp.isAlive()) continue;
+  
+      if (this.checkCollision(this.player, enemy)) {
+        if (!this.player.isInvincible && now > enemy.nextHitTime) {
+          this.player.receiveDamage(enemy.contactDamage); // ✅ 改为每个敌人自己的伤害
+          enemy.nextHitTime = now + enemy.hitCooldown;
+          console.log("敌人打到玩家！伤害:", enemy.contactDamage);
         }
       }
     }
   }
+  
   
 
   handleBulletPlayerCollision() {
-    
-
     for (let bullet of this.bullets) {
       if (bullet.isReflected) continue;
-      if (!this.player.isInvincible && this.checkCollision(this.player, bullet)) {
-        this.player.hp.takeDamage(5);
-        bullet.alive = false;
-        console.log("玩家被子弹击中！扣5血");
-        if (!this.player.hp.isAlive()) {
-          gameOver = true;
-          console.log("玩家死亡！");
+  
+      if (this.checkCollision(this.player, bullet)) {
+        if (this.player.isReflecting) {
+          bullet.reflect(); // 开启反弹
+          continue;         // 跳过后续伤害处理
+        }
+  
+        if (!this.player.isInvincible) {
+          this.player.receiveDamage(5); // 包含伤害判断和 gameOver 判定
+          bullet.alive = false;
+          console.log("玩家被子弹击中！");
         }
       }
     }
   }
+  
 
   handleBulletEnemyCollision() {
     for (let bullet of this.bullets) {
       if (!bullet.isReflected) continue;
       for (let enemy of this.enemies) {
         if (!enemy.hp || !enemy.hp.isAlive()) continue;
-        if (enemy instanceof BulletEnemy) continue;
         if (this.checkCollision(bullet, enemy)) {
           enemy.hp.takeDamage(15);
           bullet.alive = false;
@@ -1922,7 +2737,7 @@ class MeleeAttack {
     this.currentFrame  = 0;
     this.frameStartTime= millis();
     this.damageDone    = false;
-    this.player.playAttackGif();   // 切到攻击 GIF
+    this.player.isAttacking = true;   // 切到攻击 GIF流派系统改动
   }
 
   update() {
@@ -1952,7 +2767,7 @@ class MeleeAttack {
     if (this.currentFrame >= 4) {
       this.inProgress   = false;
       this.currentFrame = 0;
-      this.player.resetImage();
+      this.player.isAttacking = false;//流派系统改动
       return;
     }
 
@@ -2014,6 +2829,8 @@ class MeleeAttack {
     const arcAng = radians(240);
     const R      = 60 * (1 + 1 * 0.25); // 在帧 1 时的实际半径
 
+    let totalDamage = 0; // ✅ 初始化总伤害
+
     for (let e of this.enemies) {
       if (!e.hp || !e.hp.isAlive()) continue;
 
@@ -2025,14 +2842,73 @@ class MeleeAttack {
       let ang = atan2(e.pos.y - C.y, e.pos.x - C.x);
       let diff = (ang - dirAng + PI*3) % (PI*2) - PI; 
       if (abs(diff) <= arcAng/2) {
-        // 造成一次伤害（此处填入具体数值）
-        //e.hp.takeDamage(15);
+        /*// 造成一次伤害（此处填入具体数值）
+        
         e.hp.takeDamage(player.attackPower);
-        console.log("Melee hit! 敌人扣血");
+        console.log("Melee hit! 敌人扣血");*/
+
+        // ✅ 使用统一伤害计算器
+        const attackInfo = {
+        source: "melee",                          // 普通攻击
+        player: this.player,
+        baseDamage: this.player.baseAttack,      // 注意是 baseAttack，不是 attackPower
+        target: e
+      };
+
+      let damageDone = DamageCalculator.calculate(attackInfo);
+      totalDamage += damageDone; // ✅ 累加到总伤害
+      console.log(`Melee hit! 敌人扣血 ${damageDone}`);
+
       }
     }
+
+    // ✅ 攻击结束，报告总伤害值
+  if (totalDamage > 0) {
+    console.log(`✅ 本次普攻总伤害: ${totalDamage}`);
+
+    for (let skill of this.player.selectedSkills) {
+      if (skill instanceof LifestealSkill) {
+        skill.onDamageDealt(totalDamage, "melee"); // 或 "melee"、"charged"
+      }
+    }
+    
+
+  }
+    
+  
   }
 }
+
+class DamageCalculator {
+  static calculate(attackInfo) {
+    const { source, baseDamage, player, target } = attackInfo;
+    if (!target || !target.hp || !target.hp.isAlive()) return 0;
+
+    // 根据来源修正最终伤害（如技能加成等）
+    let effectiveDamage = baseDamage;
+
+    if (source === "melee") {
+      effectiveDamage = player.attackPower; // 这里自动包含加成
+    } else if (source === "charged") {
+      effectiveDamage = baseDamage; // 示例：蓄力2倍
+    }else if (source === "dash") {
+      effectiveDamage = baseDamage; // 你可以以后给 dash 加成倍率
+    }
+    // 👉 未来你可以拓展更多类型：fireball、dash、critical 等
+
+    // 不超过目标血量
+    let actualDamage = min(target.hp.currentHP, floor(effectiveDamage));
+    target.hp.takeDamage(actualDamage);
+
+    return actualDamage; // 返回真实伤害值
+  }
+}
+
+
+
+
+
+
 
 class PixelExplosion {
   constructor(pos, count = 20, maxRadius = 50) {
@@ -2072,10 +2948,469 @@ class PixelExplosion {
   }
 }
 
+/* ───────────────────────────────────────────────
+ *  减速领域 - 主动
+ *    Z 键触发，持续 5s，半径 160，敌人速度 ×0.4
+ * ─────────────────────────────────────────────── */
+class SlowFieldSkill extends Skill {
+  constructor(player, enemies,
+              radius   = 160,
+              slowMul  = 0.1,
+              duration = 5000) {
+
+    super("减速领域", "Z", 8);     // 名称 / 触发键 / 冷却秒数
+    this.player   = player;
+    this.enemies  = enemies;
+
+    this.radius   = radius;
+    this.slowMul  = slowMul;
+    this.duration = duration;
+
+    this.active   = false;
+    this.endTime  = 0;
+    this.slowed   = new Set();     // 目前被减速的敌人
+  }
+
+  /* 主动触发 */
+  castSkillEffect() {
+    this.active  = true;
+    this.endTime = millis() + this.duration;
+    console.log("🌀 减速领域开启");
+  }
+
+  /* 每帧调用（来自 Player.updateSkills） */
+  update() {
+    super.update();                // 冷却倒计时
+
+    if (!this.active) return;
+
+    // 1. 处理减速 / 恢复
+    for (let enemy of this.enemies) {
+      if (!enemy.hp || !enemy.hp.isAlive()) continue;
+
+      const d       = dist(this.player.pos.x, this.player.pos.y,
+                           enemy .pos.x, enemy .pos.y);
+      const inAura  = d <= this.radius + enemy.r;
+
+      if (inAura) {
+  if (!this.slowed.has(enemy)) {
+
+    /* 通用：有 speed 属性的怪 */
+    if (enemy.speed !== undefined) {
+      enemy.originalSpeed = enemy.speed;
+      enemy.speed        *= this.slowMul;
+    }
+
+    /* 针对 AmbushEnemy：同时缩放冲刺速度 */
+    if (enemy instanceof AmbushEnemy) {
+      enemy.originalDash      = enemy.dushSpeed;
+      enemy.originalMaxDash   = enemy.maxDashSpeed;
+
+      enemy.dushSpeed    *= this.slowMul;
+      enemy.maxDashSpeed *= this.slowMul;
+    }
+
+    this.slowed.add(enemy);
+  }
+}
+
+// ▽▽ ② 离开领域或领域结束时复原 ▽▽
+else if (this.slowed.has(enemy)) {
+
+  if (enemy.originalSpeed !== undefined) enemy.speed = enemy.originalSpeed;
+  if (enemy instanceof AmbushEnemy) {
+    enemy.dushSpeed    = enemy.originalDash;
+    enemy.maxDashSpeed = enemy.originalMaxDash;
+  }
+
+  this.slowed.delete(enemy);
+}
+    }
+
+    // 2. 到时关闭
+    if (millis() > this.endTime) this.deactivate();
+
+    // 3. 可视化光环（可删）
+    this.drawAura();
+  }
+
+  deactivate() {
+  this.active = false;
+
+  for (let enemy of this.slowed) {
+    /* ---------- 通用移动速度 ---------- */
+    if (enemy.originalSpeed !== undefined) {
+      enemy.speed = enemy.originalSpeed;
+    }
+
+    /* ---------- 伏击怪冲刺速度 ---------- */
+    if (enemy instanceof AmbushEnemy) {
+      enemy.dushSpeed    = enemy.originalDash;
+      enemy.maxDashSpeed = enemy.originalMaxDash;
+    }
+  }
+
+  this.slowed.clear();
+  console.log("🌀 减速领域结束");
+}
+
+  drawAura() {
+    push();
+    noFill();
+    stroke(0, 255, 255, 120);
+    strokeWeight(3);
+    ellipse(this.player.pos.x, this.player.pos.y,
+            this.radius * 2);
+    pop();
+  }
+}
+
+/* ───────────────────────────────────────────────
+ *  减速领域 • 首次入圈伤害 - 被动
+ *    同一个敌人 10s 内只吃一次额外伤害
+ * ─────────────────────────────────────────────── */
+class SlowFieldBonusDamage extends Skill {
+  constructor(player, enemies, slowField,
+              damage   = 5,
+              innerCD  = 10000) {
+
+    super("减速领域-电击", "", 0);     /* 被动无需手动触发 */
+    this.player    = player;
+    this.enemies   = enemies;
+    this.slowField = slowField;
+
+    this.damage    = damage;
+    this.innerCD   = innerCD;
+    this.lastHit   = new Map();       // enemy → millis
+  }
+
+  update() {
+    // 被动：只要主动技在生效，就检查 slowed 集合
+    const now = millis();
+    if (!this.slowField.active) return;
+
+    for (let enemy of this.slowField.slowed) {
+      if (!enemy.hp || !enemy.hp.isAlive()) continue;
+
+      const last = this.lastHit.get(enemy) ?? -Infinity;
+      if (now - last >= this.innerCD) {
+        enemy.hp.takeDamage(this.damage);
+        this.lastHit.set(enemy, now);
+        console.log("⚡ 电击领域额外伤害", this.damage);
+      }
+    }
+  }
+
+  castSkillEffect() {}   // 被动，没有触发体
+}
+
+
+class BlackHole {
+  constructor ( x, y, type = "danger", safeRadius = 80, dangerRadius = 60) {
+    this.pos = createVector(x, y);
+    this.state = "idle";
+
+    this.type = type;  // "danger" or "heal"
+
+    this.safeRadius = safeRadius;   // 玩家进入此范围变状态
+    this.dangerRadius = dangerRadius;  // 判定为“在黑洞里”的范围
+    this.sparkList = [];
+  }
+
+  update( player ) {
+    let d = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
+
+    // 切换状态判断
+    if ( d < this.dangerRadius ) {
+      if ( this.state !== "active") this.state = "active";
+      this.applyEffects(player);
+    } else {
+      this.state = "idle";
+    }
+
+
+    // 添加火花粒子
+    if ( this.state == "active" ) {
+      if ( this.type == "danger" ){
+        for ( let i = 0; i < 20; i++ ){
+          this.sparkList.push(new OgSpark(this.pos.x, this.pos.y));
+        }
+      } else if ( this.type == "heal" ){
+        for ( let i = 0; i < 5; i++ ){
+          this.sparkList.push(new CrossSpark(this.pos.x, this.pos.y));
+        }
+      }
+
+    }
+
+    for (let i = this.sparkList.length - 1; i >= 0; i--) {
+      this.sparkList[i].update();
+      if (this.sparkList[i].lifespan <= 0) {
+        this.sparkList.splice(i, 1);
+      }
+    }
+  }
+
+  applyEffects(player) {
+    if (this.type == "danger") {
+      player.hp.takeDamage(0.3); // 每帧小幅掉血
+      // ✅ 用 player.isInvincible 判断冲刺状态
+      if (!player.isInvincible && player.speed > 2) {
+        player.speed = 2;
+      }
+    } else if (this.type === "heal") {
+      player.hp.heal(0.2);
+    }
+  }
+  
+  show() {
+      push();
+      // translate(this.pos.x, this.pos.y);
+      if (this.state === "idle") {
+        push();
+        translate(this.pos.x, this.pos.y);
+
+        drawPixelSpiralBlackHole(80, frameCount * 0.03); // 打印锯齿状紫色黑洞
+        pop();
+      } else {
+        push();
+        translate(this.pos.x, this.pos.y);
+        if ( this.type === "danger") {
+          drawPurpleBlackHole( 120, frameCount * 0.04);
+        } else if ( this.type === "heal" ) {
+          drawGreenBlackHole(120, frameCount * 0.04);
+        }
+        // drawCircularSpiral(40, 8, frameCount * 0.08);    // 危险螺旋状态
+        pop();
+
+        for (let spark of this.sparkList) spark.display();
+      }
+      pop();
+  }
+
+  }
+
+
+
+  // 危险的紫色黑洞
+  function drawPurpleBlackHole( maxRadius, angleOffset) {
+    let arms = 4; // 螺旋臂数was 3
+    // let maxRadius = 120;
+    let angleStep = 0.15;
+
+    let pixelSize = 6;     // 像素块大小（越大越粗糙）
+    let innerRadius = 10;
+
+    for (let t = 0; t < TWO_PI * 10; t += angleStep) {
+      let r = map(t, 0, TWO_PI * 10, 10, maxRadius);
+      let baseAngle = t + angleOffset;
+
+      for ( let a = 0; a < arms; a++ ) {
+        let armOffset = a * TWO_PI / arms;
+        let x = r * cos(baseAngle + armOffset);
+        let y = r * sin(baseAngle + armOffset);
+        let brightness = map(r, 10, maxRadius, 255, 20);
+        fill(120, 0, 255, brightness); // 冷紫，alpha 控制亮暗
+
+
+        // 像素网格对齐：确保块状颗粒感
+        let px = floor(x / pixelSize) * pixelSize;
+        let py = floor(y / pixelSize) * pixelSize;
+        rect(px, py, pixelSize, pixelSize);
+
+        // point(x, y);
+      }
+    }
+
+    // noStroke();
+    // fill(0);
+    // ellipse(0, 0, 40, 40);
+    // 中心遮挡（保持）
+    fill(0);
+    rect(-pixelSize/2, -pixelSize/2, pixelSize * 2, pixelSize * 2);
+
+    // pop();
+
+  }
+
+
+// 安全的绿色黑洞，进去可以回血
+function drawGreenBlackHole( maxRadius, angleOffset) {
+  let arms = 4; // 螺旋臂数was 3
+  // let maxRadius = 120;
+  let angleStep = 0.15;
+
+  let pixelSize = 6;     // 像素块大小（越大越粗糙）
+  let innerRadius = 10;
+
+  for (let t = 0; t < TWO_PI * 10; t += angleStep) {
+    let r = map(t, 0, TWO_PI * 10, 10, maxRadius);
+    let baseAngle = t + angleOffset;
+
+    for ( let a = 0; a < arms; a++ ) {
+      let armOffset = a * TWO_PI / arms;
+      let x = r * cos(baseAngle + armOffset);
+      let y = r * sin(baseAngle + armOffset);
+      let brightness = map(r, 10, maxRadius, 255, 20);
+      fill(0, 180, 80, brightness); // 绿色，alpha 控制亮暗
+
+
+      // 像素网格对齐：确保块状颗粒感
+      let px = floor(x / pixelSize) * pixelSize;
+      let py = floor(y / pixelSize) * pixelSize;
+      rect(px, py, pixelSize, pixelSize);
+
+      // point(x, y);
+    }
+  }
+
+  // noStroke();
+  // fill(0);
+  // ellipse(0, 0, 40, 40);
+  // 中心遮挡（保持）
+  fill(0);
+  rect(-pixelSize/2, -pixelSize/2, pixelSize * 2, pixelSize * 2);
+
+  // pop();
+
+}
 
 
 
 
 
+  // 锯齿状，紫色黑洞
+  function drawPixelSpiralBlackHole( maxRadius, angleOffset ) {
+    let stepSize = 4;
+    let palette = [
+      color(0),    
+      color(59, 0, 102),
+      color(68)
+    ];
 
+    let spiralTurns = 5;
+    let angleStep = PI / 64;  // 更细腻的角度
+    for (let t = 0; t < spiralTurns * TWO_PI; t += angleStep) {
+      let r = map(t, 0, spiralTurns * TWO_PI, 0, maxRadius);
+      let angle = t + angleOffset;
+
+      let x = r * cos(angle);
+      let y = r * sin(angle);
+
+      // 调色：越靠近中心越黑
+      let index = int(map(r, 0, maxRadius, 0, palette.length));
+      index = constrain(index, 0, palette.length - 1);
+
+      fill(palette[index]);
+      rect(floor(x / stepSize) * stepSize, floor(y / stepSize) * stepSize, stepSize, stepSize);
+    }
+  }
+
+  // 螺旋图案
+  function drawCircularSpiral(radius, stepSize, angleOffset) {
+    push();
+    rotate(angleOffset);
+    for (let r = radius; r > 0; r -= stepSize) {
+      let angleStep = PI / 8;
+      for (let a = 0; a < TWO_PI; a += angleStep) {
+        let x = r * cos(a);
+        let y = r * sin(a);
+        let index = int((r + a * 10) / stepSize);
+        fill(index % 2 === 0 ? 0 : 80);
+        rect(x, y, stepSize, stepSize);
+      }
+    }
+    pop();
+  }
+
+  // 普通火花
+  class OgSpark {
+    constructor(x, y) {
+      this.pos = createVector(x, y);
+      this.vel = p5.Vector.random2D().mult(random(2, 5));
+      this.lifespan = 40 + random(20);
+      let palette = [
+        color(255, 105, 180),
+        color(255, 165, 0),
+        color(50, 255, 100)
+      ];
+      this.color = random(palette);
+    }
+  
+    update() {
+      this.pos.add(this.vel);
+      this.lifespan -= 2;
+    }
+  
+    display() {
+      fill(red(this.color), green(this.color), blue(this.color), this.lifespan * 4);
+      let px = floor(this.pos.x / 4) * 4;
+      let py = floor(this.pos.y / 4) * 4;
+      rect(px, py, 6, 6);
+    }
+  }
+
+// 回血的绿色火花
+class CrossSpark {
+  constructor(x, y) {
+    this.pos = createVector(x, y);
+    this.vel = p5.Vector.random2D().mult(random(0.5, 1.5));
+    this.lifespan = 40 + random(20);
+    this.size = 30;
+  }
+
+  update() {
+    this.pos.add(this.vel);
+    this.lifespan -= 2;
+  }
+
+  display() {
+    let px = floor(this.pos.x / 4) * 4;
+    let py = floor(this.pos.y / 4) * 4;
+    let alpha = this.lifespan * 4;
+
+    fill(50, 255, 100, alpha); // 绿色
+
+    // 绘制十字：竖一条，横一条
+    rect(px, py - this.size, this.size, this.size);
+    rect(px, py, this.size, this.size);
+    rect(px, py + this.size, this.size, this.size);
+    rect(px - this.size, py, this.size, this.size);
+    rect(px + this.size, py, this.size, this.size);
+  }
+}
+
+//新增对于playergif的管理流派系统
+/* ========= ③ SpriteManager ========= */
+class SpriteManager {
+  constructor(player) {
+    this.player  = player;
+    this.queue   = [];   // {name, end, prio, ts}
+  }
+
+  /* 请求一张覆盖层 gif */
+  request(name, keepMs, prio = 1) {
+    this.queue.push({ name, end: millis()+keepMs, prio, ts: millis() });
+  }
+
+  /* 清过期 & 取当前 overlay */
+  getCurrentOverlay() {
+    const now = millis();
+    this.queue = this.queue.filter(r => r.end > now);
+    if (this.queue.length === 0) return "base";
+    // 先比 prio 再比 ts
+    return this.queue.sort((a,b)=>(b.prio-a.prio)||(b.ts-a.ts))[0].name;
+  }
+
+  /* Player.show() 调用 */
+  chooseGif() {
+    const fac   = this.player.faction;                // 流派
+    const state = this.player.isAttacking ? "attack":"idle";
+    const over  = this.getCurrentOverlay();           // shield/dash/base
+
+    const p1 = GIF_POOL[fac]      ?? GIF_POOL.normal;
+    const p2 = p1[state]          ?? p1.idle;
+    return       p2[over]         ?? p2.base ?? null; // 兜底
+  }
+}
 
