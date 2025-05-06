@@ -17,7 +17,6 @@
       width: 100vw; height: 100vh;
       border: none;
       z-index: 0;
-      /* 鼠标事件都穿透到上层 canvas */
       pointer-events: none;
     }
     /* p5.js 的画布 */
@@ -28,22 +27,36 @@
       background: transparent !important;
     }
   </style>
+
+  <!-- 1. 拿 URL 中的 saveId -->
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const saveId = params.get('saveId');
+    if (!saveId) {
+      console.error('Missing saveId in URL');
+      alert('存档 ID 缺失，无法继续');
+    }
+    window.APP_SAVE_ID = saveId;
+  </script>
+
+  <!-- 2. p5.js 与游戏脚本 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+  <script src="GameFile.js"></script>
+
 </head>
 <body>
 
-  <!-- 1. 去掉 ?auto=true，改成手动模式 -->
   <iframe id="bgFrame" src="BG.html"></iframe>
 
-  <!-- p5.js 库 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
-  <!-- 你的游戏逻辑 -->
-  <script src="GameFile.js"></script>
-
-  <!-- 2. 在父页面监听键盘，转发给 BG.html -->
+  <!-- 3. 父页面键盘事件转发给背景 -->
   <script>
     const bg = document.getElementById('bgFrame');
-    window.addEventListener('keydown',   e => bg.contentWindow.postMessage({ type: 'keydown', key: e.key }, '*'));
-    window.addEventListener('keyup',     e => bg.contentWindow.postMessage({ type: 'keyup',   key: e.key }, '*'));
+    window.addEventListener('keydown', e => {
+      bg.contentWindow.postMessage({ type: 'keydown', key: e.key }, '*');
+    });
+    window.addEventListener('keyup', e => {
+      bg.contentWindow.postMessage({ type: 'keyup', key: e.key }, '*');
+    });
   </script>
 </body>
 </html>
