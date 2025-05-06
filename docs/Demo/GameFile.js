@@ -70,8 +70,9 @@ const GIF_POOL = {
 
 
 
-function preload() {
 
+function preload() {
+  // 加载技能图标（统一管理）
   skillIcons["闪现"] = null;
   skillIcons["火球"] = null;
   skillIcons["护盾"] = null;
@@ -92,12 +93,12 @@ function preload() {
   //loadImage("精灵-0002.gif");
 
   GIF_POOL.normal.idle.base   = null;
-  GIF_POOL.normal.idle.dash   = loadImage("normalidledash.gif");
+  GIF_POOL.normal.idle.dash   = null;
   GIF_POOL.normal.idle.boost  = null;
   GIF_POOL.normal.idle.steal  = null;
-  GIF_POOL.normal.idle.charge = loadImage("normalidlecharge.gif");
+  GIF_POOL.normal.idle.charge = null;
   GIF_POOL.normal.idle.shield = null;
-  GIF_POOL.normal.attack.base   = loadImage("normalattackbase.gif");
+  GIF_POOL.normal.attack.base   = null;
   GIF_POOL.normal.attack.dash   = null;//没用
   GIF_POOL.normal.attack.boost  = null;
   GIF_POOL.normal.attack.steal  = null;
@@ -109,20 +110,19 @@ function preload() {
   GIF_POOL.agile.attack.base  = null;
   GIF_POOL.agile.attack.dash  = null;//没用
   GIF_POOL.agile.attack.boost = null;
-  GIF_POOL.power.idle.base   = loadImage("power-idle-base.gif");
-  GIF_POOL.power.idle.steal  = loadImage("power-idle-steal.gif");
-  GIF_POOL.power.idle.charge = loadImage("power-idle-charge.gif");
-  GIF_POOL.power.attack.base   = loadImage("power-attack-base.gif");
-  GIF_POOL.power.attack.steal  = loadImage("power-attack-steal.gif");
+  GIF_POOL.power.idle.base   = null;
+  GIF_POOL.power.idle.steal  = null;
+  GIF_POOL.power.idle.charge = null;
+  GIF_POOL.power.attack.base   = null;
+  GIF_POOL.power.attack.steal  = null;
   GIF_POOL.power.attack.charge = null;//没用
-  GIF_POOL.tank.idle.base   = loadImage("tankidlebase.gif");
-  GIF_POOL.tank.idle.shield = loadImage("tankidleshield.gif");
-  GIF_POOL.tank.attack.base   = loadImage("tankattackbase.gif");
-  GIF_POOL.tank.attack.shield = loadImage("tankattackshield.gif");
+  GIF_POOL.tank.idle.base   = null;
+  GIF_POOL.tank.idle.shield = null;
+  GIF_POOL.tank.attack.base   = null;
+  GIF_POOL.tank.attack.shield = null;
+
 
 }
-
-
 
 function applyFactionFromSkills() {
   const sel = skillSystem.selectedSkills;
@@ -142,38 +142,48 @@ else                  player.faction = "normal";
 
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
+  
+  
+  if (!dataLoaded) {
+    noLoop();
+    const check = setInterval(() => {
+      if (dataLoaded) {
+        clearInterval(check);
+        initGame();
+        loop();
+      }
+    }, 50);
+    return;
+  }
+
+  initGame();
   
 
-  //设置玩家
+
+
+}
+
+function initGame() {
+  createCanvas(windowWidth, windowHeight);
+  console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
+
+  // 设置关卡
+  gamelevel = savedLevel || 1;
+  currentMode = savedMode || "normal"; // 如果你有 currentMode 的概念
+
+  // 玩家和系统初始化
   setPlayer();
-
-  //设置敌人
-  //setEnemies();
-
-  //设置技能系统
-  setSkillSystem();
-
-  // 初始化关卡系统
+  setSkillSystem(savedSkills); // ✅ 传入读取到的技能数组
   levelManager = new LevelManager();
   levelManager.addLevel(new Level1());
   levelManager.addLevel(new Level2());
-  // 这里可以继续 addLevel(new Level2()), ... 以后加
 
-  //吞食逻辑未完成
   setTimeBonuses();
-
   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
+  player.meleeAttack = new MeleeAttack(player, enemies);
+  applyFactionFromSkills();
 
-// 假设 enemies 是你的敌人数组
-player.meleeAttack = new MeleeAttack(player, enemies);
-
-applyFactionFromSkills();   // 首关
-
-levelManager.loadLevel(0);
-
-
+  levelManager.loadLevel(gamelevel - 1); // 因为关卡数组从 0 开始
 }
   
 function setSkillSystem(savedSkills = null) {
@@ -193,16 +203,17 @@ function setSkillSystem(savedSkills = null) {
 
   skillSystem.selectedSkills = [];
 
-  /*if (savedSkills) {
+  if (savedSkills) {
     // 使用存档中的技能名选择技能
     for (let name of savedSkills) {
       let skill = skillSystem.allSkills.find(s => s.name === name);
       if (skill) skillSystem.selectSkill(skill);
     }
-  } */
- skillSystem.selectSkill(skillSystem.allSkills[6]);
+  } 
+  
+ /*skillSystem.selectSkill(skillSystem.allSkills[6]);
  skillSystem.selectSkill(skillSystem.allSkills[7]);
- skillSystem.selectSkill(skillSystem.allSkills[8]);
+ skillSystem.selectSkill(skillSystem.allSkills[8]);*/
 
   player.selectedSkills = skillSystem.selectedSkills;
 }
@@ -3402,3 +3413,4 @@ class SpriteManager {
     return       p2[over]         ?? p2.base ?? null; // 兜底
   }
 }
+
