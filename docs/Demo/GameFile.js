@@ -1,3 +1,36 @@
+import { supabase } from './js/supabase.js';
+
+const params = new URLSearchParams(window.location.search);
+const saveId = params.get('saveId');
+
+if (!saveId) {
+  alert('缺少存档 ID，无法加载存档。');
+  throw new Error('saveId required');
+}
+
+let savedLevel, savedMode, savedSkills = [];
+let dataLoaded = false;
+
+async function loadSaveData() {
+  const { data, error } = await supabase
+    .from('saves')
+    .select('current_level, mode, skills')
+    .eq('id', saveId)
+    .single();
+
+  if (error) {
+    console.error('加载存档失败：', error);
+    alert('加载存档失败：' + error.message);
+    return;
+  }
+
+  savedLevel  = data.current_level;
+  savedMode   = data.mode;
+  savedSkills = data.skills || [];
+
+  console.log('读到存档→', { savedLevel, savedMode, savedSkills });
+}
+
 let player;
 let enemies = [];
 
@@ -70,9 +103,12 @@ const GIF_POOL = {
 
 
 
-
 function preload() {
-  // 加载技能图标（统一管理）
+
+  loadSaveData().then(() => {
+    dataLoaded = true;
+  });
+
   skillIcons["闪现"] = null;
   skillIcons["火球"] = null;
   skillIcons["护盾"] = null;
@@ -121,8 +157,9 @@ function preload() {
   GIF_POOL.tank.attack.base   = null;
   GIF_POOL.tank.attack.shield = null;
 
-
 }
+
+
 
 function applyFactionFromSkills() {
   const sel = skillSystem.selectedSkills;
@@ -142,8 +179,10 @@ else                  player.faction = "normal";
 
 
 function setup() {
-  
-  
+  createCanvas(windowWidth, windowHeight);
+  console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
+
+  // 延迟初始化
   if (!dataLoaded) {
     noLoop();
     const check = setInterval(() => {
@@ -156,36 +195,33 @@ function setup() {
     return;
   }
 
-  initGame();
-  
-
+  initGame(); // 正常加载路径
 
 
 }
-
+  
 function initGame() {
-  createCanvas(windowWidth, windowHeight);
-  console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
+  setPlayer();
+
+  // 设置技能系统，传入后端存的技能
+  setSkillSystem(savedSkills);
 
   // 设置关卡
-  gamelevel = savedLevel || 1;
-  currentMode = savedMode || "normal"; // 如果你有 currentMode 的概念
-
-  // 玩家和系统初始化
-  setPlayer();
-  setSkillSystem(savedSkills); // ✅ 传入读取到的技能数组
   levelManager = new LevelManager();
   levelManager.addLevel(new Level1());
   levelManager.addLevel(new Level2());
 
   setTimeBonuses();
+
   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
   player.meleeAttack = new MeleeAttack(player, enemies);
+
   applyFactionFromSkills();
 
-  levelManager.loadLevel(gamelevel - 1); // 因为关卡数组从 0 开始
+  // 从存档加载关卡
+  levelManager.loadLevel(savedLevel || 0);
 }
-  
+
 function setSkillSystem(savedSkills = null) {
   skillSystem = new SkillSystem();
   const slowField   = new SlowFieldSkill(player, enemies);
@@ -203,17 +239,16 @@ function setSkillSystem(savedSkills = null) {
 
   skillSystem.selectedSkills = [];
 
-  if (savedSkills) {
+  /*if (savedSkills) {
     // 使用存档中的技能名选择技能
     for (let name of savedSkills) {
       let skill = skillSystem.allSkills.find(s => s.name === name);
       if (skill) skillSystem.selectSkill(skill);
     }
-  } 
-  
- /*skillSystem.selectSkill(skillSystem.allSkills[6]);
+  } */
+ skillSystem.selectSkill(skillSystem.allSkills[6]);
  skillSystem.selectSkill(skillSystem.allSkills[7]);
- skillSystem.selectSkill(skillSystem.allSkills[8]);*/
+ skillSystem.selectSkill(skillSystem.allSkills[8]);
 
   player.selectedSkills = skillSystem.selectedSkills;
 }
