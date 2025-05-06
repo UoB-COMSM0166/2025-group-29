@@ -67,15 +67,12 @@ const GIF_POOL = {
 };
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 68a9b809f48b2ab7b09234b2ce7bd76f41998da1
 
 
 
 function preload() {
-
+  // 加载技能图标（统一管理）
   skillIcons["闪现"] = null;
   skillIcons["火球"] = null;
   skillIcons["护盾"] = null;
@@ -96,12 +93,12 @@ function preload() {
   //loadImage("精灵-0002.gif");
 
   GIF_POOL.normal.idle.base   = null;
-  GIF_POOL.normal.idle.dash   = loadImage("normalidledash.gif");
+  GIF_POOL.normal.idle.dash   = null;
   GIF_POOL.normal.idle.boost  = null;
   GIF_POOL.normal.idle.steal  = null;
-  GIF_POOL.normal.idle.charge = loadImage("normalidlecharge.gif");
+  GIF_POOL.normal.idle.charge = null;
   GIF_POOL.normal.idle.shield = null;
-  GIF_POOL.normal.attack.base   = loadImage("normalattackbase.gif");
+  GIF_POOL.normal.attack.base   = null;
   GIF_POOL.normal.attack.dash   = null;//没用
   GIF_POOL.normal.attack.boost  = null;
   GIF_POOL.normal.attack.steal  = null;
@@ -113,27 +110,20 @@ function preload() {
   GIF_POOL.agile.attack.base  = null;
   GIF_POOL.agile.attack.dash  = null;//没用
   GIF_POOL.agile.attack.boost = null;
-  GIF_POOL.power.idle.base   = loadImage("power-idle-base.gif");
-  GIF_POOL.power.idle.steal  = loadImage("power-idle-steal.gif");
-  GIF_POOL.power.idle.charge = loadImage("power-idle-charge.gif");
-  GIF_POOL.power.attack.base   = loadImage("power-attack-base.gif");
-  GIF_POOL.power.attack.steal  = loadImage("power-attack-steal.gif");
+  GIF_POOL.power.idle.base   = null;
+  GIF_POOL.power.idle.steal  = null;
+  GIF_POOL.power.idle.charge = null;
+  GIF_POOL.power.attack.base   = null;
+  GIF_POOL.power.attack.steal  = null;
   GIF_POOL.power.attack.charge = null;//没用
-  GIF_POOL.tank.idle.base   = loadImage("tankidlebase.gif");
-  GIF_POOL.tank.idle.shield = loadImage("tankidleshield.gif");
-  GIF_POOL.tank.attack.base   = loadImage("tankattackbase.gif");
-  GIF_POOL.tank.attack.shield = loadImage("tankattackshield.gif");
+  GIF_POOL.tank.idle.base   = null;
+  GIF_POOL.tank.idle.shield = null;
+  GIF_POOL.tank.attack.base   = null;
+  GIF_POOL.tank.attack.shield = null;
 
-<<<<<<< HEAD
 
 }
 
-=======
-}
-
-
-
->>>>>>> 68a9b809f48b2ab7b09234b2ce7bd76f41998da1
 function applyFactionFromSkills() {
   const sel = skillSystem.selectedSkills;
 
@@ -183,37 +173,10 @@ function initGame() {
 
   // 玩家和系统初始化
   setPlayer();
-<<<<<<< HEAD
   setSkillSystem(savedSkills); // ✅ 传入读取到的技能数组
   levelManager = new LevelManager();
   levelManager.addLevel(new Level1());
   levelManager.addLevel(new Level2());
-=======
-
-  //设置敌人
-  //setEnemies();
-
-  //设置技能系统
-  setSkillSystem();
-
-  // 初始化关卡系统
-  levelManager = new LevelManager();
-  levelManager.addLevel(new Level1());
-  levelManager.addLevel(new Level2());
-  // 这里可以继续 addLevel(new Level2()), ... 以后加
-
-  //吞食逻辑未完成
-  setTimeBonuses();
-
-  collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
-
-// 假设 enemies 是你的敌人数组
-player.meleeAttack = new MeleeAttack(player, enemies);
-
-applyFactionFromSkills();   // 首关
-
-levelManager.loadLevel(0);
->>>>>>> 68a9b809f48b2ab7b09234b2ce7bd76f41998da1
 
   setTimeBonuses();
   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
@@ -240,28 +203,17 @@ function setSkillSystem(savedSkills = null) {
 
   skillSystem.selectedSkills = [];
 
-<<<<<<< HEAD
   if (savedSkills) {
-=======
-  /*if (savedSkills) {
->>>>>>> 68a9b809f48b2ab7b09234b2ce7bd76f41998da1
     // 使用存档中的技能名选择技能
     for (let name of savedSkills) {
       let skill = skillSystem.allSkills.find(s => s.name === name);
       if (skill) skillSystem.selectSkill(skill);
     }
-<<<<<<< HEAD
   } 
   
  /*skillSystem.selectSkill(skillSystem.allSkills[6]);
  skillSystem.selectSkill(skillSystem.allSkills[7]);
  skillSystem.selectSkill(skillSystem.allSkills[8]);*/
-=======
-  } */
- skillSystem.selectSkill(skillSystem.allSkills[6]);
- skillSystem.selectSkill(skillSystem.allSkills[7]);
- skillSystem.selectSkill(skillSystem.allSkills[8]);
->>>>>>> 68a9b809f48b2ab7b09234b2ce7bd76f41998da1
 
   player.selectedSkills = skillSystem.selectedSkills;
 }
@@ -3341,7 +3293,6 @@ function drawGreenBlackHole( maxRadius, angleOffset) {
     for (let t = 0; t < spiralTurns * TWO_PI; t += angleStep) {
       let r = map(t, 0, spiralTurns * TWO_PI, 0, maxRadius);
       let angle = t + angleOffset;
-<<<<<<< HEAD
 
       let x = r * cos(angle);
       let y = r * sin(angle);
@@ -3462,125 +3413,4 @@ class SpriteManager {
     return       p2[over]         ?? p2.base ?? null; // 兜底
   }
 }
-=======
->>>>>>> 68a9b809f48b2ab7b09234b2ce7bd76f41998da1
 
-      let x = r * cos(angle);
-      let y = r * sin(angle);
-
-      // 调色：越靠近中心越黑
-      let index = int(map(r, 0, maxRadius, 0, palette.length));
-      index = constrain(index, 0, palette.length - 1);
-
-      fill(palette[index]);
-      rect(floor(x / stepSize) * stepSize, floor(y / stepSize) * stepSize, stepSize, stepSize);
-    }
-  }
-
-  // 螺旋图案
-  function drawCircularSpiral(radius, stepSize, angleOffset) {
-    push();
-    rotate(angleOffset);
-    for (let r = radius; r > 0; r -= stepSize) {
-      let angleStep = PI / 8;
-      for (let a = 0; a < TWO_PI; a += angleStep) {
-        let x = r * cos(a);
-        let y = r * sin(a);
-        let index = int((r + a * 10) / stepSize);
-        fill(index % 2 === 0 ? 0 : 80);
-        rect(x, y, stepSize, stepSize);
-      }
-    }
-    pop();
-  }
-
-  // 普通火花
-  class OgSpark {
-    constructor(x, y) {
-      this.pos = createVector(x, y);
-      this.vel = p5.Vector.random2D().mult(random(2, 5));
-      this.lifespan = 40 + random(20);
-      let palette = [
-        color(255, 105, 180),
-        color(255, 165, 0),
-        color(50, 255, 100)
-      ];
-      this.color = random(palette);
-    }
-  
-    update() {
-      this.pos.add(this.vel);
-      this.lifespan -= 2;
-    }
-  
-    display() {
-      fill(red(this.color), green(this.color), blue(this.color), this.lifespan * 4);
-      let px = floor(this.pos.x / 4) * 4;
-      let py = floor(this.pos.y / 4) * 4;
-      rect(px, py, 6, 6);
-    }
-  }
-
-// 回血的绿色火花
-class CrossSpark {
-  constructor(x, y) {
-    this.pos = createVector(x, y);
-    this.vel = p5.Vector.random2D().mult(random(0.5, 1.5));
-    this.lifespan = 40 + random(20);
-    this.size = 30;
-  }
-
-  update() {
-    this.pos.add(this.vel);
-    this.lifespan -= 2;
-  }
-
-  display() {
-    let px = floor(this.pos.x / 4) * 4;
-    let py = floor(this.pos.y / 4) * 4;
-    let alpha = this.lifespan * 4;
-
-    fill(50, 255, 100, alpha); // 绿色
-
-    // 绘制十字：竖一条，横一条
-    rect(px, py - this.size, this.size, this.size);
-    rect(px, py, this.size, this.size);
-    rect(px, py + this.size, this.size, this.size);
-    rect(px - this.size, py, this.size, this.size);
-    rect(px + this.size, py, this.size, this.size);
-  }
-}
-
-//新增对于playergif的管理流派系统
-/* ========= ③ SpriteManager ========= */
-class SpriteManager {
-  constructor(player) {
-    this.player  = player;
-    this.queue   = [];   // {name, end, prio, ts}
-  }
-
-  /* 请求一张覆盖层 gif */
-  request(name, keepMs, prio = 1) {
-    this.queue.push({ name, end: millis()+keepMs, prio, ts: millis() });
-  }
-
-  /* 清过期 & 取当前 overlay */
-  getCurrentOverlay() {
-    const now = millis();
-    this.queue = this.queue.filter(r => r.end > now);
-    if (this.queue.length === 0) return "base";
-    // 先比 prio 再比 ts
-    return this.queue.sort((a,b)=>(b.prio-a.prio)||(b.ts-a.ts))[0].name;
-  }
-
-  /* Player.show() 调用 */
-  chooseGif() {
-    const fac   = this.player.faction;                // 流派
-    const state = this.player.isAttacking ? "attack":"idle";
-    const over  = this.getCurrentOverlay();           // shield/dash/base
-
-    const p1 = GIF_POOL[fac]      ?? GIF_POOL.normal;
-    const p2 = p1[state]          ?? p1.idle;
-    return       p2[over]         ?? p2.base ?? null; // 兜底
-  }
-}
