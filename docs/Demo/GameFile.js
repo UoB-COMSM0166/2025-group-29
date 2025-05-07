@@ -461,22 +461,18 @@ class LevelManager {
 
 class BaseLevel {
   constructor(name) {
-    this.name = name;
+    this.name      = name;
     this.baseScore = 0;
     this.timeBonus = 0;
-    this.totalScore = 0;
+    this.totalScore= 0;
 
-    this.saveSlots = [1, 2, 3, 4, 5];   // 存档槽编号（以后可扩展为真正的存档信息）
-    this.selectedSlotIndex = 0;         // 当前高亮选中的存档框索引（0 ~ 4）
-
-
-    this.finished = false;
+    this.finished       = false;   // 关卡是否已结束
+    this.postGameStage  = 0;       // 0‑结算信息；1‑Save / Continue
   }
 
   start() {
     console.log(`开始关卡: ${this.name}`);
-    player.hp.currentHP = player.hp.maxHP;  // 每关开始时HP回复满
-    // 初始化关卡数据（如敌人、道具等）
+    player.hp.currentHP = player.hp.maxHP;    // 每关开局满血
   }
 
   update() {
@@ -491,13 +487,12 @@ class BaseLevel {
   finalizeScore() {
     this.baseScore = score;
     this.timeBonus = Math.floor(remainingTime) * 10;
-    this.totalScore = this.baseScore + this.timeBonus;
-
+    this.totalScore= this.baseScore + this.timeBonus;
   }
 
   onTimeUp() {
     console.log("时间到（BaseLevel 默认处理）：判定失败");
-    gameOver = true;  // 默认行为：时间到即失败（比如 Boss 关）
+    gameOver = true;                              // 可被子类覆写
   }
   
 
@@ -527,109 +522,61 @@ class BaseLevel {
     
     else if (this.postGameStage === 1) {
       // 第二步：保存/继续界面
-      textSize(30);
-
       textSize(24);
       text("Save current progress(press 'S')", windowWidth / 2, windowHeight / 2);
       text("Countinue without saving(press 'C')", windowWidth / 2, windowHeight / 2 + 40);
     }
+  }
 
-    else if (this.postGameStage === 2) {
-    // 存档界面（简单显示存档格子）
-    textSize(30);
-    text("Please select a save slot", windowWidth / 2, windowHeight / 2 - 160);
+  /* ---------- 键盘交互 ---------- */
+  async handleKeyPressed(key) {
+    if (!this.finished) return;                // 只在关卡结束后响应
 
-    const slotWidth = 400;
-    const slotHeight = 50;
-    const slotSpacing = 20;
-    const startX = windowWidth / 2 - slotWidth / 2;
-    const startY = windowHeight / 2 - 100;
-
-    for (let i = 0; i < this.saveSlots.length; i++) {
-      let y = startY + i * (slotHeight + slotSpacing);
-
-      // 高亮选中的槽
-      if (i === this.selectedSlotIndex) {
-          fill(100, 200, 255);  
-          stroke(255);
-          strokeWeight(3);
-      } else {
-          fill(80);
-          stroke(180);
-          strokeWeight(1);
-      }
-
-      rect(startX, y, slotWidth, slotHeight, 8);  // 圆角矩形
-
-      // 绘制槽号
-      fill(255);
-      noStroke();
-      textSize(20);
-      textAlign(CENTER, CENTER);
+    /* 调试：直接跳关 */
+    if (['2','3','4'].includes(key)) {
+      const idx = Number(key) - 1;
+      console.log(`🔄 跳转到 Level ${key}`);
+      levelManager.loadLevel(idx);
+      return;
     }
 
-    textSize(18);
-    fill(200);
-    text("Use ↑ ↓ to select, press Enter to save", windowWidth / 2, windowHeight - 60);
-  }
-}
-
-
-handleKeyPressed(key) {
-  if (this.finished) {
-
-    // 🔥 特殊快捷键：按 2 / 3 / 4 直接切换关卡
-    if (key === '2') {
-      console.log("🔄 跳转到 Level 2");
-      levelManager.loadLevel(1);  // 关卡数组是从 0 开始的
+    /* 结算 → Save / Continue 选择 */
+    if (this.postGameStage === 0) {
+      this.postGameStage = 1;                  // 任意键继续
       return;
-  } else if (key === '3') {
-      console.log("🔄 跳转到 Level 3");
-      levelManager.loadLevel(2);
-      return;
-  } else if (key === '4') {
-      console.log("🔄 跳转到 Level 4");
-      levelManager.loadLevel(3);
-      return;
+    }
+
+    if (this.postGameStage === 1) {
+      if (key === 'S' || key === 's') {
+        await this.saveProgressToSupabase();   // 存档
+        levelManager.loadNextLevel();          // 下一关
+      }
+      if (key === 'C' || key === 'c') {
+        levelManager.loadNextLevel();          // 直接下一关
+      }
+    }
   }
 
+  /* ---------- 保存到 Supabase ---------- */
+  async saveProgressToSupabase() {
+    const payload = {
+      current_level : this.levelNumber + 1,            // 下一关
+      total_score   : score,
+      hp            : player.hp.currentHP,
+      skills        : player.selectedSkills.map(s => s.name)
+    };
 
+    const { error } = await supabase
+      .from('saves')
+      .update(payload)
+      .eq('id', saveId);
 
-      if (this.postGameStage === 0) {
-          // 玩家按任意键继续
-          this.postGameStage = 1;
-      }
-      else if (this.postGameStage === 1) {
-          if (key === 'S' || key === 's') {
-              // 进入存档界面
-              this.postGameStage = 2;
-          }
-          else if (key === 'C' || key === 'c') {
-              // 🚀 直接进入下一关
-              console.log("玩家选择继续下一关");
-              levelManager.loadNextLevel();
-          }
-      }
-      else if (this.postGameStage === 2) {
-          // 在存档界面时，用 ↑ ↓ 选择槽，用 Enter 存档
-          if (keyCode === UP_ARROW) {
-              this.selectedSlotIndex = (this.selectedSlotIndex - 1 + this.saveSlots.length) % this.saveSlots.length;
-          }
-          else if (keyCode === DOWN_ARROW) {
-              this.selectedSlotIndex = (this.selectedSlotIndex + 1) % this.saveSlots.length;
-          }
-          else if (keyCode === ENTER) {
-              const selectedSlot = this.saveSlots[this.selectedSlotIndex];
-              console.log(`保存到槽 ${selectedSlot}`);
-              this.saveProgress(selectedSlot);
-
-              // 存档完毕，自动进入下一关
-              levelManager.loadNextLevel();
-          }
-      }
+    if (error) {
+      alert('保存失败：' + error.message);
+      throw error;
+    }
+    console.log('✅ 进度已保存到 Supabase');
   }
-}
-
 
   isCompleted() {
     // 默认 false，子类可以重写，判断通关条件
