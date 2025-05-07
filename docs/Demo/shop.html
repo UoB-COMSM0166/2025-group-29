@@ -34,20 +34,20 @@
     </div>
 
     <div id="shop">
-      <div class="column agile"    data-col="0">
-        <div class="item" data-row="0">Agile – Skill 1</div>
-        <div class="item" data-row="1">Agile – Skill 2</div>
-        <div class="item" data-row="2">Agile – Passive</div>
+      <div class="column agile" data-col="0">
+        <div class="item" data-row="0">Phantom Dash</div>
+        <div class="item" data-row="1">Ghost Cutter</div>
+        <div class="item" data-row="2">Runner’s Instinct</div>
       </div>
-      <div class="column tank"     data-col="1">
-        <div class="item" data-row="0">Tank – Skill 1</div>
-        <div class="item" data-row="1">Tank – Skill 2</div>
-        <div class="item" data-row="2">Tank – Passive</div>
+      <div class="column tank" data-col="1">
+        <div class="item" data-row="0">Iron Reversal</div>
+        <div class="item" data-row="1">Anchor Field</div>
+        <div class="item" data-row="2">Guardian’s Will</div>
       </div>
-      <div class="column strength" data-col="2">
-        <div class="item" data-row="0">Strength – Skill 1</div>
-        <div class="item" data-row="1">Strength – Skill 2</div>
-        <div class="item" data-row="2">Strength – Passive</div>
+      <div class="column power" data-col="2">
+        <div class="item" data-row="0">Crimson Drain</div>
+        <div class="item" data-row="1">Wrath Unchained</div>
+        <div class="item" data-row="2">Berserker’s Blood</div>
       </div>
     </div>
 
@@ -56,30 +56,26 @@
       <ul id="storedList"><li>None</li></ul>
     </div>
 
-    <button class="menuButton" id="backToGame">Continue</button> <!-- ★ 新增 -->
+    <button class="menuButton" id="backToGame">Continue</button>
   </div>
 
   <script type="module">
-    // 直接引入 Supabase 客户端
     import { supabase } from './js/supabase.js';
 
-    // 读取 URL 中的 saveId
     const params  = new URLSearchParams(window.location.search);
     const saveId  = params.get('saveId');
     if (!saveId) { alert('缺少存档 ID'); throw new Error('saveId required'); }
 
-    /* ─── 本地状态 ─── */
     let level = 0, chosenCol = null;
-    let stored = [];                       // 已选技能
+    let stored = [];
     const MAX = 3;
-    const attrNames = ['Agile','Tank','Strength'];
+    const attrNames = ['Agile','Tank','Power'];
 
-    /* ─── DOM ─── */
-    const lvlDisplay  = document.getElementById('levelDisplay');
-    const resetBtn    = document.getElementById('resetBtn');
-    const shop        = document.getElementById('shop');
-    const storedList  = document.getElementById('storedList');
-    const backBtn     = document.getElementById('backToGame');  // ★ 新增
+    const lvlDisplay = document.getElementById('levelDisplay');
+    const resetBtn   = document.getElementById('resetBtn');
+    const shop       = document.getElementById('shop');
+    const storedList = document.getElementById('storedList');
+    const backBtn    = document.getElementById('backToGame');
 
     function renderStored() {
       storedList.innerHTML = stored.length
@@ -112,7 +108,6 @@
       renderStored();
     }
 
-    /* ─── Supabase 读存档 ─── */
     async function loadSave() {
       const { data, error } = await supabase
         .from('saves')
@@ -130,7 +125,6 @@
       updateUI();
     }
 
-    /* ─── 写回存档 ─── */
     async function saveState() {
       await supabase
         .from('saves')
@@ -138,7 +132,6 @@
         .eq('id', saveId);
     }
 
-    /* ─── 点击技能格 ─── */
     shop.addEventListener('click', e => {
       const it = e.target.closest('.item');
       if (!it || it.classList.contains('disabled')) return;
@@ -148,7 +141,9 @@
       const name = it.textContent;
 
       if (level === 0) {
-        stored.push(name); chosenCol = col; level = 1;
+        stored.push(name);
+        chosenCol = col;
+        level = 1;
       } else if (level === 1) {
         if (stored.length === 1 && col === chosenCol) {
           stored.push(name);
@@ -164,9 +159,10 @@
       saveState();
     });
 
-    /* ─── Reset ─── */
     resetBtn.addEventListener('click', async () => {
-      level = 0; chosenCol = null; stored = [];
+      level = 0;
+      chosenCol = null;
+      stored = [];
       updateUI();
       await supabase
         .from('saves')
@@ -174,13 +170,11 @@
         .eq('id', saveId);
     });
 
-    /* ─── Continue 按钮：保存 → 回游戏 ─── */
-    backBtn.addEventListener('click', async () => {          // ★ 新增
+    backBtn.addEventListener('click', async () => {
       await saveState();
       window.location.href = `game.html?saveId=${saveId}`;
     });
 
-    /* ─── 启动 ─── */
     loadSave();
   </script>
 </body>
