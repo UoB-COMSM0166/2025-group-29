@@ -183,7 +183,7 @@ else                  player.faction = "normal";
 function setup() {
   createCanvas(windowWidth, windowHeight);
   console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
-
+  
   // 延迟初始化
   if (!dataLoaded) {
     noLoop();
@@ -208,15 +208,21 @@ function initGame() {
   // 设置技能系统，传入后端存的技能
   setSkillSystem(savedSkills);
 
-  // 设置关卡
+  // 初始化关卡系统
   levelManager = new LevelManager();
   levelManager.addLevel(new Level1());
   levelManager.addLevel(new Level2());
+  levelManager.addLevel(new Level3());
+  levelManager.addLevel(new Level4());
+  // 这里可以继续 addLevel(new Level2()), ... 以后加
+
 
   setTimeBonuses();
 
   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
-  player.meleeAttack = new MeleeAttack(player, enemies);
+
+// 假设 enemies 是你的敌人数组
+player.meleeAttack = new MeleeAttack(player, enemies);
 
   applyFactionFromSkills();
 
@@ -226,14 +232,14 @@ function initGame() {
   : 0;
 levelManager.loadLevel(idx);
 }
-
-function setSkillSystem(savedSkills = null) {
+  
+function setSkillSystem() {
   skillSystem = new SkillSystem();
-  const slowField   = new SlowFieldSkill(player, enemies);
+   const slowField   = new SlowFieldSkill(player, enemies);
   const fieldShock  = new SlowFieldBonusDamage(player, enemies, slowField);
-
-  skillSystem.addSkill(new DashSkill(player, enemies));
-  skillSystem.addSkill(new AttackBoostSkill(player));
+  
+  skillSystem.addSkill(new DashSkill(player, enemies)); 
+  skillSystem.addSkill(new AttackBoostSkill(player)); 
   skillSystem.addSkill(new DashResetSkill(player, skillSystem.selectedSkills));
   skillSystem.addSkill(new LifestealSkill(player));
   skillSystem.addSkill(new ChargeStrikeSkill(player, enemies));
@@ -257,8 +263,8 @@ function setSkillSystem(savedSkills = null) {
  skillSystem.selectSkill(skillSystem.allSkills[8]);
 
   player.selectedSkills = skillSystem.selectedSkills;
-}
 
+}
 
 
 function setPlayer() {
@@ -453,8 +459,7 @@ class LevelManager {
 
 
 
-class 
-BaseLevel {
+class BaseLevel {
   constructor(name) {
     this.name = name;
     this.baseScore = 0;
@@ -487,7 +492,15 @@ BaseLevel {
     this.baseScore = score;
     this.timeBonus = Math.floor(remainingTime) * 10;
     this.totalScore = this.baseScore + this.timeBonus;
+
   }
+
+  onTimeUp() {
+    console.log("时间到（BaseLevel 默认处理）：判定失败");
+    gameOver = true;  // 默认行为：时间到即失败（比如 Boss 关）
+  }
+  
+
 
   // 通用结算画面
   showSummaryScreen() {
@@ -616,6 +629,24 @@ VALUES (
 
 handleKeyPressed(key) {
   if (this.finished) {
+
+    // 🔥 特殊快捷键：按 2 / 3 / 4 直接切换关卡
+    if (key === '2') {
+      console.log("🔄 跳转到 Level 2");
+      levelManager.loadLevel(1);  // 关卡数组是从 0 开始的
+      return;
+  } else if (key === '3') {
+      console.log("🔄 跳转到 Level 3");
+      levelManager.loadLevel(2);
+      return;
+  } else if (key === '4') {
+      console.log("🔄 跳转到 Level 4");
+      levelManager.loadLevel(3);
+      return;
+  }
+
+
+
       if (this.postGameStage === 0) {
           // 玩家按任意键继续
           this.postGameStage = 1;
@@ -626,8 +657,9 @@ handleKeyPressed(key) {
               this.postGameStage = 2;
           }
           else if (key === 'C' || key === 'c') {
-            console.log("玩家选择继续下一关 → 跳转商店");
-            goToShop();
+              // 🚀 直接进入下一关
+              console.log("玩家选择继续下一关");
+              levelManager.loadNextLevel();
           }
       }
       else if (this.postGameStage === 2) {
@@ -705,6 +737,8 @@ function parseSaveFileAndLoad(sqlContent) {
       playerId, levelNumber, saveDate, saveTime, slotNumber,
       playerHP, savedScore, skillsJson
   });
+
+  
 
   // 加载“下一关”
   const nextLevelIndex = levelNumber;  // 因为 LevelManager.levels 是从0开始的
@@ -821,8 +855,22 @@ class Level1 extends BaseLevel {
           // 结算分数
           this.finalizeScore();
       }
+      
+
     }
   }
+
+  onTimeUp() {
+    if (!this.finished) {
+      console.log("Level1 时间到，正常结算");
+      this.stage = 5;
+      this.tip = "Finished！";
+      this.tipExpireTime = null;
+      this.finished = true;
+      this.finalizeScore();
+    }
+  }
+
 
   draw() {
     push();
@@ -931,7 +979,7 @@ class Level1 extends BaseLevel {
 
 }
 
-// 第2关
+// 第2关：伏击怪
 class Level2 extends BaseLevel {
   constructor() {
       super("Level 2");
@@ -943,7 +991,7 @@ class Level2 extends BaseLevel {
       // 2: 完成
       this.stage = 0;
 
-      this.tip = "特殊敌人出现！警惕";
+      this.tip = "Marked for death...The ambush is coming fast-stay alert!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
       this.finished = false;
 
@@ -967,6 +1015,10 @@ class Level2 extends BaseLevel {
     bullets.length = 0;
     timeBonuses.length = 0;
 
+    // 初始化提示内容 + 定时消失
+    this.tip = "Marked for death...The ambush is coming fast - stay alert!";
+    this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+
     // 刷敌人（正常血量）
     let minSpawnDistance = player.r * 10;
 
@@ -976,12 +1028,6 @@ class Level2 extends BaseLevel {
     for (let i = 0; i < 4; i++) {
         let ambushPos = generateValidEnemyPosition(minSpawnDistance);
         enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
-    }
-
-    // StealthEnemy
-    for (let i = 0; i < 4; i++) {
-        let stealthPos = generateValidEnemyPosition(minSpawnDistance);
-        enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
     }
 
     // FollowEnemy
@@ -1016,7 +1062,7 @@ class Level2 extends BaseLevel {
         // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
             gamePaused = true;
-            this.tip = "尝试寻找地图中的黑洞，看看会有什么效果！（但不会尽如人意…）";
+            this.tip = "Seek out the black holes🌀— some heal, some hurt!";
             this.pauseShown = true;
             this.pausedForBlackHoleTip = true;
             this.tipExpireTime = null;  // 让它一直显示，直到按键继续
@@ -1031,6 +1077,8 @@ class Level2 extends BaseLevel {
             // 结算分数
             this.finalizeScore();
         }
+
+        
 
         // 更新奖励物
         for (let i = timeBonuses.length - 1; i >= 0; i--) {
@@ -1069,6 +1117,16 @@ class Level2 extends BaseLevel {
     }
 }
   
+onTimeUp() {
+  if (!this.finished) {
+    console.log("Level2 时间到，正常结算");
+    this.stage = 2;
+    this.tip = "Finished！";
+    this.finished = true;
+    this.finalizeScore();
+  }
+}
+
   
 draw() {
   push();
@@ -1105,15 +1163,405 @@ handleKeyPressed(key) {
 
 }
 
+// 出现隐形怪
+class Level3 extends BaseLevel {
+  constructor() {
+    super("Level 3");
+    this.levelNumber = 3;
+
+    // 阶段控制：
+    // 0: 初始提示
+    // 1: 生存战中
+    // 2: 完成
+    this.stage = 0;
+
+    this.tip = "Something's lurking in the dark... Run for your life!";
+    this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+    this.finished = false;
+
+    this.blackHoles = [];
+    this.postGameStage = 0;
+  }
+
+  start() {
+    super.start();
+    console.log("Level3 已开始");
+
+    // 玩家归位
+    player.pos.set(0, 0);
+
+    // 清空数组
+    enemies.length = 0;
+    bullets.length = 0;
+    timeBonuses.length = 0;
+
+    // 初始化提示内容 + 定时消失
+    this.tip = "Something's lurking in the dark... Run for your life!";
+    this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+
+
+    // 刷敌人
+    let minSpawnDistance = player.r * 10;
+
+    // AmbushEnemy
+    for (let i = 0; i < 4; i++) {
+      let ambushPos = generateValidEnemyPosition(minSpawnDistance);
+      enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
+    }
+
+    // StealthEnemy
+    for (let i = 0; i < 4; i++) {
+      let stealthPos = generateValidEnemyPosition(minSpawnDistance);
+      enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
+    }
+
+    // FollowEnemy
+    for (let i = 0; i < 5; i++) {
+      let followPos = generateValidEnemyPosition(minSpawnDistance);
+      enemies.push(new FollowEnemy(followPos.x, followPos.y));
+    }
+
+    // CommonEnemy
+    for (let i = 0; i < 10; i++) {
+      let pos = generateOutsideViewPosition();
+      enemies.push(new CommonEnemy(pos.x, pos.y));
+    }
+
+    // 刷黑洞
+    for (let i = 0; i < 2; i++) {
+      let pos = generateValidEnemyPosition(300);
+      this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
+    }
+    let healPos = generateValidEnemyPosition(300);
+    this.blackHoles.push(new BlackHole(healPos.x, healPos.y, "heal"));
+
+    // 刷奖励物
+    for (let i = 0; i < 3; i++) {
+      timeBonuses.push(new TimeBonus(
+        random(-width, width),
+        random(-height, height),
+        15
+      ));
+    }
+
+    // 设置倒计时
+    timer = 60;
+    startTime = millis();
+
+    this.stage = 1;  // 切换到正式战斗阶段
+  }
+
+  update() {
+    if (this.stage === 1) {
+      // 检查完成
+      if (!this.finished && remainingTime <= 0) {
+        this.stage = 2;
+        this.tip = "Finished！";
+        this.finished = true;
+
+        // 结算分数
+        this.finalizeScore();
+      }
+
+      // 更新奖励物
+      for (let i = timeBonuses.length - 1; i >= 0; i--) {
+        timeBonuses[i].show();
+      }
+
+      // 更新黑洞
+      for (let bh of this.blackHoles) {
+        bh.update(player);
+        bh.show();
+      }
+
+      // 更新敌人
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+        enemy.update();
+        enemy.show();
+
+        if (enemy.isExplosionFinished()) {
+          if (enemy instanceof CommonEnemy) {
+            let pos = generateOutsideViewPosition();
+            enemies.push(new CommonEnemy(pos.x, pos.y));
+          }
+          enemies.splice(i, 1);
+        }
+      }
+
+      // 更新子弹
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].update();
+        bullets[i].show();
+        if (!bullets[i].alive) {
+          bullets.splice(i, 1);
+        }
+      }
+
+              // 检查完成
+              if (!this.finished && remainingTime <= 0) {
+                this.stage = 2;
+                this.tip = "Finished！";
+                this.finished = true;
+    
+                // 结算分数
+                this.finalizeScore();
+            }
+
+    }
+  }
+
+
+  onTimeUp() {
+    if (!this.finished) {
+      console.log("Level3 时间到，正常结算");
+      this.stage = 2;
+      this.tip = "Finished！";
+      this.finished = true;
+      this.finalizeScore();
+    }
+  }
+  
+
+  draw() {
+    push();
+    resetMatrix();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(28);
+
+    // 判断是否过期：只有未过期时显示
+    if (!this.tipExpireTime || millis() < this.tipExpireTime) {
+      text(this.tip, windowWidth / 2, 80);
+    }
+
+    if (this.finished) {
+      this.showSummaryScreen();
+    }
+
+    pop();
+  }
+
+  handleKeyPressed(key) {
+    // 直接转发给 BaseLevel 处理 Save / Continue 等逻辑
+    super.handleKeyPressed(key);
+  }
+}
+
+// 出现弹幕怪
+class Level4 extends BaseLevel{
+  constructor() {
+      super("Level 4");
+      this.levelNumber = 4;
+  
+      // 阶段控制：
+      // 0: 初始提示
+      // 1: 生存战中
+      // 2: 完成
+      this.stage = 0;
+  
+      this.tip = "Something wicked this way comes! Dodge their bullets!";
+      this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+      this.finished = false;
+  
+      this.blackHoles = [];
+      this.postGameStage = 0;
+    }
+
+    start() {
+      super.start();
+      console.log("Level4 已开始");
+  
+      // 玩家归位
+      player.pos.set(0, 0);
+  
+      // 清空数组
+      enemies.length = 0;
+      bullets.length = 0;
+      timeBonuses.length = 0;
+  
+      // 初始化提示内容 + 定时消失
+      this.tip = "Something wicked this way comes! Dodge their bullets!";
+      this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+  
+  
+      // 刷敌人
+      let minSpawnDistance = player.r * 10;
+  
+      // BulletEnemy（弹幕怪）追击玩家
+      for (let i = 0; i < 5; i++) {
+        let pos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new BulletEnemy(pos.x, pos.y, 35));
+      }
+  
+      // AmbushEnemy
+      for (let i = 0; i < 4; i++) {
+        let ambushPos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
+      }
+  
+      // StealthEnemy
+      for (let i = 0; i < 4; i++) {
+        let stealthPos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
+      }
+  
+      // FollowEnemy
+      for (let i = 0; i < 5; i++) {
+        let followPos = generateValidEnemyPosition(minSpawnDistance);
+        enemies.push(new FollowEnemy(followPos.x, followPos.y));
+      }
+  
+      // CommonEnemy
+      for (let i = 0; i < 10; i++) {
+        let pos = generateOutsideViewPosition();
+        enemies.push(new CommonEnemy(pos.x, pos.y));
+      }
+  
+      // 刷黑洞
+      for (let i = 0; i < 2; i++) {
+        let pos = generateValidEnemyPosition(300);
+        this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
+      }
+      let healPos = generateValidEnemyPosition(300);
+      this.blackHoles.push(new BlackHole(healPos.x, healPos.y, "heal"));
+  
+      // 刷奖励物
+      for (let i = 0; i < 3; i++) {
+        timeBonuses.push(new TimeBonus(
+          random(-width, width),
+          random(-height, height),
+          15
+        ));
+      }
+  
+      // 设置倒计时
+      timer = 60;
+      startTime = millis();
+  
+      this.stage = 1;  // 切换到正式战斗阶段
+    }
+update() {
+  if (this.stage === 1) {
+    // 检查完成
+    if (!this.finished && remainingTime <= 0) {
+      this.stage = 2;
+      this.tip = "Finished！";
+      this.finished = true;
+
+      // 结算分数
+      this.finalizeScore();
+    }
+
+    // 更新奖励物
+    for (let i = timeBonuses.length - 1; i >= 0; i--) {
+      timeBonuses[i].show();
+    }
+
+    // 更新黑洞
+    for (let bh of this.blackHoles) {
+      bh.update(player);
+      bh.show();
+    }
+
+    // 更新敌人
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const enemy = enemies[i];
+      enemy.update();
+      enemy.show();
+
+      if (enemy.isExplosionFinished()) {
+        if (enemy instanceof CommonEnemy) {
+          let pos = generateOutsideViewPosition();
+          enemies.push(new CommonEnemy(pos.x, pos.y));
+        }
+        enemies.splice(i, 1);
+      }
+    }
+
+    // 更新子弹
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      bullets[i].update();
+      bullets[i].show();
+      if (!bullets[i].alive) {
+        bullets.splice(i, 1);
+      }
+    }
+
+            // 检查完成
+            if (!this.finished && remainingTime <= 0) {
+              this.stage = 2;
+              this.tip = "Finished！";
+              this.finished = true;
+  
+              // 结算分数
+              this.finalizeScore();
+          }
+  
+
+
+  }
+}
+
+onTimeUp() {
+  if (!this.finished) {
+    console.log("Level4 时间到，正常结算");
+    this.stage = 2;
+    this.tip = "Finished！";
+    this.finished = true;
+    this.finalizeScore();
+  }
+}
+
+
+
+draw() {
+  push();
+  resetMatrix();
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(28);
+
+  // 判断是否过期：只有未过期时显示
+  if (!this.tipExpireTime || millis() < this.tipExpireTime) {
+    text(this.tip, windowWidth / 2, 80);
+  }
+
+  if (this.finished) {
+    this.showSummaryScreen();
+  }
+
+  pop();
+}
+
+handleKeyPressed(key) {
+  // 直接转发给 BaseLevel 处理 Save / Continue 等逻辑
+  super.handleKeyPressed(key);
+}
+
+
+}
+
 
 
 function updateTimer() {
   let elapsedTime = (millis() - startTime) / 1000;
   remainingTime = max(0, timer - elapsedTime);
+  // if (remainingTime <= 0) {
+  //   gameOver = true;
+  //   showGameOverScreen();
+  // }
   if (remainingTime <= 0) {
-    gameOver = true;
-    showGameOverScreen();
+    // 不再直接 Game Over，而是通知关卡
+    if (levelManager && levelManager.currentLevel && typeof levelManager.currentLevel.onTimeUp === 'function') {
+      levelManager.currentLevel.onTimeUp();
+    } else {
+      // 兜底：没有关卡 or 没实现 onTimeUp()，默认判定失败
+      console.log("时间到（无关卡响应），默认判定失败");
+      gameOver = true;
+    }
   }
+
 }
 
 function updateCamera() {
@@ -1423,6 +1871,8 @@ class Player {
     this.pos = createVector(x, y);
     this.r = 35;
     this.speed = 4;
+
+
     
     this.hp = new HPSystem(1000); // 初始血量100
     
@@ -1441,7 +1891,7 @@ class Player {
 
   this.isCharging = false;
   this.damageMultiplier = 1; // 默认受伤为100%
-  
+
   //新增流派系统
   this.faction   = "normal";              // <- 初始流派
   this.spriteMgr = new SpriteManager(this);
@@ -1485,6 +1935,7 @@ class Player {
       this.lastDirection = "right";
     }
     
+
     
     // **标准化方向，防止对角线加速**
     if (move.mag() > 0) {
@@ -1518,6 +1969,7 @@ class Player {
     }
   }
   
+
   
   show() {
     // ✅ 先画拖影
@@ -2033,8 +2485,8 @@ class Boss extends Enemy {
       if (action.canTrigger()) {
         action.trigger();
         break; // 每帧只执行一个行为
-      }
     }
+  }
   }
 
   checkStageTransition() {
@@ -3196,11 +3648,16 @@ class BlackHole {
 
   applyEffects(player) {
     if (this.type == "danger") {
+
+
       player.hp.takeDamage(0.3); // 每帧小幅掉血
-      // ✅ 用 player.isInvincible 判断冲刺状态
+      // 用 player.isInvincible 判断冲刺状态
       if (!player.isInvincible && player.speed > 2) {
         player.speed = 2;
       }
+
+
+
     } else if (this.type === "heal") {
       player.hp.heal(0.2);
     }
