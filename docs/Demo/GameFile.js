@@ -560,7 +560,7 @@ class BaseLevel {
   /* ---------- 保存到 Supabase ---------- */
   async saveProgressToSupabase() {
     const payload = {
-      current_level : this.levelNumber + 1,            // 下一关
+      current_level : this.levelNumber,            // 下一关
       skills        : player.selectedSkills.map(s => s.name)
     };
 
@@ -3735,22 +3735,7 @@ class SpriteManager {
 
 /* ---------- 跳商店 ---------- */
 async function goToShop() {
-  // 1. 计算下一关号（当前关卡已完成，所以 +1）
-  const current = levelManager.currentLevel.levelNumber || 1;
-  const nextLvl = current + 1;
-
-  // 2. 写回 Supabase
-  const { error } = await supabase
-    .from('saves')
-    .update({ current_level: nextLvl })
-    .eq('id', saveId);
-
-  if (error) {
-    alert('同步存档失败：' + error.message);
-    return;
-  }
-
-  // 3. 跳转到商店并把 saveId 携带过去
+  // 直接跳转到商店页面，不再提前更新 current_level
   window.location.href = `shop.html?saveId=${saveId}`;
 }
 

@@ -171,6 +171,7 @@
     });
 
     backBtn.addEventListener('click', async () => {
+      level += 1; 
       await saveState();
       window.location.href = `game.html?saveId=${saveId}`;
     });
