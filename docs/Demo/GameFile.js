@@ -219,7 +219,10 @@ function initGame() {
   applyFactionFromSkills();
 
   // 从存档加载关卡
-  levelManager.loadLevel(savedLevel || 0);
+  const idx = (typeof savedLevel === 'number' && savedLevel > 0)
+  ? savedLevel - 1
+  : 0;
+levelManager.loadLevel(idx);
 }
 
 function setSkillSystem(savedSkills = null) {
@@ -314,6 +317,9 @@ function setEnemies() {
 
 
 function draw() {
+  if (!levelManager || !levelManager.currentLevel) {
+    return;
+  }
  // 只修正四个方向键的状态
 keys["ArrowUp"]    = keyIsDown(UP_ARROW);
 keys["ArrowDown"]  = keyIsDown(DOWN_ARROW);
@@ -3449,3 +3455,9 @@ class SpriteManager {
   }
 }
 
+// 文件末尾加上：
+window.preload    = preload;
+window.setup      = setup;
+window.draw       = draw;
+window.keyPressed = keyPressed;
+window.keyReleased= keyReleased;
