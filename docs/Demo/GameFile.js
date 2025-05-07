@@ -792,6 +792,18 @@ class BaseLevel {
     console.log(`开始关卡: ${this.name}`);
     player.hp.currentHP = player.hp.maxHP;    // 每关开局满血
     this.resetSkillsCooldown(); // 重置技能冷却时间
+
+        // 玩家归位
+    player.pos.set(0, 0);
+
+    // 清空数组
+    enemies.length = 0;
+    bullets.length = 0;
+    timeBonuses.length = 0;
+
+
+
+
   }
 
   update() {
@@ -1146,7 +1158,7 @@ class Level2 extends BaseLevel {
 
       this.tip = "Marked for death...The ambush is coming fast-stay alert!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-      this.finished = false;
+      // this.finished = false;
 
       this.blackHoles = [];
 
@@ -1159,14 +1171,6 @@ class Level2 extends BaseLevel {
   start() {
     super.start();
     console.log("Level2 已开始");
-
-    // 玩家归位
-    player.pos.set(0, 0);
-
-    // 清空数组
-    enemies.length = 0;
-    bullets.length = 0;
-    timeBonuses.length = 0;
 
     // 初始化提示内容 + 定时消失
     this.tip = "Marked for death...The ambush is coming fast - stay alert!";
@@ -1330,7 +1334,7 @@ class Level3 extends BaseLevel {
 
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-    this.finished = false;
+    // this.finished = false;
 
     this.blackHoles = [];
     this.postGameStage = 0;
@@ -1340,13 +1344,6 @@ class Level3 extends BaseLevel {
     super.start();
     console.log("Level3 已开始");
 
-    // 玩家归位
-    player.pos.set(0, 0);
-
-    // 清空数组
-    enemies.length = 0;
-    bullets.length = 0;
-    timeBonuses.length = 0;
 
     // 初始化提示内容 + 定时消失
     this.tip = "Something's lurking in the dark... Run for your life!";
@@ -1515,7 +1512,7 @@ class Level4 extends BaseLevel{
   
       this.tip = "Something wicked this way comes! Dodge their bullets!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-      this.finished = false;
+      // this.finished = false;
   
       this.blackHoles = [];
       this.postGameStage = 0;
@@ -1525,13 +1522,6 @@ class Level4 extends BaseLevel{
       super.start();
       console.log("Level4 已开始");
   
-      // 玩家归位
-      player.pos.set(0, 0);
-  
-      // 清空数组
-      enemies.length = 0;
-      bullets.length = 0;
-      timeBonuses.length = 0;
   
       // 初始化提示内容 + 定时消失
       this.tip = "Something wicked this way comes! Dodge their bullets!";
