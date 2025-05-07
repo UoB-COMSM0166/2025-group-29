@@ -574,58 +574,6 @@ class BaseLevel {
   }
 }
 
-  saveProgress(slot) {
-  const playerId = "player123";  // 假设你有玩家 ID，可从外部传入
-  const levelNumber = this.levelNumber || 1;  // 当前关卡号
-  const now = new Date();
-
-  const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-  
-  // 获取玩家基础状态
-  const playerHP = player.hp.currentHP;
-  const skills = player.selectedSkills.map(s => s.name);  // 技能名数组
-  const skillsJson = JSON.stringify(skills);
-
-
-  const sql = `
-  INSERT INTO saves (
-    player_id,
-    level_number,
-    save_date,
-    save_time,
-    slot_number,
-    player_hp,
-    total_score,
-    selected_skills
-)
-VALUES (
-    '${playerId}',
-    ${levelNumber},
-    '${dateStr}',
-    '${timeStr}',
-    ${slot},
-    ${playerHP},
-    ${score},
-    '${skillsJson}'
-);
-`;
-
-  // 下载为 .sql 文件
-  this.downloadSQLFile(sql.trim(), `save_slot_${slot}.sql`);
-}
-
-  downloadSQLFile(sqlContent, fileName) {
-  const blob = new Blob([sqlContent], { type: 'text/sql' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-
 
 handleKeyPressed(key) {
   if (this.finished) {
@@ -692,76 +640,6 @@ handleKeyPressed(key) {
 
 }
 
-
-function triggerLoadSQLFile() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.sql';
-
-  input.onchange = e => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = event => {
-          const sqlContent = event.target.result;
-          console.log("已读取 SQL 文件:", sqlContent);
-          parseSaveFileAndLoad(sqlContent);
-      };
-      reader.readAsText(file);
-  };
-
-  input.click();
-}
-
-
-function parseSaveFileAndLoad(sqlContent) {
-  const match = sqlContent.match(/\(([^)]+)\);/);
-  if (!match) {
-      alert("无法解析存档文件");
-      return;
-  }
-
-  const values = match[1].split(',').map(s => s.trim());
-
-  const playerId = values[0].replace(/['"]/g, '');
-  const levelNumber = parseInt(values[1]);  // 已完成的关卡编号
-  const saveDate = values[2].replace(/['"]/g, '');
-  const saveTime = values[3].replace(/['"]/g, '');
-  const slotNumber = parseInt(values[4]);
-  const playerHP = parseInt(values[5]);
-  const savedScore = parseInt(values[6]);
-  const skillsJson = JSON.parse(values[7].replace(/['"]/g, ''));
-
-  console.log("解析出的存档数据:", {
-      playerId, levelNumber, saveDate, saveTime, slotNumber,
-      playerHP, savedScore, skillsJson
-  });
-
-  
-
-  // 加载“下一关”
-  const nextLevelIndex = levelNumber;  // 因为 LevelManager.levels 是从0开始的
-  if (nextLevelIndex >= levelManager.levels.length) {
-      alert("🎉 你已完成所有关卡！");
-      return;
-  }
-
-  console.log(`正在加载关卡 ${nextLevelIndex + 1}...`);
-  levelManager.loadLevel(nextLevelIndex);
-
-  // 延时恢复基础状态（等 Level 初始化好）
-  setTimeout(() => {
-      console.log("恢复玩家进度...");
-      player.hp.currentHP = playerHP;
-      score = savedScore;
-
-      // ✅ 直接调用技能系统加载函数
-      setSkillSystem(skillsJson);
-      
-      console.log("进度恢复完成 ✅");
-  }, 100);
-}
 
 
 // 第1关
@@ -1737,11 +1615,6 @@ function keyPressed() {
     levelManager.currentLevel.handlePlayerAttack();
 }
   }
-
-  if (key.toLowerCase() === 'l') {
-    console.log("请选择存档文件...");
-    triggerLoadSQLFile();
-}
 
   // 让当前关卡处理按键
   if (levelManager && levelManager.currentLevel) {
