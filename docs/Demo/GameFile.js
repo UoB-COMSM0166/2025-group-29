@@ -1,3 +1,36 @@
+import { supabase } from './js/supabase.js';
+
+const params = new URLSearchParams(window.location.search);
+const saveId = params.get('saveId');
+
+if (!saveId) {
+  alert('缺少存档 ID，无法加载存档。');
+  throw new Error('saveId required');
+}
+
+let savedLevel, savedMode, savedSkills = [];
+let dataLoaded = false;
+
+async function loadSaveData() {
+  const { data, error } = await supabase
+    .from('saves')
+    .select('current_level, mode, skills')
+    .eq('id', saveId)
+    .single();
+
+  if (error) {
+    console.error('加载存档失败：', error);
+    alert('加载存档失败：' + error.message);
+    return;
+  }
+
+  savedLevel  = data.current_level;
+  savedMode   = data.mode;
+  savedSkills = data.skills || [];
+
+  console.log('读到存档→', { savedLevel, savedMode, savedSkills });
+}
+
 let player;
 let enemies = [];
 
@@ -72,6 +105,10 @@ const GIF_POOL = {
 
 function preload() {
 
+  loadSaveData().then(() => {
+    dataLoaded = true;
+  });
+
   skillIcons["闪现"] = null;
   skillIcons["火球"] = null;
   skillIcons["护盾"] = null;
@@ -144,38 +181,50 @@ else                  player.faction = "normal";
 function setup() {
   createCanvas(windowWidth, windowHeight);
   console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
-  
 
-  //设置玩家
-  setPlayer();
+  // 延迟初始化
+  if (!dataLoaded) {
+    noLoop();
+    const check = setInterval(() => {
+      if (dataLoaded) {
+        clearInterval(check);
+        initGame();
+        loop();
+      }
+    }, 50);
+    return;
+  }
 
-  //设置敌人
-  //setEnemies();
-
-  //设置技能系统
-  setSkillSystem();
-
-  // 初始化关卡系统
-  levelManager = new LevelManager();
-  levelManager.addLevel(new Level1());
-  levelManager.addLevel(new Level2());
-  // 这里可以继续 addLevel(new Level2()), ... 以后加
-
-  //吞食逻辑未完成
-  setTimeBonuses();
-
-  collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
-
-// 假设 enemies 是你的敌人数组
-player.meleeAttack = new MeleeAttack(player, enemies);
-
-applyFactionFromSkills();   // 首关
-
-levelManager.loadLevel(0);
+  initGame(); // 正常加载路径
 
 
 }
   
+function initGame() {
+  setPlayer();
+
+  // 设置技能系统，传入后端存的技能
+  setSkillSystem(savedSkills);
+
+  // 设置关卡
+  levelManager = new LevelManager();
+  levelManager.addLevel(new Level1());
+  levelManager.addLevel(new Level2());
+
+  setTimeBonuses();
+
+  collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
+  player.meleeAttack = new MeleeAttack(player, enemies);
+
+  applyFactionFromSkills();
+
+  // 从存档加载关卡
+  const idx = (typeof savedLevel === 'number' && savedLevel > 0)
+  ? savedLevel - 1
+  : 0;
+levelManager.loadLevel(idx);
+}
+
 function setSkillSystem(savedSkills = null) {
   skillSystem = new SkillSystem();
   const slowField   = new SlowFieldSkill(player, enemies);
@@ -268,6 +317,9 @@ function setEnemies() {
 
 
 function draw() {
+  if (!levelManager || !levelManager.currentLevel) {
+    return;
+  }
  // 只修正四个方向键的状态
 keys["ArrowUp"]    = keyIsDown(UP_ARROW);
 keys["ArrowDown"]  = keyIsDown(DOWN_ARROW);
@@ -284,7 +336,7 @@ if (gameOver) {
 
 // 检查暂停状态
 if (typeof gamePaused !== 'undefined' && gamePaused) {
-  clear(); // 保持黑色背景
+  background(0); // 保持黑色背景
   if (levelManager && levelManager.currentLevel) {
     levelManager.currentLevel.draw();  // 显示关卡的提示语
   }
@@ -1065,7 +1117,7 @@ function updateTimer() {
 function updateCamera() {
   push();
   resetMatrix();
-  clear();
+  background(0);
   pop();
 
   let camX = constrain(player.pos.x, -width + windowWidth / 2, width - windowWidth / 2);
@@ -1189,7 +1241,7 @@ function drawInfo() {
 function showGameOverScreen() {
   push();
   resetMatrix(); // 取消 translate 变换，恢复默认坐标
-  clear(); // 确保整个屏幕填充黑色
+  background(0); // 确保整个屏幕填充黑色
 
   fill(255, 0, 0);
   textSize(50);
@@ -3402,3 +3454,10 @@ class SpriteManager {
     return       p2[over]         ?? p2.base ?? null; // 兜底
   }
 }
+
+// 文件末尾加上：
+window.preload    = preload;
+window.setup      = setup;
+window.draw       = draw;
+window.keyPressed = keyPressed;
+window.keyReleased= keyReleased;
