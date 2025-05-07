@@ -2498,7 +2498,7 @@ class SkillSystem {
 
 class AttackBoostSkill extends Skill {
   constructor(player) {
-    super("快速攻击", "", 10); // 名称、按键（暂时空）、冷却时间
+    super("Ghost Cutter", "", 10); // 名称、按键（暂时空）、冷却时间
     this.player = player; // 保存玩家对象
   }
 
@@ -2519,7 +2519,7 @@ class AttackBoostSkill extends Skill {
 
 class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("冲刺", "", 1); // 冲刺技能冷却2秒
+    super("Phantom Dash", "", 1); // 冲刺技能冷却2秒
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
@@ -2653,7 +2653,7 @@ class DashSkill extends Skill {
 
 class DashResetSkill extends Skill {
   constructor(player,selectedSkills) {
-    super("冲刺重置", "", 0); // 0秒冷却，因为它是被动技能
+    super("Runner’s Instinct", "", 0); // 0秒冷却，因为它是被动技能
     this.player = player; // 保存玩家对象
     this.selectedSkills = selectedSkills; // 保存已装备技能列表
   }
@@ -2679,7 +2679,7 @@ class DashResetSkill extends Skill {
 
 class ChargeStrikeSkill extends Skill {
   constructor(player, enemies) {
-    super("蓄力攻击", "", 3); // 技能名称，按键X，冷却8秒
+    super("Wrath Unchained", "", 3); // 技能名称，按键X，冷却8秒
     this.player = player;
     this.enemies = enemies;
 
@@ -2759,7 +2759,7 @@ class ChargeStrikeSkill extends Skill {
 
 class LifestealSkill extends Skill {
   constructor(player) {
-    super("吸血", "", 6); // 技能名称、按键、冷却秒数
+    super("Crimson Drain", "", 6); // 技能名称、按键、冷却秒数
     this.player = player;
     this.lifestealRatio = 0.3; // 吸血比例
     this.duration = 5000; // 持续时间（毫秒）
@@ -2799,7 +2799,7 @@ class LifestealSkill extends Skill {
 
 class BloodFurySkill extends Skill {
   constructor(player) {
-    super("血怒", "", 0); // 被动技能，无需冷却
+    super("Berserker’s Blood", "", 0); // 被动技能，无需冷却
     this.player = player;
     this.isBoosting = false;
   }
@@ -2827,7 +2827,7 @@ class BloodFurySkill extends Skill {
 
 class ReflectSkill extends Skill {
   constructor(player) {
-    super("反弹", "", 5);     // 名称、按键占位、冷却 12 s
+    super("Iron Reversal", "", 5);     // 名称、按键占位、冷却 12 s
     this.player   = player;
     this.duration = 4 * 1000;  // 4 秒持续
     this.endTime  = 0;
@@ -3272,7 +3272,7 @@ class SlowFieldSkill extends Skill {
               slowMul  = 0.1,
               duration = 5000) {
 
-    super("减速领域", "Z", 8);     // 名称 / 触发键 / 冷却秒数
+    super("Anchor Field", "Z", 8);     // 名称 / 触发键 / 冷却秒数
     this.player   = player;
     this.enemies  = enemies;
 
@@ -3388,7 +3388,7 @@ class SlowFieldBonusDamage extends Skill {
               damage   = 5,
               innerCD  = 10000) {
 
-    super("减速领域-电击", "", 0);     /* 被动无需手动触发 */
+    super("Guardian’s Will", "", 0);     /* 被动无需手动触发 */
     this.player    = player;
     this.enemies   = enemies;
     this.slowField = slowField;
