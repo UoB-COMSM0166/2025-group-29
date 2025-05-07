@@ -12,7 +12,7 @@
     }
     #gameCanvas {
       display: block;
-      background: transparent; /* 透明保留父背景 */
+      background: transparent;
       border: none;
     }
   </style>
@@ -24,14 +24,19 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx    = canvas.getContext('2d');
 
-    // 监听父页面转发的按键事件
-    const keys = {};
+    // parse initial level from ?level=X
+    const params  = new URLSearchParams(location.search);
+    let level      = parseInt(params.get('level')) || 1;
+
+    // when parent sends a level update
     window.addEventListener('message', e => {
-      if (e.data.type === 'keydown')  keys[e.data.key] = true;
-      if (e.data.type === 'keyup')    keys[e.data.key] = false;
+      if (e.data?.type === 'level' && typeof e.data.level === 'number') {
+        level = e.data.level;
+        loadLevelImage();  // reload new tile
+      }
     });
 
-    // 填满窗口
+    // handle resizing
     function resizeCanvas() {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -39,19 +44,23 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // 加载贴图
-    const img = new Image();
-    img.src = 'assets/media/BGelement.png';
+    // load the correct tile image for this level
+    let img = new Image();
+    function loadLevelImage() {
+      img.src = `assets/media/BG${level}.png`;
+    }
+    loadLevelImage();
 
-    // 随机稳定旋转：0,90,180,270 度
+    // random-but-stable rotation per tile
     function getRotationAngle(i, j) {
       const seed = (i * 374761393 + j * 668265263) & 3;
       return [0, 90, 180, 270][seed] * Math.PI / 180;
     }
 
-    // 平铺背景绘制
+    // draw the infinite tiled bg
     function drawBackground(offsetX, offsetY) {
       const tw = img.width, th = img.height;
+      if (!tw || !th) return;
       const cols = Math.ceil(canvas.width/tw) + 2;
       const rows = Math.ceil(canvas.height/th) + 2;
       const startCol = Math.floor(offsetX/tw);
@@ -71,25 +80,28 @@
       }
     }
 
-    // 控制偏移量
+    // keyboard movement via postMessage
+    const keys = {};
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'keydown') keys[e.data.key] = true;
+      if (e.data?.type === 'keyup')   keys[e.data.key] = false;
+    });
+
     let offsetX = 0, offsetY = 0;
-    const SPEED = 200;  // px/s
+    const SPEED = 200;
     let lastTime = 0;
 
     function loop(timestamp) {
       const dt = (timestamp - lastTime)/1000;
       lastTime = timestamp;
 
-      // 只支持箭头键 ↑↓←→
-      if (keys['ArrowUp'])    offsetY -= SPEED*dt;
-      if (keys['ArrowDown'])  offsetY += SPEED*dt;
-      if (keys['ArrowLeft'])  offsetX -= SPEED*dt;
-      if (keys['ArrowRight']) offsetX += SPEED*dt;
+      if (keys['ArrowUp'])    offsetY -= SPEED * dt;
+      if (keys['ArrowDown'])  offsetY += SPEED * dt;
+      if (keys['ArrowLeft'])  offsetX -= SPEED * dt;
+      if (keys['ArrowRight']) offsetX += SPEED * dt;
 
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      if (img.complete) {
-        drawBackground(offsetX, offsetY);
-      }
+      if (img.complete) drawBackground(offsetX, offsetY);
       requestAnimationFrame(loop);
     }
 
