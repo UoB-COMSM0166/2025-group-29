@@ -92,6 +92,8 @@ let blackHoles = [];
 let levelManager;
 let gamePaused = false;
 
+let remainingTime = 60; // 剩余时间（秒）
+
 const GIF_POOL = {
   normal: { idle:{}, attack:{} },
   agile : { idle:{}, attack:{} },
@@ -249,6 +251,7 @@ function setSkillSystem(savedSkills = null) {
       if (skill) skillSystem.selectSkill(skill);
     }
   } */
+ 
  skillSystem.selectSkill(skillSystem.allSkills[6]);
  skillSystem.selectSkill(skillSystem.allSkills[7]);
  skillSystem.selectSkill(skillSystem.allSkills[8]);
