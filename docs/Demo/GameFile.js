@@ -404,6 +404,324 @@ if (gameOver) {
 
 }
 
+function updateTimer() {
+  let elapsedTime = (millis() - startTime) / 1000;
+  remainingTime = max(0, timer - elapsedTime);
+  // if (remainingTime <= 0) {
+  //   gameOver = true;
+  //   showGameOverScreen();
+  // }
+  if (remainingTime <= 0) {
+    // 不再直接 Game Over，而是通知关卡
+    if (levelManager && levelManager.currentLevel && typeof levelManager.currentLevel.onTimeUp === 'function') {
+      levelManager.currentLevel.onTimeUp();
+    } else {
+      // 兜底：没有关卡 or 没实现 onTimeUp()，默认判定失败
+      console.log("时间到（无关卡响应），默认判定失败");
+      gameOver = true;
+    }
+  }
+
+}
+
+function updateCamera() {
+  push();
+  resetMatrix();
+  clear();
+  pop();
+
+  let camX = constrain(player.pos.x, -width + windowWidth / 2, width - windowWidth / 2);
+  let camY = constrain(player.pos.y, -height + windowHeight / 2, height - windowHeight / 2);
+  translate(windowWidth / 2 - camX, windowHeight / 2 - camY);
+}
+
+function drawMapBorder() {
+  push();
+  stroke(255, 0, 0);
+  strokeWeight(5);
+  noFill();
+  rectMode(CENTER);
+  rect(0, 0, width * 2, height * 2);
+  pop();
+}
+
+function updateTimeBonuses() {
+  for (let i = timeBonuses.length - 1; i >= 0; i--) {
+    timeBonuses[i].show();
+    
+  }
+}
+
+function updateEnemies() {
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const enemy = enemies[i];
+
+    enemy.update();       // 控制逻辑（会设置死亡、生成爆炸对象）
+    enemy.show();         // 必须调用！让它画出爆炸/尸体
+
+    // ❗最后判断是否爆炸动画也结束了
+    if (enemy.isExplosionFinished()) {
+      // 如果是 CommonEnemy，就补充一个新的
+      if (enemy instanceof CommonEnemy) {
+        let pos = generateOutsideViewPosition();
+        enemies.push(new CommonEnemy(pos.x, pos.y));
+      }
+
+      enemies.splice(i, 1);
+  }
+}
+}
+
+
+
+
+function updateBullets() {
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    bullets[i].update();
+    bullets[i].show();
+    if (!bullets[i].alive) {
+      bullets.splice(i, 1);
+    }
+  }
+}
+
+function updatePlayer() {
+  player.update();
+  player.show();
+}
+
+function updateBoss(){
+  
+    boss.update();
+    boss.show();
+  
+}
+
+function drawInfo() {
+  // *** 重要：绘制分数和倒计时，不受 translate 影响 ***
+  push(); // 保存当前坐标系
+  resetMatrix(); // 取消 translate() 的影响，恢复到屏幕原点
+
+  // 显示分数（左上角）
+  fill(255);
+  textSize(24);
+  textAlign(LEFT, TOP);
+  text("Score: " + score, 20, 20);
+
+  // **修正计时器在右上角**
+  textAlign(RIGHT, TOP);
+  text("Time: " + nf(remainingTime, 2, 1) + "s", windowWidth - 20, 20); // **改为 windowWidth**
+  
+  skillSystem.drawIcon();  // ✅ 画技能图标
+  
+  
+ 
+
+  //玩家坐标
+  
+  fill(255);
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text(`Player X: ${floor(player.pos.x)}`, 20, 50);
+  text(`Player Y: ${floor(player.pos.y)}`, 20, 80);
+
+  // 显示玩家 HP 信息
+  fill(255);
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text(`Player HP: ${player.hp.currentHP} / ${player.hp.maxHP}`, 20, 110);
+  
+  
+
+  // **在此处插入警告消息渲染**
+  if (millis() < warningTimer) {
+    //push();
+    //resetMatrix(); // 重置坐标系，防止 translate() 影响
+    fill(255, 0, 0);
+    textSize(20);
+    textAlign(CENTER, CENTER);
+    text(warningMessage, windowWidth / 2, windowHeight / 2 - 100);
+    pop();
+  }
+}
+
+
+
+//游戏结束屏幕
+function showGameOverScreen() {
+  push();
+  resetMatrix(); // 取消 translate 变换，恢复默认坐标
+  clear(); // 确保整个屏幕填充黑色
+
+  fill(255, 0, 0);
+  textSize(50);
+  textAlign(CENTER, CENTER);
+
+  // **使用 windowWidth 和 windowHeight 确保文本在屏幕中央**
+  text("Game Over", windowWidth / 2, windowHeight / 2 - 50);
+
+  textSize(30);
+  text("Final Score: " + score, windowWidth / 2, windowHeight / 2);
+  text("Press 'R' to Restart", windowWidth / 2, windowHeight / 2 + 40);
+
+  pop();
+}
+
+
+function keyPressed() {
+  keys[key] = true; // 记录按下的按键
+
+  if (key === 'R' || key === 'r') { // 按 R 重新开始
+    restartGame();
+  }
+
+
+
+  if (key == '1'){
+    gamelevel = 1;
+  }
+  
+  if (key == '2'){
+    gamelevel = 2;
+  }
+  
+  if (key.toLowerCase() === 'a') {
+    if (!player.isCharging) { // ✅ 正在蓄力时不能普攻
+      player.meleeAttack.trigger();
+    } else {
+      console.log("⚠️ 当前为蓄力攻击状态，禁止普通攻击");
+    }
+
+    // 告诉 Level1 玩家攻击了
+  if (levelManager && levelManager.currentLevel instanceof Level1) {
+    levelManager.currentLevel.handlePlayerAttack();
+}
+  }
+
+  // 让当前关卡处理按键
+  if (levelManager && levelManager.currentLevel) {
+    levelManager.currentLevel.handleKeyPressed(key);
+}
+  
+  
+
+  skillSystem.tryActivateSkill(key); // 让技能系统处理按键
+  
+  
+}
+
+function keyReleased() {
+  keys[key] = false; // 记录松开的按键
+}
+
+
+
+//保留，可以复用为其他的类别的移动方式
+function FoodMovePattern(food) {
+  let range = 10; // 运动范围
+  let speed = 0.5; // 普通食物移动速度
+
+  if (food.type === "normal") {
+    // Normal 食物 - 轻微漂浮
+    food.pos.x += random(-speed, speed);
+    food.pos.y += random(-speed, speed);
+  } 
+  else if (food.type === "trap") {
+    // Trap 食物 - 更剧烈的抖动
+    food.pos.x += random(-speed * 5, speed * 5);
+    food.pos.y += random(-speed * 5, speed * 5);
+  } 
+  else if (food.type === "power_invincible" || food.type === "power_speedBoost") {
+    // Power 食物 - 旋转运动
+    food.angle += 0.05; // 控制旋转速度
+    food.pos.x = food.basePos.x + cos(food.angle) * range;
+    food.pos.y = food.basePos.y + sin(food.angle) * range;
+  }
+
+  // 确保食物不会移动得太远
+  food.pos.x = constrain(food.pos.x, food.basePos.x - range, food.basePos.x + range);
+  food.pos.y = constrain(food.pos.y, food.basePos.y - range, food.basePos.y + range);
+}
+
+
+
+function checkGameOver() {
+  if (gameOver) {
+    showGameOverScreen();
+    return true;
+  }
+  return false;
+}
+
+
+ //重新开始
+ function restartGame() {
+  gameOver = false;
+  player.hp.currentHP = player.hp.maxHP;  // 复活时满血（保险）
+  player.hp.isDead = false; // 重置死亡状态
+  score = 0;                               // 保留分数 or 重置，看需要
+  startTime = millis();
+
+  player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
+
+
+  // 获取当前关卡索引
+  const currentIndex = levelManager.levels.indexOf(levelManager.currentLevel);
+  if (currentIndex >= 0) {
+      console.log(`重新加载当前关卡 Level ${currentIndex + 1}`);
+      levelManager.loadLevel(currentIndex);
+  } else {
+      console.warn("未找到当前关卡索引，默认回到第1关");
+      levelManager.loadLevel(0);
+  }
+}
+
+function generateValidEnemyPosition(minDistance) {
+  let pos;
+  let safe = false;
+  
+  while (!safe) {
+    pos = createVector(random(-width, width), random(-height, height));
+
+    
+    // **检查敌人与玩家的距离**
+    if (dist(pos.x, pos.y, player.pos.x, player.pos.y) >= minDistance) {
+      safe = true; // 只有当距离足够远时才接受这个位置
+    }
+  }
+  
+  return pos;
+}
+
+
+function generateOutsideViewPosition(maxAttempts = 20) {
+  let attempt = 0;
+
+  while (attempt < maxAttempts) {
+    let x = random(-width, width);
+    let y = random(-height, height);
+
+    let viewLeft   = player.pos.x - windowWidth * 0.75;
+    let viewRight  = player.pos.x + windowWidth * 0.75;
+    let viewTop    = player.pos.y - windowHeight * 0.75;
+    let viewBottom = player.pos.y + windowHeight * 0.75;
+
+    if (x < viewLeft || x > viewRight || y < viewTop || y > viewBottom) {
+      return createVector(x, y);
+    }
+
+    attempt++;
+  }
+
+  // fallback 强制生成远离玩家的位置
+  return createVector(
+    player.pos.x + random([-1, 1]) * 1000,
+    player.pos.y + random([-1, 1]) * 1000
+  );
+}
+
+
+
 // 关卡管理
 class LevelManager {
   constructor() {
@@ -473,6 +791,7 @@ class BaseLevel {
   start() {
     console.log(`开始关卡: ${this.name}`);
     player.hp.currentHP = player.hp.maxHP;    // 每关开局满血
+    this.resetSkillsCooldown(); // 重置技能冷却时间
   }
 
   update() {
@@ -494,6 +813,16 @@ class BaseLevel {
     console.log("时间到（BaseLevel 默认处理）：判定失败");
     gameOver = true;                              // 可被子类覆写
   }
+
+  resetSkillsCooldown() {
+    if (player.selectedSkills) {
+        for (let skill of player.selectedSkills) {
+            if (skill) {
+                skill.cooldownRemaining = 0;
+            }
+        }
+    }
+}
   
 
 
@@ -1368,321 +1697,6 @@ handleKeyPressed(key) {
 
 
 
-function updateTimer() {
-  let elapsedTime = (millis() - startTime) / 1000;
-  remainingTime = max(0, timer - elapsedTime);
-  // if (remainingTime <= 0) {
-  //   gameOver = true;
-  //   showGameOverScreen();
-  // }
-  if (remainingTime <= 0) {
-    // 不再直接 Game Over，而是通知关卡
-    if (levelManager && levelManager.currentLevel && typeof levelManager.currentLevel.onTimeUp === 'function') {
-      levelManager.currentLevel.onTimeUp();
-    } else {
-      // 兜底：没有关卡 or 没实现 onTimeUp()，默认判定失败
-      console.log("时间到（无关卡响应），默认判定失败");
-      gameOver = true;
-    }
-  }
-
-}
-
-function updateCamera() {
-  push();
-  resetMatrix();
-  clear();
-  pop();
-
-  let camX = constrain(player.pos.x, -width + windowWidth / 2, width - windowWidth / 2);
-  let camY = constrain(player.pos.y, -height + windowHeight / 2, height - windowHeight / 2);
-  translate(windowWidth / 2 - camX, windowHeight / 2 - camY);
-}
-
-function drawMapBorder() {
-  push();
-  stroke(255, 0, 0);
-  strokeWeight(5);
-  noFill();
-  rectMode(CENTER);
-  rect(0, 0, width * 2, height * 2);
-  pop();
-}
-
-function updateTimeBonuses() {
-  for (let i = timeBonuses.length - 1; i >= 0; i--) {
-    timeBonuses[i].show();
-    
-  }
-}
-
-function updateEnemies() {
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    const enemy = enemies[i];
-
-    enemy.update();       // 控制逻辑（会设置死亡、生成爆炸对象）
-    enemy.show();         // 必须调用！让它画出爆炸/尸体
-
-    // ❗最后判断是否爆炸动画也结束了
-    if (enemy.isExplosionFinished()) {
-      // 如果是 CommonEnemy，就补充一个新的
-      if (enemy instanceof CommonEnemy) {
-        let pos = generateOutsideViewPosition();
-        enemies.push(new CommonEnemy(pos.x, pos.y));
-      }
-
-      enemies.splice(i, 1);
-  }
-}
-}
-
-
-
-
-function updateBullets() {
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    bullets[i].update();
-    bullets[i].show();
-    if (!bullets[i].alive) {
-      bullets.splice(i, 1);
-    }
-  }
-}
-
-function updatePlayer() {
-  player.update();
-  player.show();
-}
-
-function updateBoss(){
-  
-    boss.update();
-    boss.show();
-  
-}
-
-function drawInfo() {
-  // *** 重要：绘制分数和倒计时，不受 translate 影响 ***
-  push(); // 保存当前坐标系
-  resetMatrix(); // 取消 translate() 的影响，恢复到屏幕原点
-
-  // 显示分数（左上角）
-  fill(255);
-  textSize(24);
-  textAlign(LEFT, TOP);
-  text("Score: " + score, 20, 20);
-
-  // **修正计时器在右上角**
-  textAlign(RIGHT, TOP);
-  text("Time: " + nf(remainingTime, 2, 1) + "s", windowWidth - 20, 20); // **改为 windowWidth**
-  
-  skillSystem.drawIcon();  // ✅ 画技能图标
-  
-  
- 
-
-  //玩家坐标
-  
-  fill(255);
-  textSize(20);
-  textAlign(LEFT, TOP);
-  text(`Player X: ${floor(player.pos.x)}`, 20, 50);
-  text(`Player Y: ${floor(player.pos.y)}`, 20, 80);
-
-  // 显示玩家 HP 信息
-  fill(255);
-  textSize(20);
-  textAlign(LEFT, TOP);
-  text(`Player HP: ${player.hp.currentHP} / ${player.hp.maxHP}`, 20, 110);
-  
-  
-
-  // **在此处插入警告消息渲染**
-  if (millis() < warningTimer) {
-    //push();
-    //resetMatrix(); // 重置坐标系，防止 translate() 影响
-    fill(255, 0, 0);
-    textSize(20);
-    textAlign(CENTER, CENTER);
-    text(warningMessage, windowWidth / 2, windowHeight / 2 - 100);
-    pop();
-  }
-}
-
-
-
-//游戏结束屏幕
-function showGameOverScreen() {
-  push();
-  resetMatrix(); // 取消 translate 变换，恢复默认坐标
-  clear(); // 确保整个屏幕填充黑色
-
-  fill(255, 0, 0);
-  textSize(50);
-  textAlign(CENTER, CENTER);
-
-  // **使用 windowWidth 和 windowHeight 确保文本在屏幕中央**
-  text("Game Over", windowWidth / 2, windowHeight / 2 - 50);
-
-  textSize(30);
-  text("Final Score: " + score, windowWidth / 2, windowHeight / 2);
-  text("Press 'R' to Restart", windowWidth / 2, windowHeight / 2 + 40);
-
-  pop();
-}
-
-
-function keyPressed() {
-  keys[key] = true; // 记录按下的按键
-
-  if (key === 'R' || key === 'r') { // 按 R 重新开始
-    restartGame();
-  }
-
-
-
-  if (key == '1'){
-    gamelevel = 1;
-  }
-  
-  if (key == '2'){
-    gamelevel = 2;
-  }
-  
-  if (key.toLowerCase() === 'a') {
-    if (!player.isCharging) { // ✅ 正在蓄力时不能普攻
-      player.meleeAttack.trigger();
-    } else {
-      console.log("⚠️ 当前为蓄力攻击状态，禁止普通攻击");
-    }
-
-    // 告诉 Level1 玩家攻击了
-  if (levelManager && levelManager.currentLevel instanceof Level1) {
-    levelManager.currentLevel.handlePlayerAttack();
-}
-  }
-
-  // 让当前关卡处理按键
-  if (levelManager && levelManager.currentLevel) {
-    levelManager.currentLevel.handleKeyPressed(key);
-}
-  
-  
-
-  skillSystem.tryActivateSkill(key); // 让技能系统处理按键
-  
-  
-}
-
-function keyReleased() {
-  keys[key] = false; // 记录松开的按键
-}
-
-
-
-//保留，可以复用为其他的类别的移动方式
-function FoodMovePattern(food) {
-  let range = 10; // 运动范围
-  let speed = 0.5; // 普通食物移动速度
-
-  if (food.type === "normal") {
-    // Normal 食物 - 轻微漂浮
-    food.pos.x += random(-speed, speed);
-    food.pos.y += random(-speed, speed);
-  } 
-  else if (food.type === "trap") {
-    // Trap 食物 - 更剧烈的抖动
-    food.pos.x += random(-speed * 5, speed * 5);
-    food.pos.y += random(-speed * 5, speed * 5);
-  } 
-  else if (food.type === "power_invincible" || food.type === "power_speedBoost") {
-    // Power 食物 - 旋转运动
-    food.angle += 0.05; // 控制旋转速度
-    food.pos.x = food.basePos.x + cos(food.angle) * range;
-    food.pos.y = food.basePos.y + sin(food.angle) * range;
-  }
-
-  // 确保食物不会移动得太远
-  food.pos.x = constrain(food.pos.x, food.basePos.x - range, food.basePos.x + range);
-  food.pos.y = constrain(food.pos.y, food.basePos.y - range, food.basePos.y + range);
-}
-
-
-
-function checkGameOver() {
-  if (gameOver) {
-    showGameOverScreen();
-    return true;
-  }
-  return false;
-}
-
-
- //重新开始
- function restartGame() {
-  gameOver = false;
-  player.hp.currentHP = player.hp.maxHP;  // 复活时满血（保险）
-  player.hp.isDead = false; // 重置死亡状态
-  score = 0;                               // 保留分数 or 重置，看需要
-  startTime = millis();
-
-  player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
-
-
-  // 获取当前关卡索引
-  const currentIndex = levelManager.levels.indexOf(levelManager.currentLevel);
-  if (currentIndex >= 0) {
-      console.log(`重新加载当前关卡 Level ${currentIndex + 1}`);
-      levelManager.loadLevel(currentIndex);
-  } else {
-      console.warn("未找到当前关卡索引，默认回到第1关");
-      levelManager.loadLevel(0);
-  }
-}
-
-function generateValidEnemyPosition(minDistance) {
-  let pos;
-  let safe = false;
-  
-  while (!safe) {
-    pos = createVector(random(-width, width), random(-height, height));
-
-    
-    // **检查敌人与玩家的距离**
-    if (dist(pos.x, pos.y, player.pos.x, player.pos.y) >= minDistance) {
-      safe = true; // 只有当距离足够远时才接受这个位置
-    }
-  }
-  
-  return pos;
-}
-
-
-function generateOutsideViewPosition(maxAttempts = 20) {
-  let attempt = 0;
-
-  while (attempt < maxAttempts) {
-    let x = random(-width, width);
-    let y = random(-height, height);
-
-    let viewLeft   = player.pos.x - windowWidth * 0.75;
-    let viewRight  = player.pos.x + windowWidth * 0.75;
-    let viewTop    = player.pos.y - windowHeight * 0.75;
-    let viewBottom = player.pos.y + windowHeight * 0.75;
-
-    if (x < viewLeft || x > viewRight || y < viewTop || y > viewBottom) {
-      return createVector(x, y);
-    }
-
-    attempt++;
-  }
-
-  // fallback 强制生成远离玩家的位置
-  return createVector(
-    player.pos.x + random([-1, 1]) * 1000,
-    player.pos.y + random([-1, 1]) * 1000
-  );
-}
 
 
 class Player {
