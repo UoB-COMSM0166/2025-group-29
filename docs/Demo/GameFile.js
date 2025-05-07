@@ -756,15 +756,13 @@ class BaseLevel {
     player.hp.currentHP = player.hp.maxHP;    // 每关开局满血
     this.resetSkillsCooldown(); // 重置技能冷却时间
 
-        // 玩家归位
+    // 玩家归位
     player.pos.set(0, 0);
 
     // 清空数组
     enemies.length = 0;
     bullets.length = 0;
     timeBonuses.length = 0;
-
-
 
 
   }
@@ -785,8 +783,16 @@ class BaseLevel {
   }
 
   onTimeUp() {
-    console.log("时间到（BaseLevel 默认处理）：判定失败");
-    gameOver = true;                              // 可被子类覆写
+    if (!this.finished) {
+      // console.log(`${this.name} 时间到，正常结算`);
+      this.stage = 2;  
+      this.tip = "Finished！";
+      this.tipExpireTime = null;
+      this.finished = true;
+      this.finalizeScore();
+  }// 可被子类覆写
+
+
   }
 
   resetSkillsCooldown() {
@@ -1237,15 +1243,6 @@ class Level2 extends BaseLevel {
     }
 }
   
-onTimeUp() {
-  if (!this.finished) {
-    console.log("Level2 时间到，正常结算");
-    this.stage = 2;
-    this.tip = "Finished！";
-    this.finished = true;
-    this.finalizeScore();
-  }
-}
 
   
 draw() {
@@ -1425,17 +1422,6 @@ class Level3 extends BaseLevel {
   }
 
 
-  onTimeUp() {
-    if (!this.finished) {
-      console.log("Level3 时间到，正常结算");
-      this.stage = 2;
-      this.tip = "Finished！";
-      this.finished = true;
-      this.finalizeScore();
-    }
-  }
-  
-
   draw() {
     push();
     resetMatrix();
@@ -1608,18 +1594,6 @@ update() {
 
   }
 }
-
-onTimeUp() {
-  if (!this.finished) {
-    console.log("Level4 时间到，正常结算");
-    this.stage = 2;
-    this.tip = "Finished！";
-    this.finished = true;
-    this.finalizeScore();
-  }
-}
-
-
 
 draw() {
   push();
