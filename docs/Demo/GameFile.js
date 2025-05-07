@@ -626,9 +626,8 @@ handleKeyPressed(key) {
               this.postGameStage = 2;
           }
           else if (key === 'C' || key === 'c') {
-              // 🚀 直接进入下一关
-              console.log("玩家选择继续下一关");
-              levelManager.loadNextLevel();
+            console.log("玩家选择继续下一关 → 跳转商店");
+            goToShop();
           }
       }
       else if (this.postGameStage === 2) {
@@ -3456,6 +3455,27 @@ class SpriteManager {
     const p2 = p1[state]          ?? p1.idle;
     return       p2[over]         ?? p2.base ?? null; // 兜底
   }
+}
+
+/* ---------- 跳商店 ---------- */
+async function goToShop() {
+  // 1. 计算下一关号（当前关卡已完成，所以 +1）
+  const current = levelManager.currentLevel.levelNumber || 1;
+  const nextLvl = current + 1;
+
+  // 2. 写回 Supabase
+  const { error } = await supabase
+    .from('saves')
+    .update({ current_level: nextLvl })
+    .eq('id', saveId);
+
+  if (error) {
+    alert('同步存档失败：' + error.message);
+    return;
+  }
+
+  // 3. 跳转到商店并把 saveId 携带过去
+  window.location.href = `shop.html?saveId=${saveId}`;
 }
 
 // 文件末尾加上：
