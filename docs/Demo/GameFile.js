@@ -250,18 +250,18 @@ function setSkillSystem() {
 
   skillSystem.selectedSkills = [];
 
-  /*if (savedSkills) {
+  if (savedSkills) {
     // 使用存档中的技能名选择技能
     for (let name of savedSkills) {
       let skill = skillSystem.allSkills.find(s => s.name === name);
       if (skill) skillSystem.selectSkill(skill);
     }
-  } */
+  } 
  
- skillSystem.selectSkill(skillSystem.allSkills[6]);
+ /*skillSystem.selectSkill(skillSystem.allSkills[6]);
  skillSystem.selectSkill(skillSystem.allSkills[7]);
  skillSystem.selectSkill(skillSystem.allSkills[8]);
-
+*/
   player.selectedSkills = skillSystem.selectedSkills;
 
 }
