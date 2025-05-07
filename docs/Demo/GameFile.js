@@ -92,7 +92,7 @@ let blackHoles = [];
 let levelManager;
 let gamePaused = false;
 
-let remainingTime = 60; // 剩余时间（秒）
+let remainingTime; // 剩余时间（秒）
 
 const GIF_POOL = {
   normal: { idle:{}, attack:{} },
@@ -240,7 +240,7 @@ function setSkillSystem() {
   
   skillSystem.addSkill(new DashSkill(player, enemies)); 
   skillSystem.addSkill(new AttackBoostSkill(player)); 
-  skillSystem.addSkill(new DashResetSkill(player, skillSystem.selectedSkills));
+  skillSystem.addSkill(new DashResetSkill(player));
   skillSystem.addSkill(new LifestealSkill(player));
   skillSystem.addSkill(new ChargeStrikeSkill(player, enemies));
   skillSystem.addSkill(new BloodFurySkill(player));
@@ -616,44 +616,6 @@ function keyReleased() {
 
 
 
-//保留，可以复用为其他的类别的移动方式
-function FoodMovePattern(food) {
-  let range = 10; // 运动范围
-  let speed = 0.5; // 普通食物移动速度
-
-  if (food.type === "normal") {
-    // Normal 食物 - 轻微漂浮
-    food.pos.x += random(-speed, speed);
-    food.pos.y += random(-speed, speed);
-  } 
-  else if (food.type === "trap") {
-    // Trap 食物 - 更剧烈的抖动
-    food.pos.x += random(-speed * 5, speed * 5);
-    food.pos.y += random(-speed * 5, speed * 5);
-  } 
-  else if (food.type === "power_invincible" || food.type === "power_speedBoost") {
-    // Power 食物 - 旋转运动
-    food.angle += 0.05; // 控制旋转速度
-    food.pos.x = food.basePos.x + cos(food.angle) * range;
-    food.pos.y = food.basePos.y + sin(food.angle) * range;
-  }
-
-  // 确保食物不会移动得太远
-  food.pos.x = constrain(food.pos.x, food.basePos.x - range, food.basePos.x + range);
-  food.pos.y = constrain(food.pos.y, food.basePos.y - range, food.basePos.y + range);
-}
-
-
-
-function checkGameOver() {
-  if (gameOver) {
-    showGameOverScreen();
-    return true;
-  }
-  return false;
-}
-
-
  //重新开始
  function restartGame() {
   gameOver = false;
@@ -745,6 +707,7 @@ class LevelManager {
     //  每次加载新关卡后，重新创建碰撞检测器和近战攻击器
     collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
     player.meleeAttack = new MeleeAttack(player, enemies);
+
   }
 
   loadNextLevel() {
@@ -2533,7 +2496,7 @@ class AttackBoostSkill extends Skill {
 
 class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("Phantom Dash", "", 1); // 冲刺技能冷却2秒
+    super("Phantom Dash", "", 10); // 冲刺技能冷却2秒
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
@@ -2621,25 +2584,6 @@ class DashSkill extends Skill {
       }
     }
   }
-  
-
-  /*endDash() {
-    console.log("冲刺结束，恢复速度");
-    this.isDashing = false;
-    this.player.speed = this.originalSpeed;
-    this.player.isInvincible = false;
-  
-    for (let skill of this.player.selectedSkills) {
-      if (skill instanceof LifestealSkill) {
-        skill.onDamageDealt(totalDamage, "dash"); // 或 "melee"、"charged"
-      }
-    }
-    
-  
-    this.totalDamage = 0;
-    this.dashTrail = [];
-    this.dashedEnemies = [];
-  }*/
 
 
     endDash() {
@@ -2666,25 +2610,16 @@ class DashSkill extends Skill {
 
 
 class DashResetSkill extends Skill {
-  constructor(player,selectedSkills) {
+  constructor(player) {
     super("Runner’s Instinct", "", 0); // 0秒冷却，因为它是被动技能
-    this.player = player; // 保存玩家对象
-    this.selectedSkills = selectedSkills; // 保存已装备技能列表
+    this.player = player;
   }
 
-  castSkillEffect() {
-    // ⚡ 这里什么都不用做，因为它是被动的，不靠手动触发
-    console.log("⚡ 冲刺重置技能被动生效！");
-  }
-
-  // 新增一个方法，用来在敌人死亡时被调用
   onEnemyKilled() {
     console.log("敌人被消灭，尝试重置冲刺冷却！");
-
-    // 遍历已装备技能，找到冲刺技能
-    for (let skill of this.selectedSkills) {
-      if (skill instanceof DashSkill) { // 找到冲刺技能
-        skill.cooldownRemaining = 0;    // 重置冲刺技能冷却
+    for (let skill of this.player.selectedSkills) {
+      if (skill instanceof DashSkill) {
+        skill.cooldownRemaining = 0;
         console.log("✅ 冲刺技能冷却已重置！");
       }
     }
@@ -2775,7 +2710,7 @@ class LifestealSkill extends Skill {
   constructor(player) {
     super("Crimson Drain", "", 6); // 技能名称、按键、冷却秒数
     this.player = player;
-    this.lifestealRatio = 0.3; // 吸血比例
+    this.lifestealRatio = 1; // 吸血比例
     this.duration = 5000; // 持续时间（毫秒）
     this.active = false;
     this.endTime = 0;
@@ -2822,9 +2757,9 @@ class BloodFurySkill extends Skill {
     let hpRatio = this.player.hp.currentHP / this.player.hp.maxHP;
 
     if (!this.isBoosting && hpRatio <= 0.2) {
-      this.player.attackPower = 30;
+      this.player.attackPower = 100;
       this.isBoosting = true;
-      console.log("🩸 血怒发动！攻击力提升至30");
+      console.log("🩸 血怒发动！攻击力提升至"+ this.player.attackPower);
     }
 
     if (this.isBoosting && hpRatio > 0.2) {
