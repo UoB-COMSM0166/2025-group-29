@@ -561,8 +561,6 @@ class BaseLevel {
   async saveProgressToSupabase() {
     const payload = {
       current_level : this.levelNumber + 1,            // 下一关
-      total_score   : score,
-      hp            : player.hp.currentHP,
       skills        : player.selectedSkills.map(s => s.name)
     };
 
