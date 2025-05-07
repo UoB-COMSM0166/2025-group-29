@@ -574,6 +574,7 @@ class BaseLevel {
       throw error;
     }
     console.log('✅ 进度已保存到 Supabase');
+    goToShop(); 
   }
 
   isCompleted() {
