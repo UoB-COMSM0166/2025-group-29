@@ -135,34 +135,34 @@ function preload() {
   
 
 
-  GIF_POOL.normal.idle.base   = loadImage('https://raw.githubusercontent.com/UoB-COMSM0166/2025-group-29/main/docs/Demo/assets/media/character/normal-idle-base.gif');
-  GIF_POOL.normal.idle.dash   = null;
-  GIF_POOL.normal.idle.boost  = null;
-  GIF_POOL.normal.idle.steal  = null;
-  GIF_POOL.normal.idle.charge = null;
-  GIF_POOL.normal.idle.shield = null;
-  GIF_POOL.normal.attack.base   = null;
+  GIF_POOL.normal.idle.base   = loadImage("assets/media/character/normal-idle-base.gif");
+  GIF_POOL.normal.idle.dash   = loadImage("assets/media/character/normal-idle-dash.gif");
+  GIF_POOL.normal.idle.boost  = loadImage("assets/media/character/normal-idle-boost.gif");
+  GIF_POOL.normal.idle.steal  = loadImage("assets/media/character/normal-idle-steal.gif");
+  GIF_POOL.normal.idle.charge = loadImage("assets/media/character/normal-attack-charge.gif");
+  GIF_POOL.normal.idle.shield = loadImage("assets/media/character/normal-idle-shield.gif");
+  GIF_POOL.normal.attack.base   = loadImage("assets/media/character/normal-attack-base.gif");
   GIF_POOL.normal.attack.dash   = null;//没用
-  GIF_POOL.normal.attack.boost  = null;
-  GIF_POOL.normal.attack.steal  = null;
+  GIF_POOL.normal.attack.boost  = loadImage("assets/media/character/normal-attack-boost.gif");
+  GIF_POOL.normal.attack.steal  = loadImage("assets/media/character/normal-attack-steal.gif");
   GIF_POOL.normal.attack.charge = null;//没用
-  GIF_POOL.normal.attack.shield = null;
-  GIF_POOL.agile.idle.base   = null;
-  GIF_POOL.agile.idle.dash   = null;
-  GIF_POOL.agile.idle.boost  = null;
-  GIF_POOL.agile.attack.base  = null;
+  GIF_POOL.normal.attack.shield = loadImage("assets/media/character/normal-attack-shield.gif");
+  GIF_POOL.agile.idle.base   = loadImage("assets/media/character/agile-idle-base.gif");
+  GIF_POOL.agile.idle.dash   = loadImage("assets/media/character/agile-idle-dash.gif");
+  GIF_POOL.agile.idle.boost  = loadImage("assets/media/character/agile-idle-boost.gif");
+  GIF_POOL.agile.attack.base  = loadImage("assets/media/character/agile-attack-base.gif");
   GIF_POOL.agile.attack.dash  = null;//没用
-  GIF_POOL.agile.attack.boost = null;
-  GIF_POOL.power.idle.base   = null;
-  GIF_POOL.power.idle.steal  = null;
-  GIF_POOL.power.idle.charge = null;
-  GIF_POOL.power.attack.base   = null;
-  GIF_POOL.power.attack.steal  = null;
+  GIF_POOL.agile.attack.boost = loadImage("assets/media/character/agile-attack-boost.gif");
+  GIF_POOL.power.idle.base   = loadImage("assets/media/character/power-idle-base.gif");
+  GIF_POOL.power.idle.steal  = loadImage("assets/media/character/power-idle-steal.gif");
+  GIF_POOL.power.idle.charge = loadImage("assets/media/character/power-attack-charge.gif");
+  GIF_POOL.power.attack.base   = loadImage("assets/media/character/power-attack-base.gif");
+  GIF_POOL.power.attack.steal  = loadImage("assets/media/character/power-attack-steal.gif");
   GIF_POOL.power.attack.charge = null;//没用
-  GIF_POOL.tank.idle.base   = null;
-  GIF_POOL.tank.idle.shield = null;
-  GIF_POOL.tank.attack.base   = null;
-  GIF_POOL.tank.attack.shield = null;
+  GIF_POOL.tank.idle.base   = loadImage("assets/media/character/tank-idle-base.gif");
+  GIF_POOL.tank.idle.shield = loadImage("assets/media/character/tank-idle-shield.gif");
+  GIF_POOL.tank.attack.base   = loadImage("assets/media/character/tank-attack-base.gif");
+  GIF_POOL.tank.attack.shield = loadImage("assets/media/character/tank-attack-shield.gif");
 
 }
 
