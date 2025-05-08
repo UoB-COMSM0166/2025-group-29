@@ -35,7 +35,7 @@ export const SaveMenu = {
       const mode = document.querySelector('input[name="mode"]:checked').value;
       const { data, error } = await supabase
         .from('saves')
-        .insert([{ name, current_level: 1, mode, skills: [] }])
+        .insert([{ name, current_level: 1, mode, skills: [],cumulative_score: 0}])
         .select();
       if (error) return alert('Save failed: ' + error.message);
       const saveId = data[0].id;
