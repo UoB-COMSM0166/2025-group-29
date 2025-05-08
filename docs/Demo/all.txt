@@ -458,6 +458,7 @@ echo "✅ 已将所有文本文件的路径和内容输出到 $output，二进�
 </head>
 <body>
   <div id="canvas-container"></div>
+  <!-- 所有脚本都以 ESM 加载 -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
@@ -910,35 +911,39 @@ export const LoadMenu = {
     this.el = document.createElement('div');
     this.el.className = 'loadContainer';
 
-    // 多取 skills 列
+    // 从数据库读取存档，并多取 skills 和 cumulative_score 列
     let { data: saves, error } = await supabase
       .from('saves')
-      .select('id, name, current_level, mode, creation_time, skills')
+      .select(`
+        id,
+        name,
+        current_level,
+        mode,
+        creation_time,
+        skills,
+        cumulative_score
+      `)
       .order('creation_time', { ascending: false });
     if (error) {
       alert('Load failed: ' + error.message);
       saves = [];
     }
 
-    // 构造每一行
+    // 构造表格行
     const rows = saves.length
       ? saves.map(s => {
-          const created = new Date(s.creation_time);
-          const diffMs   = Date.now() - created.getTime();
-          const h        = Math.floor(diffMs / 3600000);
-          const m        = Math.floor((diffMs % 3600000) / 60000);
-          const playTime = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-          // skills 数组转字符串
+          const created   = new Date(s.creation_time).toLocaleString();
           const skillsStr = (s.skills || []).join(', ');
+          const cumScore  = s.cumulative_score ?? 0;
 
           return `
             <tr data-id="${s.id}">
-              <td>${created.toLocaleString()}</td>
+              <td>${created}</td>
               <td>${s.name}</td>
               <td>${s.current_level}</td>
-              <td>${playTime}</td>
               <td>${s.mode}</td>
               <td>${skillsStr}</td>
+              <td>${cumScore}</td>
               <td>
                 <button class="menuButton deleteBtn" data-id="${s.id}">
                   Delete
@@ -949,6 +954,7 @@ export const LoadMenu = {
         }).join('')
       : `<tr><td colspan="7">(no saves found)</td></tr>`;
 
+    // 渲染整个界面
     this.el.innerHTML = `
       <h2>Load Game</h2>
       <div class="tableContainer">
@@ -958,9 +964,9 @@ export const LoadMenu = {
               <th>Created</th>
               <th>Name</th>
               <th>Level</th>
-              <th>Playtime</th>
               <th>Mode</th>
               <th>Skills</th>
+              <th>Total Score</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -971,7 +977,7 @@ export const LoadMenu = {
     `;
     document.body.appendChild(this.el);
 
-    // 点击行加载
+    // 点击行加载存档
     this.el.querySelectorAll('tbody tr[data-id]').forEach(tr => {
       tr.addEventListener('click', () => {
         const id = tr.getAttribute('data-id');
@@ -979,19 +985,26 @@ export const LoadMenu = {
       });
     });
 
-    // 删除按钮
+    // 删除按钮逻辑
     this.el.querySelectorAll('.deleteBtn').forEach(btn => {
       btn.addEventListener('click', async e => {
         e.stopPropagation();
         if (!confirm('Delete this save?')) return;
         const id = btn.getAttribute('data-id');
-        const { error } = await supabase.from('saves').delete().eq('id', id);
-        if (error) return alert('Delete failed: ' + error.message);
-        this.hide();
-        this.show();
+        const { error } = await supabase
+          .from('saves')
+          .delete()
+          .eq('id', id);
+        if (error) {
+          alert('Delete failed: ' + error.message);
+        } else {
+          this.hide();
+          this.show();
+        }
       });
     });
 
+    // 返回主菜单
     document.getElementById('backFromLoad').onclick = () => switchTo('MAIN_MENU');
   },
   hide() {
@@ -1061,7 +1074,7 @@ export const SaveMenu = {
       const mode = document.querySelector('input[name="mode"]:checked').value;
       const { data, error } = await supabase
         .from('saves')
-        .insert([{ name, current_level: 1, mode, skills: [] }])
+        .insert([{ name, current_level: 1, mode, skills: [],cumulative_score: 0}])
         .select();
       if (error) return alert('Save failed: ' + error.message);
       const saveId = data[0].id;
@@ -1076,6 +1089,88 @@ export const SaveMenu = {
     if (this.el) this.el.remove();
   }
 };
+
+
+===== ./js/ui/summeryMenu.js =====
+// js/ui/summaryMenu.js
+import { supabase } from '../supabase.js';
+import { switchTo } from '../router.js';
+
+/**
+ * SummaryMenu: 显示结算页面，根据分数评定等级 (C, B, A, S)
+ * 用法: SummaryMenu.show(totalScore);
+ */
+export const SummaryMenu = {
+  el: null,
+  show(totalScore) {
+    // 计算等级
+    let grade;
+    if (totalScore >= 2000)       grade = 'S';
+    else if (totalScore >= 1500)  grade = 'A';
+    else if (totalScore >= 1000)  grade = 'B';
+    else                           grade = 'C';
+
+    // 创建容器
+    this.el = document.createElement('div');
+    this.el.className = 'summaryContainer';
+    this.el.innerHTML = `
+      <h2>Level Complete!</h2>
+      <div class="summaryContent">
+        <p><strong>Score:</strong> ${totalScore}</p>
+        <p><strong>Grade:</strong> <span class="grade grade-${grade}">${grade}</span></p>
+      </div>
+      <div class="summaryActions">
+        <button id="nextLevelBtn" class="menuButton">Next Level</button>
+        <button id="retryBtn" class="menuButton">Retry</button>
+        <button id="exitBtn" class="menuButton">Exit to Menu</button>
+      </div>
+    `;
+    document.body.appendChild(this.el);
+
+    // 绑定事件
+    document.getElementById('nextLevelBtn').onclick = () => {
+      switchTo('GAME');
+    };
+    document.getElementById('retryBtn').onclick = () => {
+      switchTo('GAME', { retry: true });
+    };
+    document.getElementById('exitBtn').onclick = () => switchTo('MAIN_MENU');
+  },
+  hide() {
+    if (this.el) this.el.remove();
+  }
+};
+
+// CSS (建议加入全局样式表或内联样式)
+/*
+.summaryContainer {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 2em;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 1000;
+}
+.summaryContent p {
+  font-size: 1.2em;
+  margin: 0.5em 0;
+}
+.grade {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  font-size: 1.4em;
+}
+.grade-C { background: #888; }
+.grade-B { background: #66c; }
+.grade-A { background: #2c9; }
+.grade-S { background: gold; color: #000; }
+.summaryActions { margin-top: 1.5em; }
+.summaryActions .menuButton { margin: 0 0.5em; }
+*/
 
 
 ===== SKIPPED (binary) ./package-lock.json =====

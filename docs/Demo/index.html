@@ -5,10 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pixelated Space Demo</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* 全屏视频覆盖层 */
+    #introOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+      transition: opacity 0.8s ease;
+    }
+    #introOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #introVideo {
+      max-width: 100%; max-height: 100%;
+    }
+    #skipBtn {
+      position: absolute;
+      bottom: 10%;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: none;
+      padding: 0.5em 1em;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
+  <!-- 1. Intro 视频覆盖层 -->
+  <div id="introOverlay">
+    <video id="introVideo" src="media/intro.mp4" autoplay muted playsinline></video>
+    <button id="skipBtn">Skip</button>
+  </div>
+
+  <!-- 2. 你的原有内容 -->
   <div id="canvas-container"></div>
-  <!-- 所有脚本都以 ESM 加载 -->
   <script type="module" src="js/app.js"></script>
+
+  <!-- 3. 在视频播放完毕或跳过时，淡出并移除覆盖层 -->
+  <script>
+    const overlay = document.getElementById('introOverlay');
+    const video   = document.getElementById('introVideo');
+    const skipBtn = document.getElementById('skipBtn');
+
+    function finishIntro() {
+      overlay.classList.add('hidden');
+      // 等动画结束再彻底移除
+      setTimeout(() => overlay.remove(), 800);
+      // 这里如果需要，可以在移除后手动启动其它逻辑：
+      // window.dispatchEvent(new Event('introFinished'));
+    }
+
+    video.addEventListener('ended', finishIntro);
+    skipBtn.addEventListener('click', () => {
+      video.pause();
+      finishIntro();
+    });
+  </script>
 </body>
 </html>
