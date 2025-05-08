@@ -8,13 +8,14 @@ if (!saveId) {
   throw new Error('saveId required');
 }
 
+let savedCumulativeScore = 0;
 let savedLevel, savedMode, savedSkills = [];
 let dataLoaded = false;
 
 async function loadSaveData() {
   const { data, error } = await supabase
     .from('saves')
-    .select('current_level, mode, skills')
+    .select('current_level, mode, skills, cumulative_score')
     .eq('id', saveId)
     .single();
 
@@ -27,6 +28,7 @@ async function loadSaveData() {
   savedLevel  = data.current_level;
   savedMode   = data.mode;
   savedSkills = data.skills || [];
+  savedCumulativeScore = data.cumulative_score || 0;
 
   console.log('读到存档→', { savedLevel, savedMode, savedSkills });
 }
@@ -869,9 +871,14 @@ class BaseLevel {
 
   /* ---------- 保存到 Supabase ---------- */
   async saveProgressToSupabase() {
+    // 本关获得的分数
+    const gained = this.totalScore;  
+    // 新的累计分数
+    const newCumulative = savedCumulativeScore + gained;
     const payload = {
       current_level : this.levelNumber,            // 下一关
-      skills        : player.selectedSkills.map(s => s.name)
+      skills        : player.selectedSkills.map(s => s.name),
+      cumulative_score : newCumulative 
     };
 
     const { error } = await supabase
@@ -883,7 +890,8 @@ class BaseLevel {
       alert('保存失败：' + error.message);
       throw error;
     }
-    console.log('✅ 进度已保存到 Supabase');
+    console.log('✅ 进度已保存到 Supabase, 累计分数更新为', newCumulative);
+    savedCumulativeScore = newCumulative;
     goToShop(); 
   }
 

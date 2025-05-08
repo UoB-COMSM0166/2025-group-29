@@ -15,7 +15,7 @@
     }
     #gameCanvas {
       display: block;
-      background: transparent; /* 透明保留父背景 */
+      background: transparent;
       border: none;
     }
   </style>
@@ -27,14 +27,19 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx    = canvas.getContext('2d');
 
-    // 监听父页面转发的按键事件
-    const keys = {};
+    // parse initial level from ?level=X
+    const params  = new URLSearchParams(location.search);
+    let level      = parseInt(params.get('level')) || 1;
+
+    // when parent sends a level update
     window.addEventListener('message', e => {
-      if (e.data.type === 'keydown')  keys[e.data.key] = true;
-      if (e.data.type === 'keyup')    keys[e.data.key] = false;
+      if (e.data?.type === 'level' && typeof e.data.level === 'number') {
+        level = e.data.level;
+        loadLevelImage();  // reload new tile
+      }
     });
 
-    // 填满窗口
+    // handle resizing
     function resizeCanvas() {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -42,19 +47,23 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // 加载贴图
-    const img = new Image();
-    img.src = 'assets/media/BGelement.png';
+    // load the correct tile image for this level
+    let img = new Image();
+    function loadLevelImage() {
+      img.src = `assets/media/BG${level}.png`;
+    }
+    loadLevelImage();
 
-    // 随机稳定旋转：0,90,180,270 度
+    // random-but-stable rotation per tile
     function getRotationAngle(i, j) {
       const seed = (i * 374761393 + j * 668265263) & 3;
       return [0, 90, 180, 270][seed] * Math.PI / 180;
     }
 
-    // 平铺背景绘制
+    // draw the infinite tiled bg
     function drawBackground(offsetX, offsetY) {
       const tw = img.width, th = img.height;
+      if (!tw || !th) return;
       const cols = Math.ceil(canvas.width/tw) + 2;
       const rows = Math.ceil(canvas.height/th) + 2;
       const startCol = Math.floor(offsetX/tw);
@@ -74,25 +83,28 @@
       }
     }
 
-    // 控制偏移量
+    // keyboard movement via postMessage
+    const keys = {};
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'keydown') keys[e.data.key] = true;
+      if (e.data?.type === 'keyup')   keys[e.data.key] = false;
+    });
+
     let offsetX = 0, offsetY = 0;
-    const SPEED = 200;  // px/s
+    const SPEED = 200;
     let lastTime = 0;
 
     function loop(timestamp) {
       const dt = (timestamp - lastTime)/1000;
       lastTime = timestamp;
 
-      // 只支持箭头键 ↑↓←→
-      if (keys['ArrowUp'])    offsetY -= SPEED*dt;
-      if (keys['ArrowDown'])  offsetY += SPEED*dt;
-      if (keys['ArrowLeft'])  offsetX -= SPEED*dt;
-      if (keys['ArrowRight']) offsetX += SPEED*dt;
+      if (keys['ArrowUp'])    offsetY -= SPEED * dt;
+      if (keys['ArrowDown'])  offsetY += SPEED * dt;
+      if (keys['ArrowLeft'])  offsetX -= SPEED * dt;
+      if (keys['ArrowRight']) offsetX += SPEED * dt;
 
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      if (img.complete) {
-        drawBackground(offsetX, offsetY);
-      }
+      if (img.complete) drawBackground(offsetX, offsetY);
       requestAnimationFrame(loop);
     }
 
@@ -110,15 +122,15 @@
 
 ===== SKIPPED (binary) ./assets/font/Minecraft.ttf =====
 
-===== SKIPPED (binary) ./assets/media/BGelement.png =====
+===== SKIPPED (binary) ./assets/media/BG1.png =====
 
-===== SKIPPED (binary) ./assets/media/BGelement2.png =====
+===== SKIPPED (binary) ./assets/media/BG2.png =====
 
-===== SKIPPED (binary) ./assets/media/BGelement3.png =====
+===== SKIPPED (binary) ./assets/media/BG3.png =====
 
-===== SKIPPED (binary) ./assets/media/BGelement4.png =====
+===== SKIPPED (binary) ./assets/media/BG4.png =====
 
-===== SKIPPED (binary) ./assets/media/BGelement5.png =====
+===== SKIPPED (binary) ./assets/media/BG5.png =====
 
 ===== SKIPPED (binary) ./assets/media/bullet/Boss-bullet.gif =====
 
@@ -446,7 +458,6 @@ echo "✅ 已将所有文本文件的路径和内容输出到 $output，二进�
 </head>
 <body>
   <div id="canvas-container"></div>
-  <!-- 所有脚本都以 ESM 加载 -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
@@ -593,6 +604,207 @@ export function advanceTo(state) {
   window.addEventListener('flightComplete', handler);
   startFlight();
 }
+
+===== ./js/shop.js =====
+/* eslint-env browser, es2021 */
+// ──────────────────────────────────────────────────────────────
+// Shop page main logic — js/shop.js
+// (place this file alongside supabase.js in your js/ folder)
+// ──────────────────────────────────────────────────────────────
+import { supabase } from './supabase.js';
+
+/* ─────────── Constants & Helpers ─────────── */
+const ITEMS = [
+  ['Phantom Dash',  'Ghost Cutter',      'Runner’s Instinct'],   // col-0 - Agile
+  ['Iron Reversal', 'Anchor Field',      'Guardian’s Will'   ],  // col-1 - Tank
+  ['Crimson Drain', 'Wrath Unchained',   'Berserker’s Blood']    // col-2 - Power
+];
+// Level-1 entry: only top‐row of each column
+const ENTRY_SET = new Set([
+  'Phantom Dash',
+  'Iron Reversal',
+  'Crimson Drain'
+]);
+// Find column & row for a skill name
+const findPos = name => {
+  for (let c = 0; c < 3; c++) {
+    const r = ITEMS[c].indexOf(name);
+    if (r !== -1) return { col: c, row: r };
+  }
+  return null;
+};
+
+/* ─────────── DOM References ─────────── */
+const params     = new URLSearchParams(location.search);
+const saveId     = params.get('saveId');
+if (!saveId) {
+  alert('缺少存档 ID');
+  throw new Error('saveId required');
+}
+const lvlDisplay = document.getElementById('levelDisplay');
+const resetBtn   = document.getElementById('resetBtn');
+const shop       = document.getElementById('shop');
+const storedList = document.getElementById('storedList');
+const backBtn    = document.getElementById('backToGame');
+
+/* ─────────── State ─────────── */
+let level   = 1;    // overwritten by loadSave()
+let stored  = [];   // chosen skill names
+let homeCol = null; // column chosen in stage 1
+
+/* ─────────── UI Rendering ─────────── */
+function renderStored() {
+  storedList.innerHTML = stored.length
+    ? stored.map(n => `<li>${n}</li>`).join('')
+    : '<li>None</li>';
+}
+
+function updateUI() {
+  lvlDisplay.textContent = `Level: ${level}`;
+
+  document.querySelectorAll('.column').forEach($col => {
+    const col = +$col.dataset.col;
+    $col.classList.toggle('active', col === homeCol);
+
+    $col.querySelectorAll('.item').forEach($it => {
+      const row  = +$it.dataset.row;
+      const name = $it.textContent.trim();
+      let disabled = true;
+
+      if (level === 1) {
+        // Level 1: pick exactly one from the top row
+        disabled = !ENTRY_SET.has(name) || stored.length >= 1;
+      }
+      else if (level === 2) {
+        if (stored.length === 1) {
+          // specialization: same-column row 1
+          if (col === homeCol && row === 1) disabled = false;
+          // cross-column first pick: other columns, row 0 or 1
+          if (col !== homeCol && (row === 0 || row === 1)) disabled = false;
+        }
+        else if (stored.length === 2) {
+          // cross-column second pick: only the remaining column, row 0 or 1
+          const usedCols = new Set(stored.map(n => findPos(n).col));
+          if (!usedCols.has(col) && (row === 0 || row === 1)) {
+            disabled = false;
+          }
+        }
+      }
+      // Level ≥3: all disabled (preview only)
+      
+      // never allow re-clicking an owned skill or any passive (row 2)
+      if (stored.includes(name) || row === 2) disabled = true;
+
+      $it.classList.toggle('disabled', disabled);
+    });
+  });
+
+  renderStored();
+}
+
+/* ─────────── Supabase Load / Save ─────────── */
+async function loadSave() {
+  const { data, error } = await supabase
+    .from('saves')
+    .select('current_level, skills')
+    .eq('id', saveId)
+    .single();
+  if (error) {
+    alert('加载失败: ' + error.message);
+    return;
+  }
+
+  level  = data.current_level || 1;
+  stored = data.skills        || [];
+
+  if (stored.length) {
+    const p = findPos(stored[0]);
+    homeCol = p ? p.col : null;
+  }
+
+  updateUI();
+}
+
+function saveState() {
+  return supabase
+    .from('saves')
+    .update({ current_level: level, skills: stored })
+    .eq('id', saveId);
+}
+
+/* ─────────── Shop Click Logic ─────────── */
+shop.addEventListener('click', async e => {
+  const $it = e.target.closest('.item');
+  if (!$it || $it.classList.contains('disabled')) return;
+
+  const col  = +$it.parentElement.dataset.col;
+  const row  = +$it.dataset.row;
+  const name = $it.textContent.trim();
+
+  if (level === 1) {
+    // Stage 1 pick
+    stored.push(name);
+    homeCol = col;
+  }
+  else if (level === 2) {
+    if (stored.length === 1) {
+      // first pick in Level 2
+      if (col === homeCol && row === 1) {
+        // specialize: same-column second row + auto-unlock passive
+        stored.push(name);
+        stored.push(ITEMS[col][2]);
+      }
+      else if (col !== homeCol && (row === 0 || row === 1)) {
+        // cross-column first pick
+        stored.push(name);
+      }
+    }
+    else if (stored.length === 2) {
+      // cross-column second pick
+      const usedCols = new Set(stored.map(n => findPos(n).col));
+      if (!usedCols.has(col) && (row === 0 || row === 1)) {
+        stored.push(name);
+      }
+    }
+  }
+
+  await saveState();
+  updateUI();
+});
+
+/* ─────────── Reset / Continue ─────────── */
+resetBtn.addEventListener('click', async () => {
+  level   = 1;
+  stored  = [];
+  homeCol = null;
+  await saveState();
+  updateUI();
+});
+
+backBtn.addEventListener('click', async () => {
+  // advance stage on Continue
+  if (level === 1 && stored.length === 1) {
+    level = 2;
+  } else if (level === 2 && stored.length >= 2) {
+    level = 3;
+  } else if (level === 3) {
+    level = 4;
+  } else if (level === 4) {
+    level = 5;
+  }
+
+  // notify BG frame to switch tileset
+  document
+    .getElementById('bgFrame')
+    .contentWindow
+    .postMessage({ type: 'level', level }, '*');
+
+  await saveState();
+  location.href = `game.html?saveId=${saveId}`;
+});
+
+/* ─────────── Init ─────────── */
+loadSave();
 
 ===== ./js/supabase.js =====
 // js/supabase.js
@@ -905,20 +1117,20 @@ export const SaveMenu = {
     </div>
 
     <div id="shop">
-      <div class="column agile"    data-col="0">
-        <div class="item" data-row="0">Agile – Skill 1</div>
-        <div class="item" data-row="1">Agile – Skill 2</div>
-        <div class="item" data-row="2">Agile – Passive</div>
+      <div class="column agile" data-col="0">
+        <div class="item" data-row="0">Phantom Dash</div>
+        <div class="item" data-row="1">Ghost Cutter</div>
+        <div class="item" data-row="2">Runner’s Instinct</div>
       </div>
-      <div class="column tank"     data-col="1">
-        <div class="item" data-row="0">Tank – Skill 1</div>
-        <div class="item" data-row="1">Tank – Skill 2</div>
-        <div class="item" data-row="2">Tank – Passive</div>
+      <div class="column tank" data-col="1">
+        <div class="item" data-row="0">Iron Reversal</div>
+        <div class="item" data-row="1">Anchor Field</div>
+        <div class="item" data-row="2">Guardian’s Will</div>
       </div>
-      <div class="column strength" data-col="2">
-        <div class="item" data-row="0">Strength – Skill 1</div>
-        <div class="item" data-row="1">Strength – Skill 2</div>
-        <div class="item" data-row="2">Strength – Passive</div>
+      <div class="column power" data-col="2">
+        <div class="item" data-row="0">Crimson Drain</div>
+        <div class="item" data-row="1">Wrath Unchained</div>
+        <div class="item" data-row="2">Berserker’s Blood</div>
       </div>
     </div>
 
@@ -926,142 +1138,11 @@ export const SaveMenu = {
       <h3>Stored Skills</h3>
       <ul id="storedList"><li>None</li></ul>
     </div>
+
+    <button class="menuButton" id="backToGame">Continue</button>
   </div>
 
-  <script type="module">
-    // 直接引入你已有的 supabase 客户端
-    import { supabase } from './js/supabase.js';
-
-    // 读取 URL 中的 saveId
-    const params = new URLSearchParams(window.location.search);
-    const saveId = params.get('saveId');
-    if (!saveId) {
-      alert('缺少存档 ID');
-      throw new Error('saveId required');
-    }
-
-    // 本地状态
-    let level       = 0;
-    let chosenCol   = null;
-    let stored      = [];               // 已选技能名数组
-    const MAX       = 3;
-    const attrNames = ['Agile','Tank','Strength'];
-
-    // DOM 元素
-    const lvlDisplay = document.getElementById('levelDisplay');
-    const resetBtn    = document.getElementById('resetBtn');
-    const shop        = document.getElementById('shop');
-    const storedList  = document.getElementById('storedList');
-
-    function renderStored() {
-      storedList.innerHTML = '';
-      if (stored.length === 0) {
-        storedList.innerHTML = '<li>None</li>';
-      } else {
-        stored.forEach(n => {
-          const li = document.createElement('li');
-          li.textContent = n;
-          storedList.appendChild(li);
-        });
-      }
-    }
-
-    function updateUI() {
-      lvlDisplay.textContent = 'Level: ' + level;
-      document.querySelectorAll('.column').forEach(colEl => {
-        const col = +colEl.dataset.col;
-        colEl.classList.toggle('active', col === chosenCol);
-        colEl.querySelectorAll('.item').forEach(item => {
-          const row  = +item.dataset.row;
-          const name = item.textContent;
-          item.classList.remove('disabled');
-          if (
-            level >= 2 ||
-            stored.includes(name) ||
-            stored.length >= MAX ||
-            (level === 0 && row !== 0) ||
-            (level === 1 && row === 2) ||
-            (level === 1 && stored.length === 1 && col !== chosenCol && stored.some(n => n.startsWith(attrNames[col]))) ||
-            (level === 1 && stored.length === 2 && (col === chosenCol || stored.some(n => n.startsWith(attrNames[col]))))
-          ) {
-            item.classList.add('disabled');
-          }
-        });
-      });
-      renderStored();
-    }
-
-    // 从 Supabase 拉取存档
-    async function loadSave() {
-      const { data, error } = await supabase
-        .from('saves')
-        .select('current_level, skills')
-        .eq('id', saveId)
-        .single();
-      if (error) {
-        return alert('加载失败: ' + error.message);
-      }
-      level  = data.current_level;
-      stored = data.skills || [];
-      if (stored.length > 0) {
-        const first = stored[0];
-        chosenCol = attrNames.findIndex(a => first.startsWith(a));
-      }
-      updateUI();
-    }
-
-    // 把最新的 level 和 skills 写回 Supabase
-    async function saveState() {
-      await supabase
-        .from('saves')
-        .update({ current_level: level, skills: stored })
-        .eq('id', saveId);
-    }
-
-    // 交互：点击技能格
-    shop.addEventListener('click', e => {
-      const it = e.target.closest('.item');
-      if (!it || it.classList.contains('disabled')) return;
-      const col = +it.parentElement.dataset.col;
-      const row = +it.dataset.row;
-      const name = it.textContent;
-
-      if (level === 0) {
-        stored.push(name);
-        chosenCol = col;
-        level = 1;
-      }
-      else if (level === 1) {
-        if (stored.length === 1 && col === chosenCol) {
-          stored.push(name);
-          stored.push(`${attrNames[col]} – Passive`);
-          level = 2;
-        }
-        else if (stored.length < MAX && col !== chosenCol) {
-          stored.push(name);
-          if (stored.length === MAX) level = 2;
-        }
-      }
-
-      updateUI();
-      saveState();
-    });
-
-    // 重置
-    resetBtn.addEventListener('click', async () => {
-      level = 0;
-      chosenCol = null;
-      stored = [];
-      updateUI();
-      await supabase
-        .from('saves')
-        .update({ current_level: 0, skills: [] })
-        .eq('id', saveId);
-    });
-
-    // 启动
-    loadSave();
-  </script>
+  <script type="module" src="js/shop.js"></script>
 </body>
 </html>
 
