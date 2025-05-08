@@ -32,19 +32,20 @@ vaguely hear a voice:
 “This is a retrieval mission, not an exploration.”`,
     `When you awaken, only a single directive remains before you:
 Hunt—until nothing is left.`,
-    ``
+    ''
   ];
 
-  let idx          = 0;
-  const overlay    = document.getElementById('introOverlay');
-  const imgEl      = document.getElementById('introImage');
-  const storyEl    = document.getElementById('storyText');
-  const clickEl    = document.getElementById('clickText');
+  let idx       = 0;
+  const overlay = document.getElementById('introOverlay');
+  const imgEl   = document.getElementById('introImage');
+  const storyEl = document.getElementById('storyText');
+  const clickEl = document.getElementById('clickText');
+  const skipBtn = document.getElementById('skipButton');
 
-  let typingTimer  = null;
-  let charIndex    = 0;
+  let typingTimer = null;
+  let charIndex   = 0;
 
-  // 打字机效果
+  // 文字打字机效果
   function startTyping(text) {
     clearInterval(typingTimer);
     storyEl.textContent = '';
@@ -55,53 +56,55 @@ Hunt—until nothing is left.`,
       } else {
         clearInterval(typingTimer);
       }
-    }, 20); // 加快一些
+    }, 30);
   }
 
-  // 显示第 i 页字幕
   function showSubtitleForSlide(i) {
+    const text = subtitles[i] || '';
     clearInterval(typingTimer);
     storyEl.textContent = '';
-    const txt = subtitles[i] || '';
-    if (txt) {
+    if (text) {
       storyEl.style.opacity = '1';
-      startTyping(txt);
+      startTyping(text);
     } else {
       storyEl.style.opacity = '0';
     }
   }
 
-  // “Click to continue” 省略号动画
+  // “Click to continue” 的省略号动画
   let dotCount = 0;
   const ellipsisTimer = setInterval(() => {
     dotCount = (dotCount + 1) % 4;
     clickEl.textContent = 'Click to continue' + '.'.repeat(dotCount);
-  }, 500);
+  }, 600);
 
-  // 点击切图
+  // 收尾：淡出并触发 introFinished
+  function endIntro() {
+    clearInterval(ellipsisTimer);
+    overlay.classList.add('hidden');
+    overlay.addEventListener('transitionend', () => {
+      overlay.remove();
+      window.dispatchEvent(new Event('introFinished'));
+    }, { once: true });
+  }
+
   imgEl.addEventListener('click', () => {
     if (idx < images.length - 1) {
       idx++;
-      // 淡出当前图
       imgEl.classList.add('fade');
       imgEl.addEventListener('transitionend', function handler() {
         imgEl.removeEventListener('transitionend', handler);
         imgEl.src = images[idx];
         imgEl.classList.remove('fade');
-        // 切换字幕
         showSubtitleForSlide(idx);
       });
     } else {
-      // 最后一张，结束引导
-      clearInterval(ellipsisTimer);
-      overlay.classList.add('hidden');
-      overlay.addEventListener('transitionend', () => {
-        overlay.remove();
-        window.dispatchEvent(new Event('introFinished'));
-      }, { once: true });
+      endIntro();
     }
   });
 
-  // 初始显示
+  skipBtn.addEventListener('click', endIntro);
+
+  // 初始加载第一张和文字
   showSubtitleForSlide(0);
 });
