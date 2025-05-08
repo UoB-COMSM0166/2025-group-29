@@ -1753,8 +1753,8 @@ class Player {
     image(
       gifToDraw,
       0, 0,
-      this.r * (this.isAttacking ? 2.5 : 2),
-      this.r * (this.isAttacking ? 2.5 : 2)
+      this.r * (this.isAttacking ? 5.5 : 5),
+      this.r * (this.isAttacking ? 5.5 : 5)
     );
     pop();
   } else {
@@ -2759,7 +2759,7 @@ class BloodFurySkill extends Skill {
 
 class ReflectSkill extends Skill {
   constructor(player) {
-    super("Iron Reversal", "", 1);     // 名称、按键占位、冷却 12 s
+    super("Iron Reversal", "", 12);     // 名称、按键占位、冷却 12 s
     this.player   = player;
     this.duration = 4 * 1000;  // 4 秒持续
     this.endTime  = 0;
