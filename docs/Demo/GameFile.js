@@ -698,10 +698,6 @@ class LevelManager {
   }
 
   loadLevel(index) {
-    if (index < 0 || index >= this.levels.length) {
-      console.error("关卡索引超出范围！");
-      return;
-    }
     this.currentLevel = this.levels[index];
     console.log(`加载 Level ${index + 1}`);
     this.currentLevel.start();  // 启动关卡
@@ -828,7 +824,7 @@ class BaseLevel {
     text(`Total Score: ${this.totalScore}`, windowWidth / 2, windowHeight / 2 + 50);
 
     textSize(20);
-    text("Press any key to countinue", windowWidth / 2, windowHeight / 2 + 120);
+    text("Press any key to continue", windowWidth / 2, windowHeight / 2 + 120);
     }
 
     
@@ -1143,7 +1139,7 @@ class Level2 extends BaseLevel {
       this.pauseShown = false;
       this.pausedForBlackHoleTip = false;
 
-      this.postGameStage = 0;
+      // this.postGameStage = 0;
   }
   start() {
     super.start();
@@ -1305,7 +1301,7 @@ class Level3 extends BaseLevel {
     // this.finished = false;
 
     this.blackHoles = [];
-    this.postGameStage = 0;
+    // this.postGameStage = 0;
   }
 
   start() {
@@ -1415,17 +1411,6 @@ class Level3 extends BaseLevel {
           bullets.splice(i, 1);
         }
       }
-
-              // 检查完成
-              if (!this.finished && remainingTime <= 0) {
-                this.stage = 2;
-                this.tip = "Finished！";
-                this.finished = true;
-    
-                // 结算分数
-                this.finalizeScore();
-            }
-
     }
   }
 
@@ -1472,7 +1457,7 @@ class Level4 extends BaseLevel{
       // this.finished = false;
   
       this.blackHoles = [];
-      this.postGameStage = 0;
+      // this.postGameStage = 0;
     }
 
     start() {
@@ -1588,15 +1573,14 @@ update() {
       }
     }
 
-            // 检查完成
-            if (!this.finished && remainingTime <= 0) {
-              this.stage = 2;
-              this.tip = "Finished！";
-              this.finished = true;
-  
-              // 结算分数
-              this.finalizeScore();
-          }
+    // 检查完成
+    if (!this.finished && remainingTime <= 0) {
+      this.stage = 2;
+      this.tip = "Finished！";
+      this.finished = true;
+      // 结算分数
+      this.finalizeScore();
+    }
   
 
 
