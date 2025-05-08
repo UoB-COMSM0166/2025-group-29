@@ -17,7 +17,9 @@ export const IntroScreen = {
     window.removeEventListener('keydown', this.onKey);
     this.el.remove();
   },
-  onKey() {
+  onKey(event) {
+    // 如果引导遮罩还在，就不响应“任何键继续”
+    if (document.getElementById('introOverlay')) return;
     advanceTo('MAIN_MENU');
   }
 };

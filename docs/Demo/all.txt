@@ -122,6 +122,8 @@
 
 ===== SKIPPED (binary) ./assets/font/Minecraft.ttf =====
 
+===== SKIPPED (binary) ./assets/media/.DS_Store =====
+
 ===== SKIPPED (binary) ./assets/media/BG1.png =====
 
 ===== SKIPPED (binary) ./assets/media/BG2.png =====
@@ -185,6 +187,20 @@
 ===== SKIPPED (binary) ./assets/media/character/tank-idle-base.gif =====
 
 ===== SKIPPED (binary) ./assets/media/character/tank-idle-shield.gif =====
+
+===== SKIPPED (binary) ./assets/media/intro/1.png =====
+
+===== SKIPPED (binary) ./assets/media/intro/2-1.png =====
+
+===== SKIPPED (binary) ./assets/media/intro/2-2.png =====
+
+===== SKIPPED (binary) ./assets/media/intro/3.png =====
+
+===== SKIPPED (binary) ./assets/media/intro/4.png =====
+
+===== SKIPPED (binary) ./assets/media/intro/5-1.png =====
+
+===== SKIPPED (binary) ./assets/media/intro/5-2.png =====
 
 ===== SKIPPED (binary) ./assets/media/monster/Ambush-monster-attack.gif =====
 
@@ -455,11 +471,61 @@ echo "✅ 已将所有文本文件的路径和内容输出到 $output，二进�
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pixelated Space Demo</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* 确保页面底色是黑色，避免白屏 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* —— 全屏引导遮罩 —— */
+    #introOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+    /* 隐藏时淡出 */
+    #introOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* —— 引导图 —— */
+    #introImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;      /* 保持纵横比，裁切超出的部分 */
+      cursor: pointer;
+      opacity: 1;
+      transition: opacity 0.6s ease;  /* 切换时渐变 */
+    }
+    /* 切换到下一张时先淡出 */
+    #introImage.fade {
+      opacity: 0;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- ====== 引导遮罩 ====== -->
+  <div id="introOverlay">
+    <img id="introImage" src="assets/media/intro/1.png" alt="Intro"/>
+  </div>
+
+  <!-- ====== 你的原有内容 ====== -->
   <div id="canvas-container"></div>
-  <!-- 所有脚本都以 ESM 加载 -->
   <script type="module" src="js/app.js"></script>
+  <script src="js/intro.js"></script>
 </body>
 </html>
 
@@ -468,9 +534,19 @@ echo "✅ 已将所有文本文件的路径和内容输出到 $output，二进�
 import { initRouter } from './router.js';
 import { initBackground } from './background.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+function startApp() {
   initRouter();
   initBackground(document.getElementById('canvas-container'));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 立即初始化路由与背景，让它始终在 #introOverlay 下面渲染
+  startApp();
+
+  // （可选）如果需要在引导结束后做些额外逻辑，再监听它：
+  window.addEventListener('introFinished', () => {
+    // 这里放「引导结束后」才想做的事
+  }, { once: true });
 });
 
 ===== ./js/background.js =====
@@ -567,6 +643,46 @@ function easeInOutQuad(t) {
     ? 2*t*t
     : -1 + (4 - 2*t)*t;
 }
+
+===== ./js/intro.js =====
+// js/intro.js
+document.addEventListener('DOMContentLoaded', () => {
+  const images = [
+    'assets/media/intro/1.png',
+    'assets/media/intro/2-1.png',
+    'assets/media/intro/2-2.png',
+    'assets/media/intro/3.png',
+    'assets/media/intro/4.png',
+    'assets/media/intro/5-1.png',
+    'assets/media/intro/5-2.png'
+  ];
+
+  let idx     = 0;
+  const overlay = document.getElementById('introOverlay');
+  const imgEl   = document.getElementById('introImage');
+
+  imgEl.addEventListener('click', () => {
+    if (idx < images.length - 1) {
+      // 切下一张：先淡出
+      idx++;
+      imgEl.classList.add('fade');
+      // 淡出完成后换图，再淡入
+      imgEl.addEventListener('transitionend', function handler() {
+        imgEl.removeEventListener('transitionend', handler);
+        imgEl.src = images[idx];
+        requestAnimationFrame(() => imgEl.classList.remove('fade'));
+      });
+    } else {
+      // 最后一张，点击后淡出遮罩并触发事件
+      overlay.classList.add('hidden');
+      overlay.addEventListener('transitionend', () => {
+        overlay.remove();
+        // 通知应用：引导结束
+        window.dispatchEvent(new Event('introFinished'));
+      }, { once: true });
+    }
+  });
+});
 
 ===== ./js/router.js =====
 // js/router.js
