@@ -1625,6 +1625,7 @@ handleKeyPressed(key) {
 
 
 
+
 class Player {
   constructor(x, y, r) {
     this.pos = createVector(x, y);
@@ -1637,9 +1638,7 @@ class Player {
     
 
     this.baseAttack = 15;  // 原本的基础攻击力
-    this.attackPower = this.baseAttack; // 当前生效的攻击力（默认 = 基础）
-
-    this.isInvincible = false; // 初始不无敌
+    this.buffAttack = this.baseAttack; // 当前生效的攻击力（默认 = 基础）
 
     this.selectedSkills = []; // 玩家已装备的技能
 
@@ -1654,8 +1653,10 @@ class Player {
   //新增流派系统
   this.faction   = "normal";              // <- 初始流派
   this.spriteMgr = new SpriteManager(this);
-
-  }
+  
+  this.pendingBonusShield = 0; // 存储由电击被动转化的护盾值
+  this.isInBloodFury = false; // 是否处于血怒状态
+}
 
   
   //两个被调用来切图的方法
@@ -1712,7 +1713,6 @@ class Player {
     this.pos.y = constrain(this.pos.y, -height + this.r, height - this.r);
     
     
- 
     
     
     
@@ -1769,21 +1769,34 @@ class Player {
   }
 
   receiveDamage(rawDamage) {
-    if (this.isInvincible) return;
+    // 1️⃣ 技能优先判断（如限量护盾/反弹）
+    for (let skill of this.selectedSkills) {
+      if (skill.absorbDamage && skill.absorbDamage(rawDamage)) {
+        console.log("技能吸收了伤害！");
+        return; // 技能处理了这次伤害，直接跳出
+      }
+    }
   
-    let damage = floor(rawDamage * this.damageMultiplier); // 支持减伤
+    // 2️⃣ 如果玩家是无敌状态（比如其他技能导致的） → 跳过
+    if (this.isCurrentlyInvincible()) return;
+  
+    // 3️⃣ 计算最终伤害（例如减伤）
+    let damage = floor(rawDamage * this.damageMultiplier);
     this.hp.takeDamage(damage);
     console.log(`玩家受到 ${damage} 点伤害`);
   
+    // 4️⃣ 死亡检测
     if (!this.hp.isAlive()) {
       gameOver = true;
       console.log("玩家死亡！");
     }
   }
-  
 
-
-
+  isCurrentlyInvincible() {
+    if (this.isInvincibleFromDash) console.log("⚡ Dash 提供无敌");
+    if (this.isInvincibleFromReflect) console.log("🛡️ Reflect 提供无敌");
+    return this.isInvincibleFromDash || this.isInvincibleFromReflect;
+  }           
 
 }
 
@@ -2318,7 +2331,7 @@ class TimeBonus {
 
 
 
-  class Skill {
+    class Skill {
   constructor(name, key, cooldownTotal) {
     this.name = name;
     this.key = key;
@@ -2444,10 +2457,10 @@ class AttackBoostSkill extends Skill {
 
   castSkillEffect() {
     console.log("快速攻击发动！攻击力提升3秒");
-    this.player.attackPower = 30; // 技能发动时，攻击力变成30
+    this.player.buffAttack = 30; // 技能发动时，攻击力变成30
 
     setTimeout(() => {
-      this.player.attackPower = player.baseAttack; // 3秒后恢复原来的基础攻击
+      this.player.buffAttack = player.baseAttack; // 3秒后恢复原来的基础攻击
       console.log("攻击加成结束，恢复基础伤害");
     }, 3000);
     this.player.spriteMgr.request("boost", 3000, 1);
@@ -2483,7 +2496,9 @@ class DashSkill extends Skill {
     this.dashedEnemies = []; // 冲刺开始时清空已撞敌人列表
     this.originalSpeed = this.player.speed;
     this.player.speed *= 3;
-    this.player.isInvincible = true; // 开启无敌
+    this.player.isInvincibleFromDash = true;
+    
+    
 
     this.dashEndTime = millis() + 500; // 冲刺持续0.5秒
     this.player.spriteMgr.request("dash", 500, 1);
@@ -2553,8 +2568,8 @@ class DashSkill extends Skill {
       console.log("冲刺结束，恢复速度");
       this.isDashing = false;
       this.player.speed = this.originalSpeed;
-      this.player.isInvincible = false;
-    
+      this.player.isInvincibleFromDash = false;
+      
       if (this.totalDamage > 0) {
         for (let skill of this.player.selectedSkills) {
           if (skill instanceof LifestealSkill) {
@@ -2566,6 +2581,7 @@ class DashSkill extends Skill {
       this.totalDamage = 0; // 重置
       this.dashTrail = [];
       this.dashedEnemies = [];
+
     }
     
   
@@ -2598,7 +2614,9 @@ class ChargeStrikeSkill extends Skill {
     this.isCharging = false;
     this.startTime = 0;
     this.chargeDuration = 2000; // 1秒蓄力
-    this.attackPower = 30;      // 高额范围伤害
+    
+    this.chargeAttack = 40;      // 高额范围伤害
+    
     this.range = 100;           // 攻击范围半径
   }
 
@@ -2641,7 +2659,7 @@ class ChargeStrikeSkill extends Skill {
         const attackInfo = {
           source: "charged",
           player: this.player,
-          baseDamage: this.attackPower,
+          baseDamage: this.chargeAttack,
           target: enemy
         };
   
@@ -2673,7 +2691,7 @@ class LifestealSkill extends Skill {
   constructor(player) {
     super("Crimson Drain", "", 6); // 技能名称、按键、冷却秒数
     this.player = player;
-    this.lifestealRatio = 1; // 吸血比例
+    this.lifestealRatio = 0.5; // 吸血比例
     this.duration = 5000; // 持续时间（毫秒）
     this.active = false;
     this.endTime = 0;
@@ -2713,21 +2731,23 @@ class BloodFurySkill extends Skill {
   constructor(player) {
     super("Berserker’s Blood", "", 0); // 被动技能，无需冷却
     this.player = player;
+    player.isInBloodFury = false; // 初始化状态
     this.isBoosting = false;
   }
 
   update() {
     let hpRatio = this.player.hp.currentHP / this.player.hp.maxHP;
 
-    if (!this.isBoosting && hpRatio <= 0.2) {
-      this.player.attackPower = 100;
-      this.isBoosting = true;
-      console.log("🩸 血怒发动！攻击力提升至"+ this.player.attackPower);
+    if (!this.isBoosting && hpRatio <= 0.3) {
+      this.isBoosting = true; // 进入血怒状态
+      player.isInBloodFury = true; // 进入血怒状态
+      console.log("🩸 血怒开始，攻击力提高");
+     
     }
 
-    if (this.isBoosting && hpRatio > 0.2) {
-      this.player.attackPower = this.player.baseAttack;
-      this.isBoosting = false;
+    if (this.isBoosting && hpRatio > 0.3) {
+     this.isBoosting = false; // 结束血怒状态
+     player.isInBloodFury = false;
       console.log("🩸 血怒结束，攻击力恢复基础值");
     }
   }
@@ -2739,18 +2759,32 @@ class BloodFurySkill extends Skill {
 
 class ReflectSkill extends Skill {
   constructor(player) {
-    super("Iron Reversal", "", 5);     // 名称、按键占位、冷却 12 s
+    super("Iron Reversal", "", 1);     // 名称、按键占位、冷却 12 s
     this.player   = player;
     this.duration = 4 * 1000;  // 4 秒持续
     this.endTime  = 0;
+    this.shieldHP = 200; // 最大可抵挡伤害
+    this.remainingShieldHP = 0; // 当前护盾剩余值
   }
+
+ 
 
   /* ① 真正的效果写在这里，供父类 trigger() 调用 */
   castSkillEffect() {
     this.player.isReflecting = true;       // 开启反弹状态
+    this.player.isInvincibleFromReflect = true;       // ✅ 设置为无敌
+    this.remainingShieldHP = this.shieldHP;     // 初始化护盾值
+    // ✅ 加上被动护盾（电击领域）
+  if (this.player.pendingBonusShield > 0) {
+    console.log(`🛡️ 叠加被动护盾 ${this.player.pendingBonusShield}`);
+    this.remainingShieldHP += this.player.pendingBonusShield;
+    this.player.pendingBonusShield = 0; // ⚠️ 重置
+  }
     this.endTime = millis() + this.duration;
-    console.log("⚡ 反弹开启（4 s）");
-    this.player.spriteMgr.request("shield", 4000, 1);
+    console.log(`🛡️ 反弹开启，护盾值 ${this.remainingShieldHP}`);
+    this.player.spriteMgr.request("shield", this.duration, 1);
+    
+  
   }
 
   /* ② 持续检查时间，自动关掉反弹 */
@@ -2759,10 +2793,270 @@ class ReflectSkill extends Skill {
     if ( this.player.isReflecting &&
          millis() > this.endTime ) {
       this.player.isReflecting = false;
+      this.player.isInvincibleFromReflect = false;    // ✅ 恢复正常
       console.log("⚡ 反弹结束");
     }
   }
+
+  // 提供给 player.receiveDamage 调用，尝试吸收伤害
+  absorbDamage(rawDamage) {
+    
+    if (this.player.isInvincibleFromDash) {
+      console.log("⚡ Dash无敌中，护盾不吸收伤害");
+      return false;
+    }
+
+    if (!this.player.isReflecting || !this.player.isInvincibleFromReflect) return false;
+
+    this.remainingShieldHP -= rawDamage;
+
+    console.log(`🛡️ Iron Reversal 吸收 ${rawDamage} 点伤害，剩余护盾 ${this.remainingShieldHP}`);
+
+    if (this.remainingShieldHP <= 0) {
+      this._endShield();
+      console.log("💥 Iron Reversal 护盾破碎，技能终止");
+    }
+
+    return true; // 已处理伤害
+  }
+
+  // 内部逻辑：结束护盾效果
+  _endShield() {
+    this.player.isReflecting = false;
+    this.player.isInvincibleFromReflect = false;
+    this.remainingShieldHP = 0;
+  }
+
+ 
+
 }
+
+
+/* ───────────────────────────────────────────────
+ *  减速领域 - 主动
+ *    Z 键触发，持续 5s，半径 160，敌人速度 ×0.4
+ * ─────────────────────────────────────────────── */
+class SlowFieldSkill extends Skill {
+  constructor(player, enemies,
+              radius   = 160,
+              slowMul  = 0.1,
+              duration = 5000) {
+
+    super("Anchor Field", "Z", 8);     // 名称 / 触发键 / 冷却秒数
+    this.player   = player;
+    this.enemies  = enemies;
+
+    this.radius   = radius;
+    this.slowMul  = slowMul;
+    this.duration = duration;
+
+    this.active   = false;
+    this.endTime  = 0;
+    this.slowed   = new Set();     // 目前被减速的敌人
+  }
+
+  /* 主动触发 */
+  castSkillEffect() {
+    this.active  = true;
+    this.endTime = millis() + this.duration;
+    console.log("🌀 减速领域开启");
+  }
+
+  /* 每帧调用（来自 Player.updateSkills） */
+  update() {
+    super.update();                // 冷却倒计时
+
+    if (!this.active) return;
+
+    // 1. 处理减速 / 恢复
+    for (let enemy of this.enemies) {
+      if (!enemy.hp || !enemy.hp.isAlive()) continue;
+
+      const d       = dist(this.player.pos.x, this.player.pos.y,
+                           enemy .pos.x, enemy .pos.y);
+      const inAura  = d <= this.radius + enemy.r;
+
+      if (inAura) {
+  if (!this.slowed.has(enemy)) {
+
+    /* 通用：有 speed 属性的怪 */
+    if (enemy.speed !== undefined) {
+      enemy.originalSpeed = enemy.speed;
+      enemy.speed        *= this.slowMul;
+    }
+
+    /* 针对 AmbushEnemy：同时缩放冲刺速度 */
+    if (enemy instanceof AmbushEnemy) {
+      enemy.originalDash      = enemy.dushSpeed;
+      enemy.originalMaxDash   = enemy.maxDashSpeed;
+
+      enemy.dushSpeed    *= this.slowMul;
+      enemy.maxDashSpeed *= this.slowMul;
+    }
+
+    this.slowed.add(enemy);
+  }
+}
+
+// ▽▽ ② 离开领域或领域结束时复原 ▽▽
+else if (this.slowed.has(enemy)) {
+
+  if (enemy.originalSpeed !== undefined) enemy.speed = enemy.originalSpeed;
+  if (enemy instanceof AmbushEnemy) {
+    enemy.dushSpeed    = enemy.originalDash;
+    enemy.maxDashSpeed = enemy.originalMaxDash;
+  }
+
+  this.slowed.delete(enemy);
+}
+    }
+
+    // 2. 到时关闭
+    if (millis() > this.endTime) this.deactivate();
+
+    // 3. 可视化光环（可删）
+    this.drawAura();
+  }
+
+  deactivate() {
+  this.active = false;
+
+  for (let enemy of this.slowed) {
+    /* ---------- 通用移动速度 ---------- */
+    if (enemy.originalSpeed !== undefined) {
+      enemy.speed = enemy.originalSpeed;
+    }
+
+    /* ---------- 伏击怪冲刺速度 ---------- */
+    if (enemy instanceof AmbushEnemy) {
+      enemy.dushSpeed    = enemy.originalDash;
+      enemy.maxDashSpeed = enemy.originalMaxDash;
+    }
+  }
+
+  this.slowed.clear();
+  console.log("🌀 减速领域结束");
+}
+
+  drawAura() {
+    push();
+    noFill();
+    stroke(0, 255, 255, 120);
+    strokeWeight(3);
+    ellipse(this.player.pos.x, this.player.pos.y,
+            this.radius * 2);
+    pop();
+  }
+}
+
+/* ───────────────────────────────────────────────
+ *  减速领域 • 首次入圈伤害 - 被动
+ *    同一个敌人 10s 内只吃一次额外伤害
+ * ─────────────────────────────────────────────── */
+
+
+class SlowFieldBonusDamage extends Skill {
+  constructor(player, enemies, slowField,
+              damage   = 5,
+              innerCD  = 7000) {
+
+    super("Guardian’s Will", "", 0);    
+    this.player    = player;
+    this.enemies   = enemies;
+    this.slowField = slowField;
+
+    this.damage    = damage;
+    this.innerCD   = innerCD;
+    this.lastHit   = new Map();       // enemy → millis
+  }
+
+  update() {
+    // 被动：只要主动技在生效，就检查 slowed 集合
+    const now = millis();
+    if (!this.slowField.active) return;
+
+    let totalDamage = 0;
+
+for (let enemy of this.slowField.slowed) {
+  if (!enemy.hp || !enemy.hp.isAlive()) continue;
+
+  const last = this.lastHit.get(enemy) ?? -Infinity;
+  if (now - last >= this.innerCD) {
+
+    const currentHP = enemy.hp.currentHP ?? 0;  // ✅ takeDamage 前先读取血量
+    const realDamage = Math.min(currentHP, this.damage);
+
+    enemy.hp.takeDamage(this.damage);  // 再扣血
+
+    totalDamage += realDamage;
+
+    this.lastHit.set(enemy, now);
+    console.log(`⚡ 电击领域命中，造成 ${realDamage} 点真实伤害`);
+  }
+}
+
+if (totalDamage > 0) {
+  console.log(`⚡ 总共造成 ${totalDamage} 点真实伤害`);
+  const shield = Math.floor(totalDamage * 1); // 50% 转化为护盾
+  this.player.pendingBonusShield += shield;
+  console.log(`🛡️ 转化为 ${shield} 点护盾`);
+}
+  }
+
+  castSkillEffect() {}   // 被动，没有触发体
+}
+
+/*class SlowFieldBonusDamage extends Skill {
+  constructor(player, enemies, slowField, damage = 5, innerCD = 10000) {
+    super("Guardian’s Will", "", 0);    
+    this.player    = player;
+    this.enemies   = enemies;
+    this.slowField = slowField;
+
+    this.damage    = damage;
+    this.innerCD   = innerCD;
+    this.lastHit   = new Map(); // enemy → last hit time
+    this.totalRealDamage = 0;   // 总真实伤害
+  }
+
+  update() {
+    const now = millis();
+    if (!this.slowField.active) return;
+    const slowed = this.slowField.slowed;
+    if (!Array.isArray(slowed)) return;
+
+    for (let enemy of slowed) {
+      if (!enemy.hp || !enemy.hp.isAlive()) continue;
+
+      const last = this.lastHit.get(enemy) ?? -Infinity;
+      if (now - last < this.innerCD) continue;
+
+      // 🔥 计算实际能打出的伤害
+      const enemyHP = enemy.hp.value ?? 0;
+      const realDamage = min(enemyHP, this.damage);
+
+      // 真正作用于敌人
+      enemy.hp.takeDamage(this.damage);  // 实际调用
+
+      // 统计伤害总和
+      this.totalRealDamage += realDamage;
+
+      // 护盾转化（例如20%）
+      const shield = floor(realDamage * 0.2);
+      this.player.pendingBonusShield += shield;
+
+      console.log(`⚡ 电击领域造成 ${realDamage} 真实伤害，+${shield} 护盾（累计伤害：${this.totalRealDamage}）`);
+
+      this.lastHit.set(enemy, now);
+    }
+  }
+
+  castSkillEffect() {} // 被动技能
+}*/
+
+
+
+
 
 
 
@@ -2875,8 +3169,8 @@ class CollisionManager {
       if (!enemy.hp || !enemy.hp.isAlive()) continue;
   
       if (this.checkCollision(this.player, enemy)) {
-        if (!this.player.isInvincible && now > enemy.nextHitTime) {
-          this.player.receiveDamage(enemy.contactDamage); // ✅ 改为每个敌人自己的伤害
+        if (now > enemy.nextHitTime) {
+          this.player.receiveDamage(enemy.contactDamage); // ✅ 不要提前判断无敌！
           enemy.nextHitTime = now + enemy.hitCooldown;
           console.log("敌人打到玩家！伤害:", enemy.contactDamage);
         }
@@ -3068,16 +3362,12 @@ class MeleeAttack {
       let ang = atan2(e.pos.y - C.y, e.pos.x - C.x);
       let diff = (ang - dirAng + PI*3) % (PI*2) - PI; 
       if (abs(diff) <= arcAng/2) {
-        /*// 造成一次伤害（此处填入具体数值）
-        
-        e.hp.takeDamage(player.attackPower);
-        console.log("Melee hit! 敌人扣血");*/
 
         // ✅ 使用统一伤害计算器
         const attackInfo = {
         source: "melee",                          // 普通攻击
         player: this.player,
-        baseDamage: this.player.baseAttack,      // 注意是 baseAttack，不是 attackPower
+        baseDamage: this.player.buffAttack,      //
         target: e
       };
 
@@ -3110,17 +3400,18 @@ class DamageCalculator {
     const { source, baseDamage, player, target } = attackInfo;
     if (!target || !target.hp || !target.hp.isAlive()) return 0;
 
-    // 根据来源修正最终伤害（如技能加成等）
+    // 根据来源修正最终伤害（被动加成）
     let effectiveDamage = baseDamage;
 
-    if (source === "melee") {
-      effectiveDamage = player.attackPower; // 这里自动包含加成
-    } else if (source === "charged") {
-      effectiveDamage = baseDamage; // 示例：蓄力2倍
-    }else if (source === "dash") {
-      effectiveDamage = baseDamage; // 你可以以后给 dash 加成倍率
-    }
-    // 👉 未来你可以拓展更多类型：fireball、dash、critical 等
+    if (source === "charged" || source === "melee") {
+      effectiveDamage = baseDamage;
+
+      if (player.isInBloodFury) {
+        effectiveDamage = floor(baseDamage * 2);  // 血怒增伤
+      }
+      console.log(`🩸 血怒增伤 [${source}] → 最终伤害: ${effectiveDamage}`);
+
+
 
     // 不超过目标血量
     let actualDamage = min(target.hp.currentHP, floor(effectiveDamage));
@@ -3131,7 +3422,7 @@ class DamageCalculator {
 }
 
 
-
+}
 
 
 
@@ -3172,162 +3463,6 @@ class PixelExplosion {
   isFinished() {
     return this.particles.length === 0;
   }
-}
-
-/* ───────────────────────────────────────────────
- *  减速领域 - 主动
- *    Z 键触发，持续 5s，半径 160，敌人速度 ×0.4
- * ─────────────────────────────────────────────── */
-class SlowFieldSkill extends Skill {
-  constructor(player, enemies,
-              radius   = 160,
-              slowMul  = 0.1,
-              duration = 5000) {
-
-    super("Anchor Field", "Z", 8);     // 名称 / 触发键 / 冷却秒数
-    this.player   = player;
-    this.enemies  = enemies;
-
-    this.radius   = radius;
-    this.slowMul  = slowMul;
-    this.duration = duration;
-
-    this.active   = false;
-    this.endTime  = 0;
-    this.slowed   = new Set();     // 目前被减速的敌人
-  }
-
-  /* 主动触发 */
-  castSkillEffect() {
-    this.active  = true;
-    this.endTime = millis() + this.duration;
-    console.log("🌀 减速领域开启");
-  }
-
-  /* 每帧调用（来自 Player.updateSkills） */
-  update() {
-    super.update();                // 冷却倒计时
-
-    if (!this.active) return;
-
-    // 1. 处理减速 / 恢复
-    for (let enemy of this.enemies) {
-      if (!enemy.hp || !enemy.hp.isAlive()) continue;
-
-      const d       = dist(this.player.pos.x, this.player.pos.y,
-                           enemy .pos.x, enemy .pos.y);
-      const inAura  = d <= this.radius + enemy.r;
-
-      if (inAura) {
-  if (!this.slowed.has(enemy)) {
-
-    /* 通用：有 speed 属性的怪 */
-    if (enemy.speed !== undefined) {
-      enemy.originalSpeed = enemy.speed;
-      enemy.speed        *= this.slowMul;
-    }
-
-    /* 针对 AmbushEnemy：同时缩放冲刺速度 */
-    if (enemy instanceof AmbushEnemy) {
-      enemy.originalDash      = enemy.dushSpeed;
-      enemy.originalMaxDash   = enemy.maxDashSpeed;
-
-      enemy.dushSpeed    *= this.slowMul;
-      enemy.maxDashSpeed *= this.slowMul;
-    }
-
-    this.slowed.add(enemy);
-  }
-}
-
-// ▽▽ ② 离开领域或领域结束时复原 ▽▽
-else if (this.slowed.has(enemy)) {
-
-  if (enemy.originalSpeed !== undefined) enemy.speed = enemy.originalSpeed;
-  if (enemy instanceof AmbushEnemy) {
-    enemy.dushSpeed    = enemy.originalDash;
-    enemy.maxDashSpeed = enemy.originalMaxDash;
-  }
-
-  this.slowed.delete(enemy);
-}
-    }
-
-    // 2. 到时关闭
-    if (millis() > this.endTime) this.deactivate();
-
-    // 3. 可视化光环（可删）
-    this.drawAura();
-  }
-
-  deactivate() {
-  this.active = false;
-
-  for (let enemy of this.slowed) {
-    /* ---------- 通用移动速度 ---------- */
-    if (enemy.originalSpeed !== undefined) {
-      enemy.speed = enemy.originalSpeed;
-    }
-
-    /* ---------- 伏击怪冲刺速度 ---------- */
-    if (enemy instanceof AmbushEnemy) {
-      enemy.dushSpeed    = enemy.originalDash;
-      enemy.maxDashSpeed = enemy.originalMaxDash;
-    }
-  }
-
-  this.slowed.clear();
-  console.log("🌀 减速领域结束");
-}
-
-  drawAura() {
-    push();
-    noFill();
-    stroke(0, 255, 255, 120);
-    strokeWeight(3);
-    ellipse(this.player.pos.x, this.player.pos.y,
-            this.radius * 2);
-    pop();
-  }
-}
-
-/* ───────────────────────────────────────────────
- *  减速领域 • 首次入圈伤害 - 被动
- *    同一个敌人 10s 内只吃一次额外伤害
- * ─────────────────────────────────────────────── */
-class SlowFieldBonusDamage extends Skill {
-  constructor(player, enemies, slowField,
-              damage   = 5,
-              innerCD  = 10000) {
-
-    super("Guardian’s Will", "", 0);     /* 被动无需手动触发 */
-    this.player    = player;
-    this.enemies   = enemies;
-    this.slowField = slowField;
-
-    this.damage    = damage;
-    this.innerCD   = innerCD;
-    this.lastHit   = new Map();       // enemy → millis
-  }
-
-  update() {
-    // 被动：只要主动技在生效，就检查 slowed 集合
-    const now = millis();
-    if (!this.slowField.active) return;
-
-    for (let enemy of this.slowField.slowed) {
-      if (!enemy.hp || !enemy.hp.isAlive()) continue;
-
-      const last = this.lastHit.get(enemy) ?? -Infinity;
-      if (now - last >= this.innerCD) {
-        enemy.hp.takeDamage(this.damage);
-        this.lastHit.set(enemy, now);
-        console.log("⚡ 电击领域额外伤害", this.damage);
-      }
-    }
-  }
-
-  castSkillEffect() {}   // 被动，没有触发体
 }
 
 
