@@ -131,8 +131,11 @@ function preload() {
   //loadImage("精灵-0001.gif");
   //playerAttackRightGif= null;
   //loadImage("精灵-0002.gif");
+// GameFile.js  → preload()
+  
 
-  GIF_POOL.normal.idle.base   = null;
+
+  GIF_POOL.normal.idle.base   = loadImage('https://raw.githubusercontent.com/UoB-COMSM0166/2025-group-29/main/docs/Demo/assets/media/character/normal-idle-base.gif');
   GIF_POOL.normal.idle.dash   = null;
   GIF_POOL.normal.idle.boost  = null;
   GIF_POOL.normal.idle.steal  = null;
