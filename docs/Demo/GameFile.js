@@ -781,7 +781,7 @@ class BaseLevel {
   onTimeUp() {
     if (!this.finished) {
       // console.log(`${this.name} 时间到，正常结算`);
-      this.stage = 2;  
+      // this.stage = 2;  
       this.tip = "Finished！";
       this.tipExpireTime = null;
       this.finished = true;
@@ -1609,7 +1609,6 @@ handleKeyPressed(key) {
 
 
 
-
 class Player {
   constructor(x, y, r) {
     this.pos = createVector(x, y);
@@ -2303,7 +2302,7 @@ class TimeBonus {
 
 
 
-    class Skill {
+  class Skill {
   constructor(name, key, cooldownTotal) {
     this.name = name;
     this.key = key;
