@@ -132,7 +132,7 @@ function preload() {
   //playerAttackRightGif= null;
   //loadImage("精灵-0002.gif");
 
-  GIF_POOL.normal.idle.base   = loadImage("assets/media/character/normal-idle-base.gif");
+  GIF_POOL.normal.idle.base   = loadImage("/2025-group-29/docs/Demo/assets/media/character/normal-idle-base.gif");
   GIF_POOL.normal.idle.dash   = null;
   GIF_POOL.normal.idle.boost  = null;
   GIF_POOL.normal.idle.steal  = null;
