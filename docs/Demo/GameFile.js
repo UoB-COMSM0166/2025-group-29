@@ -12,6 +12,8 @@ let savedCumulativeScore = 0;
 let savedLevel, savedMode, savedSkills = [];
 let dataLoaded = false;
 
+let minecraftFont;
+
 async function loadSaveData() {
   const { data, error } = await supabase
     .from('saves')
@@ -109,6 +111,8 @@ const GIF_POOL = {
 
 function preload() {
 
+  minecraftFont = loadFont('assets/font/Minecraft.ttf');
+
   loadSaveData().then(() => {
     dataLoaded = true;
   });
@@ -187,6 +191,7 @@ else                  player.faction = "normal";
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  textFont(minecraftFont);
   console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
   
   // 延迟初始化
