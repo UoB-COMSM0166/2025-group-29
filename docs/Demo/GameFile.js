@@ -539,7 +539,8 @@ function drawInfo() {
   fill(255);
   textSize(20);
   textAlign(LEFT, TOP);
-  text(`Player HP: ${player.hp.currentHP} / ${player.hp.maxHP}`, 20, 110);
+  let printHP = floor(player.hp.currentHP);  // 🌟 取整当前血量
+  text(`Player HP: ${printHP} / ${player.hp.maxHP}`, 20, 110);
   
   
 
@@ -3460,7 +3461,7 @@ class BlackHole {
     if (this.type == "danger") {
 
 
-      player.hp.takeDamage(0.3); // 每帧小幅掉血
+      player.hp.takeDamage(0.2); // 每帧小幅掉血
       // 用 player.isInvincible 判断冲刺状态
       if (!player.isInvincible && player.speed > 2) {
         player.speed = 2;
