@@ -134,10 +134,10 @@ function preload() {
   skillIcons["反弹"] = null;
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
-  bulletImg = null;
+  bulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
   //loadImage("弹幕1.gif");
   //这里的注释是为了测试方便，加载图片不是必须的，传入null可以只测试代码功能。
-  bulletReflectedImg = null;
+  bulletReflectedImg = loadImage("assets/media/bullet/Character-rebound-bullet.gif");
   //playerReflectGif   = null;          // or loadImage("player-reflect.gif");
   //玩家贴图
   //playerIdleRightGif  = null;
