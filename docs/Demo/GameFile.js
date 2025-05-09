@@ -2472,7 +2472,7 @@ class AttackBoostSkill extends Skill {
 
 class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("Phantom Dash", "", 10); // 冲刺技能冷却2秒
+    super("Phantom Dash", "", 8); // 冲刺技能冷却
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
@@ -3006,63 +3006,6 @@ if (totalDamage > 0) {
   castSkillEffect() {}   // 被动，没有触发体
 }
 
-/*class SlowFieldBonusDamage extends Skill {
-  constructor(player, enemies, slowField, damage = 5, innerCD = 10000) {
-    super("Guardian’s Will", "", 0);    
-    this.player    = player;
-    this.enemies   = enemies;
-    this.slowField = slowField;
-
-    this.damage    = damage;
-    this.innerCD   = innerCD;
-    this.lastHit   = new Map(); // enemy → last hit time
-    this.totalRealDamage = 0;   // 总真实伤害
-  }
-
-  update() {
-    const now = millis();
-    if (!this.slowField.active) return;
-    const slowed = this.slowField.slowed;
-    if (!Array.isArray(slowed)) return;
-
-    for (let enemy of slowed) {
-      if (!enemy.hp || !enemy.hp.isAlive()) continue;
-
-      const last = this.lastHit.get(enemy) ?? -Infinity;
-      if (now - last < this.innerCD) continue;
-
-      // 🔥 计算实际能打出的伤害
-      const enemyHP = enemy.hp.value ?? 0;
-      const realDamage = min(enemyHP, this.damage);
-
-      // 真正作用于敌人
-      enemy.hp.takeDamage(this.damage);  // 实际调用
-
-      // 统计伤害总和
-      this.totalRealDamage += realDamage;
-
-      // 护盾转化（例如20%）
-      const shield = floor(realDamage * 0.2);
-      this.player.pendingBonusShield += shield;
-
-      console.log(`⚡ 电击领域造成 ${realDamage} 真实伤害，+${shield} 护盾（累计伤害：${this.totalRealDamage}）`);
-
-      this.lastHit.set(enemy, now);
-    }
-  }
-
-  castSkillEffect() {} // 被动技能
-}*/
-
-
-
-
-
-
-
-
-
-
 
 //弹幕
 class Bullet {
@@ -3408,9 +3351,10 @@ class DamageCalculator {
 
       if (player.isInBloodFury) {
         effectiveDamage = floor(baseDamage * 2);  // 血怒增伤
+        console.log(`🩸 血怒增伤 [${source}] → 最终伤害: ${effectiveDamage}`);
       }
-      console.log(`🩸 血怒增伤 [${source}] → 最终伤害: ${effectiveDamage}`);
-
+     
+    }
 
 
     // 不超过目标血量
@@ -3422,7 +3366,7 @@ class DamageCalculator {
 }
 
 
-}
+
 
 
 
