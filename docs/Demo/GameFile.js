@@ -3859,8 +3859,12 @@ class CollisionManager {
 
   handleBulletPlayerCollision() {
     for (let bullet of this.bullets) {
-  
+      
       if (this.checkCollision(this.player, bullet)) {
+        if (this.player.isReflecting) {
+          bullet.reflect(); // 开启反弹
+          continue;         // 跳过后续伤害处理
+        }
           this.player.receiveDamage(5); // 包含伤害判断和 gameOver 判定
           bullet.alive = false;
           console.log("玩家被子弹击中！");
