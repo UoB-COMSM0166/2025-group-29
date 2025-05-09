@@ -105,7 +105,16 @@ const GIF_POOL = {
   tank  : { idle:{}, attack:{} }
 };
 
+let BOSS_IDLE_IMG;   // ← 新增
+let BOSS_SUMMON_GIF;          // boss修改
+let BOSS_WAVE_GIF ;// 震波特效（可选）
+let BOSS_WAVE_BOSS_GIF ;//boss震波动作
+let BOSS_TOWER_SKILL_GIF;
+let TOWER_IMG;
+let BOSS_DASH_GIF;        // boss 冲刺动作图
+let BOSS_DASH_EXPLODE_GIF; // 冲刺结束后沿路径依次播放的爆炸特效
 
+let BOSS_BLACKHOLE_SKILL_GIF;//boss生成黑洞动作
 
 
 
@@ -168,6 +177,21 @@ function preload() {
   GIF_POOL.tank.attack.base   = loadImage("assets/media/character/tank-attack-base.gif");
   GIF_POOL.tank.attack.shield = loadImage("assets/media/character/tank-attack-shield.gif");
 
+  BOSS_IDLE_IMG  = loadImage("assets/media/character/tank-idle-base.gif");   // ★ 新增
+  BOSS_SUMMON_GIF = loadImage("assets/media/character/tank-idle-base.gif");   // boss修改 竖排 8 帧
+  BOSS_WAVE_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  BOSS_WAVE_BOSS_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  
+  // ─ Boss 新技能动画（30s 播放）  
+  BOSS_TOWER_SKILL_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  // ── 塔的贴图  
+  TOWER_IMG           = loadImage("assets/media/character/tank-idle-base.gif");
+  BOSS_DASH_GIF         = loadImage("assets/media/character/tank-idle-base.gif");
+  BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+
+
+
 }
 
 
@@ -224,6 +248,7 @@ function initGame() {
   levelManager.addLevel(new Level2());
   levelManager.addLevel(new Level3());
   levelManager.addLevel(new Level4());
+  levelManager.addLevel(new Level5());
   // 这里可以继续 addLevel(new Level2()), ... 以后加
 
 
@@ -613,7 +638,7 @@ function keyPressed() {
   if (levelManager && levelManager.currentLevel) {
     levelManager.currentLevel.handleKeyPressed(key);
 }
-
+  
   
 
   skillSystem.tryActivateSkill(key); // 让技能系统处理按键
@@ -777,7 +802,7 @@ class BaseLevel {
     this.baseScore = 0;
     this.timeBonus = 0;
     this.totalScore= 0;
-
+    this.blackHoles = [];
     this.finished       = false;   // 关卡是否已结束
     this.postGameStage  = 0;       // 0‑结算信息；1‑Save / Continue
   }
@@ -874,7 +899,7 @@ class BaseLevel {
     if (!this.finished) return;                // 只在关卡结束后响应
 
     /* 调试：直接跳关 */
-    if (['2','3','4'].includes(key)) {
+    if (['2','3','4','5'].includes(key)) {
       const idx = Number(key) - 1;
       console.log(`🔄 跳转到 Level ${key}`);
       levelManager.loadLevel(idx);
@@ -1166,7 +1191,7 @@ class Level2 extends BaseLevel {
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
       // this.finished = false;
 
-      this.blackHoles = [];
+      // this.blackHoles = [];
 
       // this.pauseTimer = millis() + 10000;  // 10秒后触发暂停提示
       this.pauseShown = false;
@@ -1331,9 +1356,8 @@ class Level3 extends BaseLevel {
 
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-    // this.finished = false;
 
-    this.blackHoles = [];
+    // this.blackHoles = [];
     // this.postGameStage = 0;
   }
 
@@ -1489,7 +1513,7 @@ class Level4 extends BaseLevel{
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
       // this.finished = false;
   
-      this.blackHoles = [];
+      // this.blackHoles = [];
       // this.postGameStage = 0;
     }
 
@@ -1606,14 +1630,6 @@ update() {
       }
     }
 
-    // 检查完成
-    if (!this.finished && remainingTime <= 0) {
-      this.stage = 2;
-      this.tip = "Finished！";
-      this.finished = true;
-      // 结算分数
-      this.finalizeScore();
-    }
   
 
 
@@ -1648,6 +1664,134 @@ handleKeyPressed(key) {
 }
 
 
+class Level5 extends BaseLevel{
+  constructor(){
+      super("Level 5");
+      this.levelNumber = 5;
+  
+      // 阶段控制：
+      // 0: 初始提示
+      // 1: 生存战中
+      // 2: 完成
+      this.stage = 0;
+  
+      this.tip = "So you've made it this far... Final battle begins now!";
+      this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+      // this.blackHoles = [];
+  }
+
+  start() {
+
+    // 初始化提示内容 + 定时消失
+    this.tip = "So you've made it this far... Final battle begins now!";
+    this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+    //以下是测试boss内容
+    const bossPos = createVector(0, -250);    // 出现在玩家正上方 250 像素
+    boss = new Boss(bossPos.x, bossPos.y);    // boss 是全局 let 变量
+    enemies.push(boss);                       // 加入敌人数组
+
+   
+  }
+
+  update(){
+
+    /* ---------- A. 所有阶段都更新 / 绘制敌人（含 Boss） ---------- */
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const enemy = enemies[i];
+    enemy.update();
+    enemy.show();
+
+    if (enemy.isExplosionFinished()) enemies.splice(i, 1);
+  }
+  //这里硬编码了一部分，不然看不到bullet类
+    if (boss && boss.towerActive) {
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        bullets[i].update();
+        bullets[i].show();
+        if (!bullets[i].alive) bullets.splice(i, 1);
+    }
+  }
+
+      // 阶段 4：处理生存倒计时 & 敌人更新
+  if (this.stage === 4) {
+    // 检查全局倒计时
+    if (!this.finished && remainingTime <= 0) {
+          this.stage = 5;
+          this.tip = "Finished！";
+          this.tipExpireTime = null;
+          this.finished = true;  // 标记结束
+
+          // 结算分数
+          this.finalizeScore();
+
+      }
+  
+      // 更新奖励物
+    for (let i = timeBonuses.length - 1; i >= 0; i--) {
+          timeBonuses[i].show();
+      }
+  
+    // 更新敌人
+    for (let i = enemies.length - 1; i >= 0; i--) {
+          const enemy = enemies[i];
+          enemy.update();
+          enemy.show();
+  
+          if (enemy.isExplosionFinished()) {
+              enemies.splice(i, 1);
+          }
+    }
+  
+    // 更新子弹（如果有的话）
+    for (let i = bullets.length - 1; i >= 0; i--) {
+          bullets[i].update();
+          bullets[i].show();
+          if (!bullets[i].alive) {
+              bullets.splice(i, 1);
+          }
+      }
+  
+      // 判断敌人是否清空 & 时间是否还在倒计时中
+      if (!this.finished && enemies.length === 0 && remainingTime > 0) {
+          // 提前完成
+          this.stage = 5;
+          this.tip = "Finished！";
+          this.tipExpireTime = null; 
+          this.finished = true;  // 标记结束
+
+          // 结算分数
+          this.finalizeScore();
+      }
+    }
+  }
+
+
+
+
+  draw() {
+    push();
+    resetMatrix();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(28);
+    // text(this.tip, windowWidth / 2, 80);
+
+    // 判断是否过期：只有未过期时显示
+    if (!this.tipExpireTime || millis() < this.tipExpireTime) {
+      text(this.tip, windowWidth / 2, 80);
+  }
+
+
+    // 如果关卡完成，弹出结算界面
+    if (this.finished) {
+        this.showSummaryScreen();
+    }
+
+
+    pop();
+  }
+
+}
 
 
 
@@ -2260,71 +2404,636 @@ class CommonEnemy extends Enemy {
 
 class Boss extends Enemy {
   constructor(x, y) {
-    super(x, y); // 调用 Enemy 构造函数
-    this.r = 50;
-    this.hp = new HPSystem(1000); // Boss血量比普通敌人多
-    this.stage = 1;
-    this.contactDamage = 25; // ✅ Boss 攻击更痛
+    super(x, y);
 
-    this.actions = []; // ✅ 当前阶段动作池
-    this.lastActionTime = 0;
-    
-    this.setStageActions(); // 初始化阶段行为
+    /* ───── 基本属性 ───── */
+    this.r  = 50;
+    this.hp = new HPSystem(100);
+    this.contactDamage = 40;
+
+    /* ───── idle / 召唤图片 ───── */
+    this.idleImg     = BOSS_IDLE_IMG;    // 可为 null
+    this.summonGif   = BOSS_SUMMON_GIF;  // 8-帧竖排
+    this.waveGif     = BOSS_WAVE_GIF;    // 可为 null
+    this.bossWaveGif = BOSS_WAVE_BOSS_GIF;
+
+    /* ───── 召唤伏击怪参数 ───── */
+    this.summonDur   = 1000;
+    this.summoning   = false;
+    this.summonEndT  = 0;
+
+    /* ───── 震波圆环参数 ───── */
+    this.waveTotal   = 5010;    // 总时长 8s
+    this.waveActive  = false;
+    this.waveStart   = 0;
+    //this.waveStart   = - (this.waveCD + this.waveTotal);  // ＝ -20000
+    this.ringOrder   = [];      // 如 [2,0,1]
+    this.ringHitOnce = new Set();
+
+    /* 圆环半径：用屏幕宽度做基准，实时算 */
+    this.getRings = () => {
+      const big = max(windowWidth, windowHeight);   // 最外层
+      return [ big * 0.15, big * 0.3, big * 0.45 ];
+    };
+
+        /* ───── 塔防战技能 ───── */
+        this.towerDur        = 10000;      // 持续 30s
+        this.towerActive     = false;
+        this.towerStart      = 0;
+        //this.towerStart = -(this.towerCD + this.towerDur);//-90000
+        this.towers          = [];        // 存放生成的 Tower 实例
+        this.lastTowerShot   = 0;
+        this.towerFireRate   = 400;      // 每秒发一次弹
+        this.bossTowerGif    = BOSS_TOWER_SKILL_GIF;
+        this.towerAngleOffset = 0;    // ★ 新增：累计的发射偏移角
+
+        /* ───── 冲刺技能 ───── */
+        this.dashDelay         = 2500;     // 触发后等待 1s
+        this.dashActive        = false;
+        this.dashPhase         = "idle";   // idle → prepare → dashing → hold → explode
+        this.dashPrepareEnd    = 0;
+        //this.dashStartTime     = 0;
+        this.dashStartTime     = 0;//提前触发
+        this.dashTravelTime    = 0;
+        this.dashHoldEnd       = 0;
+        this.dashExplodeEnd    = 0;
+        this.dashStartPos      = createVector(0, 0);
+        this.dashEndPos        = createVector(0, 0);
+        this.defaultContactDamage = 10;
+        this.contactDamage     = 10;
+        this.contactDamageMult = 7;        // 冲刺期间 ×7
+        this.dashGif           = BOSS_DASH_GIF;
+        this.explodeGif        = BOSS_DASH_EXPLODE_GIF;
+        this.dashBarThickness = 180;    // 长条厚度
+        this.dashDamageDone   = false; // 爆炸阶段是否已对玩家扣过血
+         /* ───── 黑洞技能 ───── */
+    this.bhActive     = false;
+    this.bhStart      = 0;
+    this.bhDuration   = 1000;                       // 持续 1s
+    this.bhGif        = BOSS_BLACKHOLE_SKILL_GIF;   // 你需要预先加载
+    this.blackHoles   = [];                         // 存放生成的 BlackHole 实例
+
+    //统一管理技能触发
+    this.unlockedSkills = [];          // [ 'earthquake', 'barrage', ... ]
+this.waitingForNext  = false;      // 正在空白期，等下一个技能触发
+this.idleStart       = 0;          // 空白期开始时刻
+this.idleDelay       = 4000;       // 空白期长度 (ms)
+this.currentSkill    = null;       // 正在执行的技能名字
   }
 
+  /* ──────────────────────── 召唤伏击怪 ─ */
+  triggerSummon() {
+    if (this.summoning) return;
+    this.summoning  = true;
+    this.summonEndT = millis() + this.summonDur;
+    this.lastSummon = millis();
+  }
+  finishSummon() {
+    const N = 6, RAD = 150;
+    for (let i = 0; i < N; i++) {
+      const ang = TWO_PI * i / N;
+      enemies.push(
+        new AmbushEnemy(this.pos.x + cos(ang)*RAD,
+                        this.pos.y + sin(ang)*RAD));
+    }
+  }
+
+  /* ──────────────────────── 震波圆环 ─ */
+  triggerWave() {
+    if (this.waveActive) return;
+    this.waveActive = true;
+    this.waveStart  = millis();
+    /* 生成随机顺序，例如 [1,2,0] */
+    this.ringOrder  = shuffle([0,1,2]);
+    this.ringHitOnce.clear();
+  }
+  handleWaveDamage() {
+    const elapsed = millis() - this.waveStart;
+  
+    // 1) 整体还没到伤害段就不判
+    //    DAMAGE_START = 2010, WAVE_END = this.waveTotal (5010)
+    const DAMAGE_START = 2010;
+    const SEG_DUR      = 1000; // 每层 1000ms
+    const BLANK        = 200;  // 每层前 200ms 空档
+  
+    if (elapsed < DAMAGE_START || elapsed >= this.waveTotal) {
+      return;
+    }
+  
+    // 2) 是哪一层？0,1,2
+    const rel = elapsed - DAMAGE_START;
+    const idx = floor(rel / SEG_DUR);
+    if (idx < 0 || idx >= this.ringOrder.length) return;
+  
+    // 3) 本层前 200ms 空档
+    const segStart = DAMAGE_START + idx * SEG_DUR;
+    if (elapsed < segStart + BLANK) {
+      return;
+    }
+  
+    // 4) 真正判伤（后 800ms）
+    const ringIdx = this.ringOrder[idx];
+    if (this.ringHitOnce.has(ringIdx)) return;
+  
+    const rings  = this.getRings();
+    const innerR = ringIdx === 0 ? 0 : rings[ringIdx - 1];
+    const outerR = rings[ringIdx];
+  
+    const d = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
+    if (d >= innerR && d <= outerR) {
+      player.receiveDamage(40);
+      this.ringHitOnce.add(ringIdx);
+      console.log(`⚡ Wave hit! ring ${ringIdx}`);
+    }
+  }
+  //塔技能-------------------------------------------
+  triggerTowerSkill() {
+    if (this.towerActive) return;
+    this.towerActive   = true;
+    this.towerStart    = millis();
+    this.lastTowerShot = millis();
+    // 四周生成 4 座塔
+    const R = this.r + 150;
+    const angs = [0, HALF_PI, PI, PI+HALF_PI];
+    for (let a of angs) {
+      const x = this.pos.x + cos(a) * R;
+      const y = this.pos.y + sin(a) * R;
+      const t = new Tower(x, y);
+      enemies.push(t);
+      this.towers.push(t);
+    }
+  }
+
+  handleTowerSkill() {
+    const elapsed = millis() - this.towerStart;
+    if (elapsed < this.towerDur) {
+      if (millis() - this.lastTowerShot >= this.towerFireRate) {
+        this.lastTowerShot = millis();
+
+        // ——— 原来的 6 个主方向改成使用 “偏移” ———
+        const baseDirs = [0, PI/3, 2*PI/3, PI, -2*PI/3, -PI/3];
+        const spreadSteps  = 3;        // 每个主方向多发几发
+        const spreadAngle  = PI/60;    // 每发间隔角度
+
+        for (let d of baseDirs) {
+          // 在主方向上加上当前的角度偏移
+          let dir = d + this.towerAngleOffset;
+          for (let s = -spreadSteps; s <= spreadSteps; s++) {
+            let ang = dir + s * spreadAngle;
+            let b = new Bullet(this.pos.copy(), p5.Vector.fromAngle(ang));
+            b.r = 15;       // 子弹半径
+            bullets.push(b);
+          }
+        }
+
+        // ★ 每发完一次，偏移 +30°（弧度制）
+        this.towerAngleOffset += radians(10);
+        // 保持在 0～2π 之间，可选
+        this.towerAngleOffset %= TWO_PI;
+      }
+    }else {
+      // 30s 到，清理塔并结算
+      this.towerActive = false;
+      // 还活着的塔
+      const alive = this.towers.filter(t => t.hp.isAlive());
+      if (alive.length) {
+        // 有没被炸掉的塔 → 全部清除并伤害玩家
+        alive.forEach(t => t.hp.takeDamage(t.hp.currentHP));
+        player.receiveDamage(50);
+      } else {
+        // 全部被玩家拆掉 → boss 受伤
+        this.hp.takeDamage(200);
+      }
+      this.towers = [];
+      // ★ 杀掉残留子弹，避免血条继续被打 —— 
+      bullets.length = 0;
+    }
+  }
+
+  //冲刺技能----------------------------------------------------
+  triggerDashSkill(){
+    if(this.dashActive) return;
+     // —— 重置标记 —— 
+    this.dashDamageDone = false;
+    this.contactDamage  = this.defaultContactDamage * this.contactDamageMult;
+    this.dashActive      = true;
+    this.dashPhase       = "prepare";
+    this.dashPrepareEnd  = millis() + this.dashDelay;
+    this.lastDashTrigger = millis();
+  }
+
+  handleDashSkill(){
+    const now = millis();
+    if(this.dashPhase === "prepare"){
+      if(now >= this.dashPrepareEnd){
+        // 开始冲刺
+        this.dashPhase     = "dashing";
+        this.dashStartTime = now;
+        this.dashStartPos  = this.pos.copy();
+        this.dashEndPos    = player.pos.copy();
+        // 固定 0.3s 完成冲刺
+        this.dashTravelTime = 300;
+        // 提升碰撞伤害
+        this.contactDamage  = this.defaultContactDamage * this.contactDamageMult;
+      }
+    }
+    else if(this.dashPhase === "dashing"){
+      let t = (now - this.dashStartTime) / this.dashTravelTime;
+      if(t < 1){
+        this.pos = p5.Vector.lerp(this.dashStartPos, this.dashEndPos, t);
+      } else {
+        // 到终点，进入 hold
+        this.pos           = this.dashEndPos.copy();
+        this.dashPhase     = "hold";
+        this.dashHoldEnd   = now + 500;   // 停留 0.5s
+      }
+    }
+    else if(this.dashPhase === "hold"){
+      if(now >= this.dashHoldEnd){
+        // 冲刺完毕，进入“爆炸沿线”阶段
+        this.dashPhase      = "explode";
+        this.dashExplodeEnd = now + 3000; // 持续 3s
+      }
+    }
+    else if(this.dashPhase === "explode"){
+      if(now >= this.dashExplodeEnd){
+        // 技能完全结束
+        this.dashPhase    = "idle";
+        this.dashActive   = false;
+        this.contactDamage = this.defaultContactDamage;
+      }
+    }
+  }
+
+  //新增dash后的长条-------------------------------------
+  handleDashDamage() {
+    if (this.dashPhase !== "explode" || this.dashDamageDone) return;
+
+    // 计算玩家到直线段最近点的距离
+    const A = this.dashStartPos,
+          B = this.dashEndPos,
+          P = player.pos;
+    const AB = p5.Vector.sub(B, A),
+          AP = p5.Vector.sub(P, A);
+    let t = AP.dot(AB) / AB.magSq();
+    t = constrain(t, 0, 1);
+    const closest = p5.Vector.add(A, p5.Vector.mult(AB, t));
+    const d = dist(P.x, P.y, closest.x, closest.y);
+
+    if (d <= this.dashBarThickness/2) {
+      player.receiveDamage(40);
+      this.dashDamageDone = true;
+    }
+  }
+
+  // 触发黑洞技能
+  triggerBhSkill() {
+    if (this.bhActive) return;
+    this.bhActive  = true;
+    this.bhStart   = millis();
+    this.lastBh    = this.bhStart;
+    // 生成 4 个黑洞
+    // 区域：以 (0,0) 画布中心为中心，宽高 = windowWidth*2, windowHeight*2
+    for (let i = 0; i < 4; i++) {
+      let px = random(-windowWidth, windowWidth);
+      let py = random(-windowHeight, windowHeight);
+      this.blackHoles.push(new BlackHole(px, py));
+    }
+  }
+
+  // 更新黑洞技能状态
+  handleBhSkill() {
+    const now = millis();
+    if (!this.bhActive) return;
+
+    // 播放 GIF 持续期间
+    if (now - this.bhStart >= this.bhDuration) {
+      // 1s 到，结束技能
+      this.bhActive = false;
+    }
+  }
+
+  //管理技能触发机制的函数方法-------------------------------------------------
+  // 检查 Boss 有没有正在执行的技能
+isAnySkillActive() {
+  return this.bhActive
+      || this.summoning
+      || this.waveActive
+      || this.towerActive
+      || this.dashActive
+      /* || earthquakeActive 等其它技能标志 */;
+}
+
+// 读取当前血量阶段，解锁＆随机触发
+selectAndTriggerSkill() {
+  const ratio = this.hp.currentHP / this.hp.maxHP;
+  let stageSkill;
+  if      (ratio <= 0.25) stageSkill = 'earthquake';
+  else if (ratio <= 0.50) stageSkill = 'barrage';
+  else if (ratio <= 0.75) stageSkill = 'dash';
+  else if (ratio <= 0.95) stageSkill = 'summon';
+  else                    stageSkill = 'blackhole';
+
+  // 如果这个阶段的技能还没解锁，就只触发它，并加入池子
+  if (!this.unlockedSkills.includes(stageSkill)) {
+    this.unlockedSkills.push(stageSkill);
+    this.triggerSkill(stageSkill);
+  }
+  // 否则从已解锁技能里随机选一个
+  else {
+    const pool = this.unlockedSkills;
+    const choice = pool[floor(random(pool.length))];
+    this.triggerSkill(choice);
+  }
+}
+
+// Dispatcher：根据名字触发真正的方法
+triggerSkill(name) {
+  this.currentSkill = name;
+  switch(name) {
+    case 'earthquake': this.triggerWave();            break;
+    case 'barrage'   : this.triggerTowerSkill();      break;
+    case 'dash'      : this.triggerDashSkill();       break;
+    case 'summon'    : this.triggerSummon();          break;
+    case 'blackhole' : this.triggerBhSkill();         break;
+  }
+}
+
+//检测是否还要tower--------------------------------------------
+cleanupTower() {
+  // 找出还存活的塔
+  const alive = this.towers.filter(t => t.hp.isAlive());
+  if (alive.length) {
+    // 有没被拆的塔：把它们都爆掉并伤害玩家
+    alive.forEach(t => t.hp.takeDamage(t.hp.currentHP));
+    player.receiveDamage(50);
+  } else {
+    // 全部都被玩家拆了：Boss 受伤
+    this.hp.takeDamage(200);
+  }
+  // 最后清空塔和子弹列表
+  this.towers = [];
+  bullets.length = 0;
+}
+
+  /* ──────────────────────── 更新 ─ */
   update() {
-    super.update();
-    if (!this.hp.isAlive()) return;
-
-    this.checkStageTransition();
-
-    for (let action of this.actions) {
-      if (action.canTrigger()) {
-        action.trigger();
-        break; // 每帧只执行一个行为
+    super.update();  
+  
+    // 一、结束检测（必须放最前面）
+    if (this.summoning && millis() >= this.summonEndT) {
+      this.summoning = false;
+      this.finishSummon();
+    }
+    if (this.waveActive && millis() - this.waveStart >= this.waveTotal) {
+      this.waveActive = false;
+    }
+    if (this.towerActive && millis() - this.towerStart >= this.towerDur) {
+      this.towerActive = false;
+      this.cleanupTower(); // 你原来清塔并结算的逻辑
+    }
+    if (this.bhActive && millis() - this.bhStart >= this.bhDuration) {
+      this.bhActive = false;
+      // 不清 blackHoles，让它们留在场上
+    }
+    // 冲刺的结束已经在 handleDashSkill 里设置了 dashActive = false
+  
+    // 二、持续执行
+    if (this.summoning) {
+      // 纯动画，没有 damage 逻辑
+    }
+    if (this.waveActive) {
+      this.handleWaveDamage();
+    }
+    if (this.towerActive) {
+      this.handleTowerSkill();
+    }
+    if (this.dashActive) {
+      this.handleDashSkill();
+      this.handleDashDamage();
+    }
+    if (this.bhActive) {
+      this.blackHoles.forEach(bh => bh.update(player));
+    }
+  
+    // 三、等待 & 触发下一个
+    if (!this.isAnySkillActive()) {
+      if (!this.waitingForNext) {
+        this.waitingForNext = true;
+        this.idleStart = millis();
+      }
+      else if (millis() - this.idleStart >= this.idleDelay) {
+        this.waitingForNext = false;
+        this.selectAndTriggerSkill();
+      }
     }
   }
-  }
 
-  checkStageTransition() {
-    const hp = this.hp.currentHP;
-
-    if (this.stage === 1 && hp <= 700) {
-      this.stage = 2;
-      this.setStageActions();
-      console.log("⚠️ Boss 进入第二阶段！");
-    } else if (this.stage === 2 && hp <= 300) {
-      this.stage = 3;
-      this.setStageActions();
-      console.log("🚨 Boss 进入第三阶段！");
+  /* ──────────────────────── 绘制 ─ */
+  drawWave() {
+    if (!this.waveActive) return;
+    const elapsed = millis() - this.waveStart;
+    const rings   = this.getRings();
+    let activeRing = -1;
+  
+    // 1. 预演阶段：1000–2500ms，每 500ms 切换一次
+    if (elapsed >= 1000 && elapsed < 1510) {
+      const idx = floor((elapsed - 1000) / 170); // 0,1,2
+      activeRing = this.ringOrder[idx];
     }
-  }
-
-  setStageActions() {
-    this.actions = [];
-
-    if (this.stage === 1) {
-      this.actions.push(new SummonAction(this));
-      this.actions.push(new LaserAction(this));
-    } else if (this.stage === 2) {
-      this.actions.push(new BulletAction(this));
-      this.actions.push(new LaserAction(this));
-      this.actions.push(new ChargeAction(this));
-    } else if (this.stage === 3) {
-      this.actions.push(new BulletAction(this));
-      this.actions.push(new ChargeAction(this));
+    // 2. 伤害阶段：3500–6500ms，每 1000ms 切换一次
+    else if (elapsed >= 2010 && elapsed < this.waveTotal) {
+      const idx = floor((elapsed - 2010) / 1000); // 0,1,2
+      activeRing = this.ringOrder[idx];
+    }
+  
+    // 画最内圈
+    push();
+    if (activeRing === 0) fill(255,0,0,140);
+    else noFill();
+    stroke(255,0,0, activeRing===0 ? 200 : 80);
+    strokeWeight(4);
+    circle(this.pos.x, this.pos.y, rings[0]*2);
+    // 伤害阶段贴刺
+    if (elapsed >= 2010 && elapsed < this.waveTotal && activeRing===0 && this.waveGif) {
+      const N      = 12;
+      const centre = rings[0] * 0.7;
+      const scale  = centre / (this.waveGif.width/2);
+      const w      = this.waveGif.width  * scale;
+      const h      = this.waveGif.height * scale;
+      imageMode(CENTER);
+      for (let k = 0; k < N; k++) {
+        const ang = TWO_PI*k/N + frameCount*0.01;
+        const x   = this.pos.x + centre*cos(ang);
+        const y   = this.pos.y + centre*sin(ang);
+        push();
+        translate(x,y);
+        rotate(ang + HALF_PI);
+        image(this.waveGif, 0,0, w,h);
+        pop();
+      }
+    }
+    pop();
+  
+    // 画外两圈
+    noFill();
+    for (let i = 1; i < 3; i++) {
+      const innerR  = rings[i-1];
+      const outerR  = rings[i];
+      const bandW   = outerR - innerR;
+      const centreR = (innerR + outerR)/2;
+      if (i === activeRing) {
+        stroke(255,0,0,140);
+        strokeWeight(bandW);
+        ellipse(this.pos.x, this.pos.y, centreR*2);
+        if (elapsed >= 2510 && elapsed < this.waveTotal && this.waveGif) {
+          const scale  = bandW / this.waveGif.height;
+          const spikeW = this.waveGif.width * scale;
+          const nSpike = floor(TWO_PI*centreR/spikeW);
+          push();
+          imageMode(CENTER);
+          for (let k = 0; k < nSpike; k++) {
+            const ang = k*TWO_PI/nSpike;
+            const px  = this.pos.x + centreR*cos(ang);
+            const py  = this.pos.y + centreR*sin(ang);
+            push();
+            translate(px,py);
+            rotate(ang+HALF_PI);
+            image(
+              this.waveGif,
+              0,0,
+              this.waveGif.width*scale*1.65,
+              this.waveGif.height*scale*1.65
+            );
+            pop();
+          }
+          pop();
+        }
+      } else {
+        stroke(255,0,0,120);
+        strokeWeight(4);
+        ellipse(this.pos.x, this.pos.y, outerR*2);
+      }
     }
   }
 
   show() {
-    if (this.exploding && this.explosion) {
-      super.show(); // 播放爆炸动画
-      return;
-    }
+    if (this.exploding && this.explosion) { super.show(); return; }
 
-    fill(255, 140, 0);
-    ellipse(this.pos.x, this.pos.y, this.r * 2.5);
+    /* 先画震波，以免被 Boss 本体挡住 */
+    this.drawWave();
+
+    push();
+    imageMode(CENTER);
+    
+// 再画所有黑洞实例
+for (let bh of this.blackHoles) {
+  bh.show();    // 如果 BlackHole 类里有 show 方法
+}
+
+    if(this.bhActive){
+      
+      const S = 0.4;
+      image(
+        this.bhGif,
+        this.pos.x, this.pos.y,
+        this.bhGif.width  * S,
+        this.bhGif.height * S
+      );
+
+
+    }
+    else if (this.dashActive) {
+      push();
+      stroke(128, 0, 128, 0);
+strokeWeight(this.dashBarThickness);
+line(
+  this.dashStartPos.x, this.dashStartPos.y,
+  this.dashEndPos.x,   this.dashEndPos.y
+);
+// 如果是 explode 阶段，也在 overlay 上画 GIF
+if (this.dashPhase === 'explode') {
+  let p = 1 - (this.dashExplodeEnd - millis()) / 3000;
+  const N = 5;
+  for (let i = 0; i < floor(p * N); i++) {
+    let t  = i / (N - 1);
+    let px = lerp(this.dashStartPos.x, this.dashEndPos.x, t);
+    let py = lerp(this.dashStartPos.y, this.dashEndPos.y, t);
+    image(this.explodeGif, px, py, 170, 170);
+  }
+}
+    pop();
+
+  
+      // ②── 再画 boss 本体 和 冲刺 GIF ──
+      push();
+     
+      // 先画 idle 背景（或一个底图）
+      if (this.idleImg) {
+        const S0 = 0.4;
+        image(
+          this.idleImg,
+          this.pos.x, this.pos.y,
+          this.idleImg.width  * S0,
+          this.idleImg.height * S0
+        );
+      } else {
+        fill(255, 140, 0);
+        ellipse(this.pos.x, this.pos.y, this.r * 2.5);
+      }
+      // 再叠加冲刺专用 GIF
+      if (this.dashPhase === 'prepare'
+       || this.dashPhase === 'dashing'
+       || this.dashPhase === 'hold'
+      ) {
+        const S = 0.4;
+        image(
+          this.dashGif,
+          this.pos.x, this.pos.y,
+          this.dashGif.width  * S,
+          this.dashGif.height * S
+        );
+      }
+      pop();
+    }
+    else if (this.waveActive && this.bossWaveGif) {
+      const S = 0.4;  // 或根据需要再调
+      image(
+        this.bossWaveGif,
+        this.pos.x, this.pos.y,
+        this.bossWaveGif.width  * S,
+        this.bossWaveGif.height * S
+      );
+    /* 召唤中用 summonGif，否则用 idleImg / fallback */  
+    }else if (this.towerActive && this.bossTowerGif) {
+      const S = 0.4;
+      image(
+        this.bossTowerGif,
+        this.pos.x, this.pos.y,
+        this.bossTowerGif.width  * S,
+        this.bossTowerGif.height * S
+      );
+
+    // ─── 原有 summon/idle/fallback 分支 ───
+    }else if (this.summoning) {
+      /* 召唤 GIF */
+      const S = 0.4;
+      image(this.summonGif, this.pos.x, this.pos.y,
+            this.summonGif.width*S, this.summonGif.height*S);
+    } else if (this.idleImg) {
+      const S = 0.4;
+      image(this.idleImg, this.pos.x, this.pos.y,
+            this.idleImg.width*S, this.idleImg.height*S);
+    } else {
+      fill(255, 140, 0);
+      ellipse(this.pos.x, this.pos.y, this.r*2.5);
+    }
+    pop();
+
+    /* 血条 */
     this.hp.draw(this.pos.x, this.pos.y, this.r);
+    
+  
   }
 }
 
@@ -3150,7 +3859,7 @@ class CollisionManager {
 
   handleBulletPlayerCollision() {
     for (let bullet of this.bullets) {
-      
+  
       if (this.checkCollision(this.player, bullet)) {
           this.player.receiveDamage(5); // 包含伤害判断和 gameOver 判定
           bullet.alive = false;
@@ -3739,6 +4448,37 @@ class SpriteManager {
     const p1 = GIF_POOL[fac]      ?? GIF_POOL.normal;
     const p2 = p1[state]          ?? p1.idle;
     return       p2[over]         ?? p2.base ?? null; // 兜底
+  }
+}
+
+
+//新增tower类用于boss的弹幕技能-------------------------------------------------
+class Tower extends Enemy {
+  constructor(x, y) {
+    super(x, y);
+    this.r   = 30;
+    this.hp  = new HPSystem(5);      // 一下子就能被拆
+    this.gif = TOWER_IMG;
+  }
+  update() {
+    // 固定不动，只管死亡检测
+    super.update();
+  }
+  show() {
+    if (this.exploding && this.explosion) {
+      super.show();
+    } else {
+      if (this.gif) {
+        push();
+        imageMode(CENTER);
+        image(this.gif, this.pos.x, this.pos.y, this.r*2, this.r*2);
+        pop();
+      } else {
+        fill(100);
+        ellipse(this.pos.x, this.pos.y, this.r*2);
+      }
+      this.hp.draw(this.pos.x, this.pos.y, this.r);
+    }
   }
 }
 
