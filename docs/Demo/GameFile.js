@@ -691,8 +691,19 @@ function generateOutsideViewPosition(maxAttempts = 20) {
     player.pos.y + random([-1, 1]) * 1000
   );
 }
-
-
+//修改关卡背景zc 5.9
+function sendLevelToBackground(levelNumber) {
+  const bgFrame = document.getElementById('bgFrame');
+  if (bgFrame && bgFrame.contentWindow) {
+    bgFrame.contentWindow.postMessage({
+      type: 'level',
+      level: levelNumber
+    }, '*');
+    console.log(`🎨 背景层已收到关卡编号：BG${levelNumber}.png`);
+  } else {
+    console.warn("⚠️ 未找到背景 iframe，无法更新背景图片");
+  }
+}
 
 // 关卡管理
 class LevelManager {
@@ -705,16 +716,29 @@ class LevelManager {
     this.levels.push(level);
   }
 
+  // loadLevel(index) {
+  //   this.currentLevel = this.levels[index];
+  //   console.log(`加载 Level ${index + 1}`);
+  //   this.currentLevel.start();  // 启动关卡
+
+  //   //  每次加载新关卡后，重新创建碰撞检测器和近战攻击器
+  //   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
+  //   player.meleeAttack = new MeleeAttack(player, enemies);
+
+  // }
+  //修改关卡背景zc5.9
   loadLevel(index) {
-    this.currentLevel = this.levels[index];
-    console.log(`加载 Level ${index + 1}`);
-    this.currentLevel.start();  // 启动关卡
+  this.currentLevel = this.levels[index];
+  console.log(`加载 Level ${index + 1}`);
+  this.currentLevel.start();
 
-    //  每次加载新关卡后，重新创建碰撞检测器和近战攻击器
-    collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
-    player.meleeAttack = new MeleeAttack(player, enemies);
+  // 👉 通知背景层更换背景图
+  sendLevelToBackground(this.currentLevel.levelNumber);
 
-  }
+  // 每次加载新关卡后，重新绑定系统
+  collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
+  player.meleeAttack = new MeleeAttack(player, enemies);
+}
 
   loadNextLevel() {
     if (!this.currentLevel) {
