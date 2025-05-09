@@ -134,10 +134,10 @@ function preload() {
   skillIcons["反弹"] = null;
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
-  bulletImg = null;
+  bulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
   //loadImage("弹幕1.gif");
   //这里的注释是为了测试方便，加载图片不是必须的，传入null可以只测试代码功能。
-  bulletReflectedImg = null;
+  bulletReflectedImg = loadImage("assets/media/bullet/Character-rebound-bullet.gif");
   //playerReflectGif   = null;          // or loadImage("player-reflect.gif");
   //玩家贴图
   //playerIdleRightGif  = null;
@@ -177,18 +177,18 @@ function preload() {
   GIF_POOL.tank.attack.base   = loadImage("assets/media/character/tank-attack-base.gif");
   GIF_POOL.tank.attack.shield = loadImage("assets/media/character/tank-attack-shield.gif");
 
-  BOSS_IDLE_IMG  = loadImage("assets/media/character/tank-idle-base.gif");   // ★ 新增
-  BOSS_SUMMON_GIF = loadImage("assets/media/character/tank-idle-base.gif");   // boss修改 竖排 8 帧
-  BOSS_WAVE_GIF = loadImage("assets/media/character/tank-idle-base.gif");
-  BOSS_WAVE_BOSS_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  BOSS_IDLE_IMG  = loadImage("assets/media/boss/BOSS_IDLE.gif");   // ★ 新增
+  BOSS_SUMMON_GIF = loadImage("assets/media/boss/BOSS_SUMMON.gif");   // boss修改 竖排 8 帧
+  BOSS_WAVE_GIF = loadImage("assets/media/boss/BOSS_WAVE.gif");
+  BOSS_WAVE_BOSS_GIF = loadImage("assets/media/boss/BOSS_WAVE_BOSS.gif");
   
   // ─ Boss 新技能动画（30s 播放）  
-  BOSS_TOWER_SKILL_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  BOSS_TOWER_SKILL_GIF = loadImage("assets/media/boss/BOSS_TOWER_SKILL.gif");
   // ── 塔的贴图  
-  TOWER_IMG           = loadImage("assets/media/character/tank-idle-base.gif");
-  BOSS_DASH_GIF         = loadImage("assets/media/character/tank-idle-base.gif");
-  BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/character/tank-idle-base.gif");
-  BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/character/tank-idle-base.gif");
+  TOWER_IMG           = loadImage("assets/media/boss/TOWER.gif");
+  BOSS_DASH_GIF         = loadImage("assets/media/boss/BOSS_DASH.gif");
+  BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/boss/BOSS_DASH_EXPLODE.gif");
+  BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/boss/BOSS_BLACKHOLE_SKILL.gif");
 
 
 
