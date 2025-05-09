@@ -8,18 +8,29 @@ export const IntroScreen = {
     this.el.id = 'introScreen';
     this.el.innerHTML = `
       <img id="titleImage" src="assets/media/titled-3.png" alt="Title Image" />
-      <div id="continueText">Press any key to continue</div>
+      <div id="continueText">Press any key or click to continue</div>
     `;
     document.body.appendChild(this.el);
-    window.addEventListener('keydown', this.onKey);
+
+    // 绑定键盘和鼠标事件
+    window.addEventListener('keydown', this._onInput);
+    window.addEventListener('mousedown', this._onInput);
   },
   hide() {
-    window.removeEventListener('keydown', this.onKey);
+    // 清除监听
+    window.removeEventListener('keydown', this._onInput);
+    window.removeEventListener('mousedown', this._onInput);
     this.el.remove();
   },
-  onKey(event) {
-    // 如果引导遮罩还在，就不响应“任何键继续”
-    if (document.getElementById('introOverlay')) return;
+
+  /**
+   * 当用户按键或点击时触发。
+   * 如果 #introOverlay 还存在，则忽略；否则进入主菜单。
+   */
+  _onInput(event) {
+    if (document.getElementById('introOverlay')) {
+      return; // 仍在播放引导，先等它消失
+    }
     advanceTo('MAIN_MENU');
   }
 };
