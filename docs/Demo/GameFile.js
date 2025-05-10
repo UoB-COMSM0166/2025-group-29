@@ -4112,13 +4112,29 @@ class MeleeAttack {
     blendMode(ADD);
 
     // 底层大弧：偏蓝青色（HSB）
-    noStroke();
-    fill(200, 80, 100, 80);
-    arc(0, 0, R*2.2, R*2.2, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
+    // noStroke();
+    // fill(200, 80, 100, 80);
+    // arc(0, 0, R*2.2, R*2.2, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
 
     // 中层弧：明黄色
-    fill(50, 100, 100, 120);
-    arc(0, 0, R*1.7, R*1.7, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
+    // fill(50, 100, 100, 120);
+    // arc(0, 0, R*1.7, R*1.7, dirAng - arcAng/2, dirAng + arcAng/2, PIE);noStroke();
+   const ctx = drawingContext;     // p5 底层 2D Canvas context
+   ctx.save();                     // 不污染外面
+
+  // 创建径向渐变：中心 0px → 外缘 R*0.85
+   const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.85);
+   grad.addColorStop(0,  'rgba(255,255,255,0)');     // 完全透明
+   grad.addColorStop(1,  'rgba(220,220,220,0.2)');   // 50% 灰白
+
+   ctx.fillStyle = grad;
+   ctx.beginPath();
+   ctx.moveTo(0, 0);
+   ctx.arc(0, 0, R * 0.85, dirAng - arcAng/2, dirAng + arcAng/2);
+   ctx.closePath();
+   ctx.fill();
+   ctx.restore();
+   
 
     // 高亮线：白色
     stroke(0, 0, 100, 200);
