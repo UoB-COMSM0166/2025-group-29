@@ -3667,48 +3667,176 @@ class DashResetSkill extends Skill {
   }
 }
 
+// class ChargeStrikeSkill extends Skill {
+//   constructor(player, enemies) {
+//     super("Wrath Unchained", "", 3); // 技能名称，按键X，冷却8秒
+//     this.player = player;
+//     this.enemies = enemies;
+
+//     this.isCharging = false;
+//     this.startTime = 0;
+//     this.chargeDuration = 2000; // 1秒蓄力
+    
+//     this.chargeAttack = 40;      // 高额范围伤害
+    
+//     this.range = 100;           // 攻击范围半径
+//   }
+
+//   castSkillEffect() {
+//     console.log("⚡ 蓄力攻击启动：玩家进入蓄力状态");
+
+//     this.isCharging = true;
+//     this.startTime = millis();
+
+//     // ✅ 设置玩家状态
+//     this.player.isCharging = true;         // 禁止移动（在 player.update 中处理）
+//     this.player.damageMultiplier = 0.5;    // 减伤50%
+//     this.player.spriteMgr.request("charge", 2000, 1);
+//   }
+
+//   update() {
+//     super.update();
+
+//     if (this.isCharging && millis() - this.startTime >= this.chargeDuration) {
+//       this.releaseExplosion();             // 造成范围伤害
+//       this.isCharging = false;
+
+//       // ✅ 恢复玩家状态
+//       this.player.isCharging = false;
+//       this.player.damageMultiplier = 1;
+//       console.log("✅ 蓄力攻击完成，状态恢复");
+//     }
+//   }
+
+//   releaseExplosion() {
+//     console.log("💥 蓄力完成，释放360°范围攻击！");
+  
+//     let totalDamage = 0; // ✅ 累计总伤害
+  
+//     for (let enemy of this.enemies) {
+//       if (!enemy.hp || !enemy.hp.isAlive()) continue;
+  
+//       let d = dist(this.player.pos.x, this.player.pos.y, enemy.pos.x, enemy.pos.y);
+//       if (d <= this.range + enemy.r) {
+//         const attackInfo = {
+//           source: "charged",
+//           player: this.player,
+//           baseDamage: this.chargeAttack,
+//           target: enemy
+//         };
+  
+//         let damageDone = DamageCalculator.calculate(attackInfo);
+//         totalDamage += damageDone;
+  
+//         console.log(`命中敌人，造成 ${damageDone} 点伤害`);
+//       }
+//     }
+  
+//     if (totalDamage > 0) {
+//       console.log(`✅ 蓄力攻击总伤害: ${totalDamage}`);
+  
+//       for (let skill of this.player.selectedSkills) {
+//         if (skill instanceof LifestealSkill) {
+//           skill.onDamageDealt(totalDamage, "dash"); // 或 "melee"、"charged"
+//         }
+//       }
+      
+//     }
+
+//     // 👉 可以在这里加入爆炸粒子特效等
+//   }
+// }
+
+/* ---------- ChargeStrikeSkill ---------- */
 class ChargeStrikeSkill extends Skill {
   constructor(player, enemies) {
-    super("Wrath Unchained", "", 3); // 技能名称，按键X，冷却8秒
-    this.player = player;
-    this.enemies = enemies;
+    super("Wrath Unchained", "", 3);
+    this.player        = player;
+    this.enemies       = enemies;
+
+    this.chargeDuration = 2000;  // ms
+    this.range          = 100;   // 蓄满后的最大攻击半径
+    this.minRange       = 20;    // 起始提示半径
+    this.chargeAttack = 40;      // 高额范围伤害
 
     this.isCharging = false;
-    this.startTime = 0;
-    this.chargeDuration = 2000; // 1秒蓄力
-    
-    this.chargeAttack = 40;      // 高额范围伤害
-    
-    this.range = 100;           // 攻击范围半径
+    this.startTime  = 0;
   }
 
+  /* 触发 —— 开始进入蓄力状态 */
   castSkillEffect() {
-    console.log("⚡ 蓄力攻击启动：玩家进入蓄力状态");
+    console.log("⚡ 蓄力攻击启动");
+    this.isCharging      = true;
+    this.startTime       = millis();
 
-    this.isCharging = true;
-    this.startTime = millis();
-
-    // ✅ 设置玩家状态
-    this.player.isCharging = true;         // 禁止移动（在 player.update 中处理）
-    this.player.damageMultiplier = 0.5;    // 减伤50%
-    this.player.spriteMgr.request("charge", 2000, 1);
+    this.player.isCharging        = true;   // 禁止位移
+    this.player.damageMultiplier  = 0.5;    // 蓄力期间减伤
+    this.player.spriteMgr.request("charge", this.chargeDuration, 1);
   }
 
+  /* 每帧更新 */
   update() {
-    super.update();
+    super.update();                     // 冷却
 
-    if (this.isCharging && millis() - this.startTime >= this.chargeDuration) {
-      this.releaseExplosion();             // 造成范围伤害
-      this.isCharging = false;
+    if (this.isCharging) {
+      /* ① 计算进度 & 渲染光波特效 */
+      const p = constrain((millis() - this.startTime) / this.chargeDuration, 0, 1);
+      this.drawChargingEffect(p);
 
-      // ✅ 恢复玩家状态
-      this.player.isCharging = false;
-      this.player.damageMultiplier = 1;
-      console.log("✅ 蓄力攻击完成，状态恢复");
+      /* ② 到点后真正释放伤害 */
+      if (p >= 1) {
+        this.releaseExplosion();
+        this.isCharging             = false;
+        this.player.isCharging      = false;
+        this.player.damageMultiplier= 1;
+        console.log("✅ 蓄力攻击完成");
+      }
     }
   }
 
-  releaseExplosion() {
+  /* ------------ 蓄力期间的可视化 ------------- */
+ drawChargingEffect(progress) {
+  const C = this.player.pos;
+  const R = lerp(this.minRange, this.range, progress);   // 半径插值
+
+  push();
+  translate(C.x, C.y);
+
+  /* ------ 内层柔和渐变填充 ------ */
+  const ctx = drawingContext;
+  ctx.save();
+  const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.85);
+  grad.addColorStop(0, 'rgba(255,255,255,0)');
+  grad.addColorStop(1, 'rgba(220,220,220,0.25)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.85, 0, TWO_PI);      // ★ 满圆
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  /* ------ 外层高亮轮廓 ------ */
+  stroke(255);
+  strokeWeight(4);
+  noFill();
+  circle(0, 0, R * 2);                     // p5.js ≥1.4 自带 circle()
+
+  /* ------ 粒子特效 ------ */
+  noStroke();
+  const nPart = 10 + floor(progress * 30); // 蓄力越久粒子越多
+  for (let i = 0; i < nPart; i++) {
+    const a  = random(TWO_PI);             // 任意方向
+    const rr = random(R * 0.7, R * 1.1);
+    const x  = cos(a) * rr, y = sin(a) * rr;
+    const sz = random(4, 12);
+    fill(50 + random(-15, 15), 100, 100, 180);
+    ellipse(x, y, sz);
+  }
+  pop();
+}
+
+  /* ---------------- 释放伤害 ---------------- */
+ releaseExplosion() {
     console.log("💥 蓄力完成，释放360°范围攻击！");
   
     let totalDamage = 0; // ✅ 累计总伤害
@@ -3743,7 +3871,7 @@ class ChargeStrikeSkill extends Skill {
       
     }
 
-    // 👉 可以在这里加入爆炸粒子特效等
+   
   }
 }
 
