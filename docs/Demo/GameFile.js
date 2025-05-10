@@ -714,11 +714,32 @@ function generateOutsideViewPosition(maxAttempts = 20) {
 }
 
 function generateStealthEnemyAhead(playerPos, playerDir, distance = 600, spread = 200) {
-  // 预测前方路径位置
-  let base = p5.Vector.add(playerPos, p5.Vector.mult(playerDir, distance));
+  let normDir = playerDir.copy().normalize();  // ✅ 确保单位向量
+  let base = p5.Vector.add(playerPos, p5.Vector.mult(normDir, distance));
   let offset = createVector(random(-spread, spread), random(-spread, spread));
   return p5.Vector.add(base, offset);
 }
+
+
+
+let stealthTimer = 0;
+
+function updateStealthSpawn(max = 6) {
+  stealthTimer++;
+  if (stealthTimer % 120 === 0) {
+    let dir = player.getDirection();
+    if (dir.mag() < 0.01) return;
+
+    const stealthCount = enemies.filter(e => e instanceof StealthEnemy).length;
+    if (stealthCount >= max) return;
+
+      let pos = generateStealthEnemyAhead(player.pos, dir);
+      enemies.push(new StealthEnemy(pos.x, pos.y));
+      console.log("生成隐形敌人", pos);
+    }
+  }
+
+
 
 
 
@@ -1385,11 +1406,11 @@ class Level3 extends BaseLevel {
       enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
     }
 
-    // StealthEnemy
+    /*// StealthEnemy
     for (let i = 0; i < 4; i++) {
-      let stealthPos = generateAheadPosition(distance = 400, spread = 150);
+      let stealthPos = generateValidEnemyPosition(minSpawnDistance);
       enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-    }
+    }*/
 
     // FollowEnemy
     for (let i = 0; i < 5; i++) {
@@ -1429,6 +1450,8 @@ class Level3 extends BaseLevel {
 
   update() {
     if (this.stage === 1) {
+
+        updateStealthSpawn(8); // ✅ 每帧尝试生成隐身怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -1473,7 +1496,7 @@ class Level3 extends BaseLevel {
           bullets.splice(i, 1);
         }
       }
-    }
+}        
   }
 
 
@@ -1981,7 +2004,15 @@ class Player {
     if (this.isInvincibleFromDash) console.log("⚡ Dash 提供无敌");
     if (this.isInvincibleFromReflect) console.log("🛡️ Reflect 提供无敌");
     return this.isInvincibleFromDash || this.isInvincibleFromReflect;
-  }           
+  } 
+  
+  getDirection() {
+  if (!this.prevPos) this.prevPos = this.pos.copy();
+  let dir = p5.Vector.sub(this.pos, this.prevPos);
+  this.prevPos = this.pos.copy();
+  return dir;
+}
+
 
 }
 
