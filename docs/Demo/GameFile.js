@@ -825,6 +825,22 @@ class BaseLevel {
 
   update() {
     // 关卡的逻辑更新，比如特殊机制
+    // 更新奖励物
+    for (let i = timeBonuses.length - 1; i >= 0; i--) {
+          timeBonuses[i].show();
+    }
+    
+    // 更新敌人
+    for (let i = enemies.length - 1; i >= 0; i--) {
+          const enemy = enemies[i];
+          enemy.update();
+          enemy.show();
+  
+          if (enemy.isExplosionFinished()) {
+              enemies.splice(i, 1);
+          }
+    }
+
   }
 
   draw() {
@@ -1001,6 +1017,7 @@ class Level1 extends BaseLevel {
   }
 
   update() {
+    super.update();
     // 阶段 4：处理生存倒计时 & 敌人更新
     if (this.stage === 4) {
       // 检查全局倒计时
@@ -1015,21 +1032,6 @@ class Level1 extends BaseLevel {
 
       }
   
-      // 更新奖励物
-      for (let i = timeBonuses.length - 1; i >= 0; i--) {
-          timeBonuses[i].show();
-      }
-  
-      // 更新敌人
-      for (let i = enemies.length - 1; i >= 0; i--) {
-          const enemy = enemies[i];
-          enemy.update();
-          enemy.show();
-  
-          if (enemy.isExplosionFinished()) {
-              enemies.splice(i, 1);
-          }
-      }
   
       // 更新子弹（如果有的话）
       for (let i = bullets.length - 1; i >= 0; i--) {
@@ -1246,6 +1248,7 @@ class Level2 extends BaseLevel {
   }
 
   update() {
+    super.update();
     if (this.stage === 1) {
         // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
@@ -1268,31 +1271,12 @@ class Level2 extends BaseLevel {
 
         
 
-        // 更新奖励物
-        for (let i = timeBonuses.length - 1; i >= 0; i--) {
-            timeBonuses[i].show();
-        }
-
         // 更新黑洞
         for (let bh of this.blackHoles) {
             bh.update(player);
             bh.show();
         }
 
-        // 更新敌人
-        for (let i = enemies.length - 1; i >= 0; i--) {
-            const enemy = enemies[i];
-            enemy.update();
-            enemy.show();
-
-            if (enemy.isExplosionFinished()) {
-                if (enemy instanceof CommonEnemy) {
-                    let pos = generateOutsideViewPosition();
-                    enemies.push(new CommonEnemy(pos.x, pos.y));
-                }
-                enemies.splice(i, 1);
-            }
-        }
 
         // 更新子弹
         for (let i = bullets.length - 1; i >= 0; i--) {
@@ -1423,6 +1407,7 @@ class Level3 extends BaseLevel {
   }
 
   update() {
+    super.update();
     if (this.stage === 1) {
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
@@ -1434,30 +1419,11 @@ class Level3 extends BaseLevel {
         this.finalizeScore();
       }
 
-      // 更新奖励物
-      for (let i = timeBonuses.length - 1; i >= 0; i--) {
-        timeBonuses[i].show();
-      }
 
       // 更新黑洞
       for (let bh of this.blackHoles) {
         bh.update(player);
         bh.show();
-      }
-
-      // 更新敌人
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        enemy.update();
-        enemy.show();
-
-        if (enemy.isExplosionFinished()) {
-          if (enemy instanceof CommonEnemy) {
-            let pos = generateOutsideViewPosition();
-            enemies.push(new CommonEnemy(pos.x, pos.y));
-          }
-          enemies.splice(i, 1);
-        }
       }
 
       // 更新子弹
@@ -1584,6 +1550,7 @@ class Level4 extends BaseLevel{
       this.stage = 1;  // 切换到正式战斗阶段
     }
 update() {
+  super.update();
   if (this.stage === 1) {
     // 检查完成
     if (!this.finished && remainingTime <= 0) {
@@ -1595,30 +1562,11 @@ update() {
       this.finalizeScore();
     }
 
-    // 更新奖励物
-    for (let i = timeBonuses.length - 1; i >= 0; i--) {
-      timeBonuses[i].show();
-    }
 
     // 更新黑洞
     for (let bh of this.blackHoles) {
       bh.update(player);
       bh.show();
-    }
-
-    // 更新敌人
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const enemy = enemies[i];
-      enemy.update();
-      enemy.show();
-
-      if (enemy.isExplosionFinished()) {
-        if (enemy instanceof CommonEnemy) {
-          let pos = generateOutsideViewPosition();
-          enemies.push(new CommonEnemy(pos.x, pos.y));
-        }
-        enemies.splice(i, 1);
-      }
     }
 
     // 更新子弹
@@ -1677,10 +1625,10 @@ class Level5 extends BaseLevel{
   
       this.tip = "So you've made it this far... Final battle begins now!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-      // this.blackHoles = [];
   }
 
   start() {
+    super.start();
 
     // 初始化提示内容 + 定时消失
     this.tip = "So you've made it this far... Final battle begins now!";
@@ -1694,15 +1642,9 @@ class Level5 extends BaseLevel{
   }
 
   update(){
+    super.update();
 
     /* ---------- A. 所有阶段都更新 / 绘制敌人（含 Boss） ---------- */
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    const enemy = enemies[i];
-    enemy.update();
-    enemy.show();
-
-    if (enemy.isExplosionFinished()) enemies.splice(i, 1);
-  }
   //这里硬编码了一部分，不然看不到bullet类
     if (boss && boss.towerActive) {
       for (let i = bullets.length - 1; i >= 0; i--) {
