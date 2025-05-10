@@ -117,7 +117,7 @@ let BOSS_DASH_GIF;        // boss 冲刺动作图
 let BOSS_DASH_EXPLODE_GIF; // 冲刺结束后沿路径依次播放的爆炸特效
 
 let BOSS_BLACKHOLE_SKILL_GIF;//boss生成黑洞动作
-
+let TRAIL_IMG;    // 冲刺残影专用贴图
 
 
 function preload() {
@@ -191,7 +191,7 @@ function preload() {
   BOSS_DASH_GIF         = loadImage("assets/media/boss/BOSS_DASH.gif");
   BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/boss/BOSS_DASH_EXPLODE.gif");
   BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/boss/BOSS_BLACKHOLE_SKILL.gif");
-
+  TRAIL_IMG = loadImage("assets/media/character/dash.png");
 
 
 }
@@ -446,10 +446,6 @@ if (gameOver) {
 function updateTimer() {
   let elapsedTime = (millis() - startTime) / 1000;
   remainingTime = max(0, timer - elapsedTime);
-  // if (remainingTime <= 0) {
-  //   gameOver = true;
-  //   showGameOverScreen();
-  // }
   if (remainingTime <= 0) {
     // 不再直接 Game Over，而是通知关卡
     if (levelManager && levelManager.currentLevel && typeof levelManager.currentLevel.onTimeUp === 'function') {
@@ -550,7 +546,10 @@ function drawInfo() {
   // **修正计时器在右上角**
   textAlign(RIGHT, TOP);
   text("Time: " + nf(remainingTime, 2, 1) + "s", windowWidth - 20, 20); // **改为 windowWidth**
-  
+  if (levelManager && levelManager.currentLevel) {
+  let lv = levelManager.currentLevel.levelNumber ?? "?";
+  text("Level: " + lv, windowWidth - 20, 50);  // 比 time 向下20~30像素
+  }
   skillSystem.drawIcon();  // ✅ 画技能图标
   
   
@@ -699,7 +698,6 @@ function generateValidEnemyPosition(minDistance) {
   return pos;
 }
 
-
 function generateOutsideViewPosition(maxAttempts = 20) {
   let attempt = 0;
 
@@ -725,6 +723,37 @@ function generateOutsideViewPosition(maxAttempts = 20) {
     player.pos.y + random([-1, 1]) * 1000
   );
 }
+
+function generateStealthEnemyAhead(playerPos, playerDir, distance = 600, spread = 200) {
+  let normDir = playerDir.copy().normalize();  // ✅ 确保单位向量
+  let base = p5.Vector.add(playerPos, p5.Vector.mult(normDir, distance));
+  let offset = createVector(random(-spread, spread), random(-spread, spread));
+  return p5.Vector.add(base, offset);
+}
+
+
+
+let stealthTimer = 0;
+
+function updateStealthSpawn(max = 6) {
+  stealthTimer++;
+  if (stealthTimer % 120 === 0) {
+    let dir = player.getDirection();
+    if (dir.mag() < 0.01) return;
+
+    const stealthCount = enemies.filter(e => e instanceof StealthEnemy).length;
+    if (stealthCount >= max) return;
+
+      let pos = generateStealthEnemyAhead(player.pos, dir);
+      enemies.push(new StealthEnemy(pos.x, pos.y));
+      console.log("生成隐形敌人", pos);
+    }
+  }
+
+
+
+
+
 //修改关卡背景zc 5.9
 function sendLevelToBackground(levelNumber) {
   const bgFrame = document.getElementById('bgFrame');
@@ -1240,7 +1269,7 @@ class Level2 extends BaseLevel {
 
     // AmbushEnemy
     for (let i = 0; i < 4; i++) {
-        let ambushPos = generateValidEnemyPosition(minSpawnDistance);
+        let ambushPos = generateValidEnemyPosition(300);
         enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
     }
 
@@ -1378,7 +1407,7 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-
+/*
     // 刷敌人
     let minSpawnDistance = player.r * 10;
 
@@ -1404,7 +1433,7 @@ class Level3 extends BaseLevel {
     for (let i = 0; i < 10; i++) {
       let pos = generateOutsideViewPosition();
       enemies.push(new CommonEnemy(pos.x, pos.y));
-    }
+    }*/
 
     // 刷黑洞
     for (let i = 0; i < 2; i++) {
@@ -1433,6 +1462,8 @@ class Level3 extends BaseLevel {
   update() {
     super.update();
     if (this.stage === 1) {
+
+        updateStealthSpawn(2); // ✅ 每帧尝试生成隐身怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -1458,7 +1489,7 @@ class Level3 extends BaseLevel {
           bullets.splice(i, 1);
         }
       }
-    }
+}        
   }
 
 
@@ -1532,11 +1563,11 @@ class Level4 extends BaseLevel{
         enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
       }
   
-      // StealthEnemy
+      /*// StealthEnemy
       for (let i = 0; i < 4; i++) {
         let stealthPos = generateValidEnemyPosition(minSpawnDistance);
         enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-      }
+      }*/
   
       // FollowEnemy
       for (let i = 0; i < 5; i++) {
@@ -1576,6 +1607,7 @@ class Level4 extends BaseLevel{
 update() {
   super.update();
   if (this.stage === 1) {
+    updateStealthSpawn(8);
     // 检查完成
     if (!this.finished && remainingTime <= 0) {
       this.stage = 2;
@@ -1812,19 +1844,6 @@ class Player {
 
 }
 
-  
-  //两个被调用来切图的方法
-  playAttackGif() {
-  this.isAttacking = true;
-  // 根据当前朝向切 GIF
-   }
-
-  resetImage() {
-  this.isAttacking = false;
-  // 切回 Idle 图
-   }
-
-
 
   update() {
     this.updateSkills(); // 更新技能状态
@@ -1956,7 +1975,15 @@ class Player {
     if (this.isInvincibleFromDash) console.log("⚡ Dash 提供无敌");
     if (this.isInvincibleFromReflect) console.log("🛡️ Reflect 提供无敌");
     return this.isInvincibleFromDash || this.isInvincibleFromReflect;
-  }           
+  } 
+  
+  getDirection() {
+  if (!this.prevPos) this.prevPos = this.pos.copy();
+  let dir = p5.Vector.sub(this.pos, this.prevPos);
+  this.prevPos = this.pos.copy();
+  return dir;
+}
+
 
 }
 
@@ -2174,48 +2201,50 @@ class StealthEnemy extends Enemy {
     this.visibility = 0;
     this.detectRange = 300;
     this.chaseRange = 200;
-    this.hideRange = 350;
     this.isChasing = false;
-    this.stealthspeed = 2;
-    this.speed = 1.5;
+    this.stealthSpeed = 3;
+    this.slowSpeed = 2;
     this.target = createVector(random(width * 2) - width, random(height * 2) - height); // ✅ 必须初始化
   }
 
   update() {
-    this.applySeparation(enemies); // 加入防重叠行为
+  this.applySeparation(enemies);
 
-    let distance = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
+  let distance = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
 
-    if (distance < this.chaseRange) {
-      this.isChasing = true;
-      this.visibility = min(this.visibility + 20, 255);
-    } else if (distance < this.detectRange) {
-      this.isChasing = false;
-      this.visibility = min(this.visibility + 10, 255);
-    } else if (distance > this.hideRange) {
-      this.isChasing = false;
-      this.visibility = max(this.visibility - 15, 0);
-    }
-
-    let dir;
-    if (this.isChasing) {
-      const stopDistance = this.r + player.r;
-      if (distance > stopDistance) {
-        dir = p5.Vector.sub(player.pos, this.pos);
-        dir.setMag(this.stealthspeed);
-        this.pos.add(dir);
-      }
-    } else {
-      if (frameCount % 60 === 0) {
-        this.target = createVector(random(width * 2) - width, random(height * 2) - height);
-      }
-      dir = p5.Vector.sub(this.target, this.pos);
-      dir.setMag(this.speed);
-      this.pos.add(dir);
-    }
-
-    super.update(); // 死亡检测
+  // ✅ 显隐逻辑（控制透明度）
+  if (distance < this.chaseRange) {
+    this.visibility = min(this.visibility + 20, 255);
+  } else if (distance < this.detectRange) {
+    this.visibility = min(this.visibility + 5, 255);
+  } else {
+    this.visibility = max(this.visibility - 5, 0);
   }
+
+  // ✅ 行为逻辑（控制移动）
+  let dir;
+  if (distance < this.chaseRange) {
+    this.isChasing = true;
+    dir = p5.Vector.sub(player.pos, this.pos);
+    dir.setMag(this.stealthSpeed); // 快速追击
+    this.pos.add(dir);
+  } else if (distance < this.detectRange) {
+    this.isChasing = false;
+    if (frameCount % 60 === 0) {
+      this.target = createVector(random(width * 2) - width, random(height * 2) - height);
+    }
+    dir = p5.Vector.sub(this.target, this.pos);
+    dir.setMag( this.slowSpeed); // 普通游走
+    this.pos.add(dir);
+  } else {
+    this.isChasing = false;
+    dir = p5.Vector.sub(player.pos, this.pos);
+    dir.setMag( this.slowSpeed); // 慢速尾随
+    this.pos.add(dir);
+  }
+
+  super.update();
+}
 
   applySeparation(others) {
     let separationForce = createVector(0, 0);
@@ -2252,7 +2281,19 @@ class StealthEnemy extends Enemy {
       // 完全隐身时不绘制
       if (this.visibility === 0) return;
     
-      push();
+      push(); 
+      /* // 🟣 显示紫色感应范围圆圈（调试用）
+      noFill();
+      stroke(150, 0, 255, 255); // 低透明紫色
+      strokeWeight(1);
+      ellipse(this.pos.x, this.pos.y, this.detectRange * 2);
+
+      noFill();
+      stroke(255, 0, 0, 255); // 
+      strokeWeight(1);
+      ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
+      */
+
       fill(150, 0, 255, this.visibility);
       ellipse(this.pos.x, this.pos.y, this.r * 2);
     
@@ -3196,7 +3237,25 @@ class AttackBoostSkill extends Skill {
 }
 
 
-class DashSkill extends Skill {
+// class DashSkill extends Skill {
+//   constructor(player,enemies) {
+//     super("Phantom Dash", "", 8); // 冲刺技能冷却
+//     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
+//     this.isDashing = false; // 冲刺中标记
+//     this.originalSpeed = 0; // 记录冲刺前的速度
+//     this.dashedEnemies = []; // 已经撞过的敌人列表
+//     this.dashEndTime = 0; // 冲刺结束时间
+
+//     this.dashTrail = [];             // ✅ 拖影数组
+//     this.maxDashTrailLength = 20;    // ✅ 最多记录多少
+
+//     this.player = player; 
+//     this.enemies = enemies; // 保存敌人列表
+
+//     this.totalDamage = 0; // 累积冲刺造成的伤害
+//   }
+
+  class DashSkill extends Skill {
   constructor(player,enemies) {
     super("Phantom Dash", "", 8); // 冲刺技能冷却
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
@@ -3206,7 +3265,14 @@ class DashSkill extends Skill {
     this.dashEndTime = 0; // 冲刺结束时间
 
     this.dashTrail = [];             // ✅ 拖影数组
-    this.maxDashTrailLength = 20;    // ✅ 最多记录多少
+    this.maxDashTrailLength = 20;   
+    this.frameSkip = 1;       // 每 1 帧采样一次
+    this._frameCounter = 0;
+
+    this.trailImg = TRAIL_IMG;   // ← 存引用 // ✅ 最多记录多少
+    this.trailSizeHead = 0.4;  // 玩家附近：0.4 × player.r
+    this.trailSizeTail = 1.1;  // 尾端：1.1 × player.r
+    this.trailSizeMul  = 5; 
 
     this.player = player; 
     this.enemies = enemies; // 保存敌人列表
@@ -3245,25 +3311,60 @@ class DashSkill extends Skill {
     }
   }
 
-  updateTrail() {
-    this.dashTrail.push(this.player.pos.copy());
-    if (this.dashTrail.length > this.maxDashTrailLength) {
-      this.dashTrail.shift();
-    }
-  }
+  // updateTrail() {
+  //   this.dashTrail.push(this.player.pos.copy());
+  //   if (this.dashTrail.length > this.maxDashTrailLength) {
+  //     this.dashTrail.shift();
+  //   }
+  // }
 
-  showTrail() {
-    for (let i = 0; i < this.dashTrail.length; i++) {
-      let pos = this.dashTrail[i];
-      let alpha = map(i, 0, this.dashTrail.length, 50, 200);
-      let size = map(i, 0, this.dashTrail.length, player.r * 0.5, this.player.r);
-      fill(0, 255, 0, alpha);
-      noStroke();
-      ellipse(pos.x, pos.y, size * 2);
-    }
-  }
+  // showTrail() {
+  //   for (let i = 0; i < this.dashTrail.length; i++) {
+  //     let pos = this.dashTrail[i];
+  //     let alpha = map(i, 0, this.dashTrail.length, 50, 200);
+  //     let size = map(i, 0, this.dashTrail.length, player.r * 0.5, this.player.r);
+  //     fill(0, 255, 0, alpha);
+  //     noStroke();
+  //     ellipse(pos.x, pos.y, size * 2);
+  //   }
+  // }
 
-    
+    updateTrail() {
+  if ((this._frameCounter++ % this.frameSkip) !== 0) return;
+
+  this.dashTrail.push({
+    pos: this.player.pos.copy(),
+    dir: this.player.lastDirection   // "left" / "right"
+  });
+  if (this.dashTrail.length > this.maxDashTrailLength) {
+    this.dashTrail.shift();
+  }
+ }
+
+ showTrail() {
+  if (!this.trailImg || !this.dashTrail.length) return;
+
+  imageMode(CENTER);
+
+  for (let i = 0; i < this.dashTrail.length; i++) {
+    const { pos, dir } = this.dashTrail[i];
+
+    // 透明度 & 尺寸渐隐
+    const alpha = map(i, 0, this.dashTrail.length, 40, 255);
+   const size = map(i, 0, this.dashTrail.length,
+                 this.player.r * this.trailSizeHead,
+                 this.player.r * this.trailSizeTail)
+             * this.trailSizeMul;
+
+    push();
+    translate(pos.x, pos.y);
+    if (dir === "left") scale(-1, 1);
+    tint(255, alpha);
+    image(this.trailImg, 0, 0, size, size);
+    pop();
+  }
+  noTint();
+ }
   
 
   checkDashDamage() {
