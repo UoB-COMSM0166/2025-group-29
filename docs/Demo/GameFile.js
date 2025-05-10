@@ -97,6 +97,8 @@ let levelManager;
 let gamePaused = false;
 
 let remainingTime; // 剩余时间（秒）
+let stealthTimer = 0;
+let ambushTimer = 0;
 
 const GIF_POOL = {
   normal: { idle:{}, attack:{} },
@@ -728,12 +730,45 @@ function generateStealthEnemyAhead(playerPos, playerDir, distance = 600, spread 
 }
 
 
+function generateAmbushOutsideViewPosition(playerPos, playerDir, baseDistance = 800, angleRange = PI / 4, maxAttempts = 20) {
+  const normDir = playerDir.copy().normalize();
 
-let stealthTimer = 0;
+  let attempt = 0;
+  while (attempt < maxAttempts) {
+    // ✅ 在 ±angleRange 范围内随机角度
+    const angleOffset = random(-angleRange, angleRange);
+    const spawnAngle = normDir.heading() + angleOffset;
+
+    // ✅ 用角度和距离生成偏移向量
+    const spawnVector = p5.Vector.fromAngle(spawnAngle).mult(baseDistance + random(-100, 100));
+
+    const candidate = p5.Vector.add(playerPos, spawnVector);
+
+    // ✅ 判断是否在视野外（绕玩家构造窗口）
+    const viewLeft   = playerPos.x - windowWidth * 0.75;
+    const viewRight  = playerPos.x + windowWidth * 0.75;
+    const viewTop    = playerPos.y - windowHeight * 0.75;
+    const viewBottom = playerPos.y + windowHeight * 0.75;
+
+    if (candidate.x < viewLeft || candidate.x > viewRight ||
+        candidate.y < viewTop  || candidate.y > viewBottom) {
+      return candidate;
+    }
+
+    attempt++;
+  }
+
+  // fallback：直接生成远方向
+  return p5.Vector.add(playerPos, p5.Vector.mult(normDir, 1000));
+}
+
+
+
+
 
 function updateStealthSpawn(max = 6) {
   stealthTimer++;
-  if (stealthTimer % 120 === 0) {
+  if (stealthTimer % 120 === 0) { // 120 帧 = 2 秒
     let dir = player.getDirection();
     if (dir.mag() < 0.01) return;
 
@@ -748,6 +783,26 @@ function updateStealthSpawn(max = 6) {
 
 
 
+
+
+function updateAmbushSpawn(max = 6) {
+  ambushTimer++;
+
+  if (ambushTimer % 360 === 0) { // 120 帧 = 2 秒
+    // 当前伏击怪数量
+    const ambushCount = enemies.filter(e => e instanceof AmbushEnemy).length;
+    console.log("伏击怪数量", ambushCount);
+    if (ambushCount >= max) return; // 已达上限
+
+   let dir = player.getDirection?.() || createVector(1, 0);
+  if (dir.mag() < 0.01) dir = createVector(1, 0); // 保底方向
+
+  const spawnPos = generateAmbushOutsideViewPosition(player.pos, dir);
+
+  enemies.push(new AmbushEnemy(spawnPos.x, spawnPos.y));
+  console.log("🗡️ 伏击怪生成于", spawnPos);
+  }
+}
 
 
 //修改关卡背景zc 5.9
@@ -1397,7 +1452,7 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-
+/*
     // 刷敌人
     let minSpawnDistance = player.r * 10;
 
@@ -1406,7 +1461,7 @@ class Level3 extends BaseLevel {
       let ambushPos = generateValidEnemyPosition(minSpawnDistance);
       enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
     }
-/*
+
     // StealthEnemy
     for (let i = 0; i < 4; i++) {
       let stealthPos = generateValidEnemyPosition(minSpawnDistance);
@@ -1443,7 +1498,7 @@ class Level3 extends BaseLevel {
     }
 
     // 设置倒计时
-    timer = 60;
+    timer = 90;
     startTime = millis();
 
     this.stage = 1;  // 切换到正式战斗阶段
@@ -1454,6 +1509,7 @@ class Level3 extends BaseLevel {
     if (this.stage === 1) {
 
         updateStealthSpawn(3); // ✅ 每帧尝试生成隐身怪
+        updateAmbushSpawn(6); // ✅ 每帧尝试生成伏击怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -1547,17 +1603,17 @@ class Level4 extends BaseLevel{
         enemies.push(new BulletEnemy(pos.x, pos.y, 35));
       }
   
-      // AmbushEnemy
+      /*// AmbushEnemy
       for (let i = 0; i < 4; i++) {
         let ambushPos = generateValidEnemyPosition(minSpawnDistance);
         enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
       }
   
-      /*// StealthEnemy
+      // StealthEnemy
       for (let i = 0; i < 4; i++) {
         let stealthPos = generateValidEnemyPosition(minSpawnDistance);
         enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-      }*/
+      }
   
       // FollowEnemy
       for (let i = 0; i < 5; i++) {
@@ -1569,7 +1625,7 @@ class Level4 extends BaseLevel{
       for (let i = 0; i < 10; i++) {
         let pos = generateOutsideViewPosition();
         enemies.push(new CommonEnemy(pos.x, pos.y));
-      }
+      }*/
   
       // 刷黑洞
       for (let i = 0; i < 2; i++) {
@@ -1598,6 +1654,7 @@ update() {
   super.update();
   if (this.stage === 1) {
     updateStealthSpawn(8);
+    updateAmbushSpawn (6); // ✅ 每帧尝试生成伏击怪
     // 检查完成
     if (!this.finished && remainingTime <= 0) {
       this.stage = 2;
@@ -3595,7 +3652,7 @@ class BloodFurySkill extends Skill {
 
 class ReflectSkill extends Skill {
   constructor(player) {
-    super("Iron Reversal", "", 12);     // 名称、按键占位、冷却 12 s
+    super("Iron Reversal", "", 2);     // 名称、按键占位、冷却 12 s
     this.player   = player;
     this.duration = 4 * 1000;  // 4 秒持续
     this.endTime  = 0;
@@ -3702,6 +3759,8 @@ class SlowFieldSkill extends Skill {
   update() {
     super.update();                // 冷却倒计时
 
+    // ✅ 每一帧都更新敌人列表，确保包括新生成的敌人
+    this.enemies = enemies;
     if (!this.active) return;
 
     // 1. 处理减速 / 恢复
@@ -3729,6 +3788,15 @@ class SlowFieldSkill extends Skill {
       enemy.dushSpeed    *= this.slowMul;
       enemy.maxDashSpeed *= this.slowMul;
     }
+
+    //  新增：StealthEnemy 特殊处理
+    if (enemy instanceof StealthEnemy) {
+    enemy.originalStealthSpeed = enemy.stealthSpeed;
+    enemy.originalSlowSpeed    = enemy.slowSpeed;
+
+    enemy.stealthSpeed *= this.slowMul;
+    enemy.slowSpeed    *= this.slowMul;
+  }
 
     this.slowed.add(enemy);
   }
