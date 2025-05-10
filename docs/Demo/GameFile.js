@@ -32,6 +32,8 @@ async function loadSaveData() {
   savedSkills = data.skills || [];
   savedCumulativeScore = data.cumulative_score || 0;
 
+  score = savedCumulativeScore; 
+
   console.log('读到存档→', { savedLevel, savedMode, savedSkills });
 }
 
@@ -40,7 +42,8 @@ let enemies = [];
 
 let zoom = 1;
 let gameOver = false;
-let score = 0; // 记录得分
+let score; // 记录得分
+let resumeScore = null;
 let timer = 60; // 设定倒计时时间（秒）
 let startTime; // 记录游戏开始的时间
 
@@ -100,6 +103,9 @@ let remainingTime; // 剩余时间（秒）
 let stealthTimer = 0;
 let ambushTimer = 0;
 
+let pauseMenuActive = false;
+
+
 const GIF_POOL = {
   normal: { idle:{}, attack:{} },
   agile : { idle:{}, attack:{} },
@@ -118,6 +124,12 @@ let BOSS_DASH_EXPLODE_GIF; // 冲刺结束后沿路径依次播放的爆炸特�
 
 let BOSS_BLACKHOLE_SKILL_GIF;//boss生成黑洞动作
 let TRAIL_IMG;    // 冲刺残影专用贴图
+let follow_gif;
+let ambush_gif;
+let ambushactive_gif;
+let stealth_gif;
+let bulletenemy_gif;
+let common_gif;
 
 
 function preload() {
@@ -191,7 +203,14 @@ function preload() {
   BOSS_DASH_GIF         = loadImage("assets/media/boss/BOSS_DASH.gif");
   BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/boss/BOSS_DASH_EXPLODE.gif");
   BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/boss/BOSS_BLACKHOLE_SKILL.gif");
+
   TRAIL_IMG = loadImage("assets/media/character/dash.png");
+  follow_gif = loadImage("assets/media/monster/Follow-monster.gif");
+  ambush_gif = loadImage("assets/media/monster/Ambush-monster-idle.gif");
+  ambushactive_gif = loadImage("assets/media/monster/Ambush-monster-attack.gif");
+  stealth_gif = loadImage("assets/media/monster/Invisible-monster.gif");
+  bulletenemy_gif = loadImage("assets/media/monster/Danmaku-monster.gif");
+  common_gif = loadImage("assets/media/monster/normal-monster.gif");
 
 
 }
@@ -220,6 +239,8 @@ function setup() {
   textFont(minecraftFont);
   console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
   
+
+
   // 延迟初始化
   if (!dataLoaded) {
     noLoop();
@@ -363,9 +384,9 @@ function setEnemies() {
 
 
 function draw() {
-  if (!levelManager || !levelManager.currentLevel) {
+if (!levelManager || !levelManager.currentLevel) {
     return;
-  }
+}
  // 只修正四个方向键的状态
 keys["ArrowUp"]    = keyIsDown(UP_ARROW);
 keys["ArrowDown"]  = keyIsDown(DOWN_ARROW);
@@ -376,6 +397,11 @@ keys["ArrowRight"] = keyIsDown(RIGHT_ARROW);
 if (gameOver) {
   showGameOverScreen();
   return;
+}
+
+if (gamePaused) {
+    drawPauseMenu();  // 渲染暂停界面
+    return;           // 停止后续更新与渲染
 }
 
 
@@ -439,7 +465,29 @@ if (gameOver) {
   showGameOverScreen();
 }
 
+
+
 }
+
+
+function drawPauseMenu() {
+  push();
+  resetMatrix();
+  fill(0, 180);
+  rect(0, 0, windowWidth, windowHeight);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(36);
+  text("⏸ Paused", windowWidth / 2, windowHeight / 2 - 100);
+
+  textSize(24);
+  text("Press R or Esc to Resume", windowWidth / 2, windowHeight / 2 - 20);
+  text("Press M to Return to Main Menu", windowWidth / 2, windowHeight / 2 + 30);
+
+  pop();
+}
+
 
 function updateTimer() {
   let elapsedTime = (millis() - startTime) / 1000;
@@ -612,8 +660,30 @@ function showGameOverScreen() {
 function keyPressed() {
   keys[key] = true; // 记录按下的按键
 
-  if (key === 'R' || key === 'r') { // 按 R 重新开始
+  if ((key === 'R' || key === 'r') && gameOver ) { // 按 R 重新开始
     restartGame();
+  }
+
+    // 暂停/恢复 游戏
+  if (keyCode === ESCAPE) {
+    pauseMenuActive = !pauseMenuActive;
+    gamePaused = pauseMenuActive;
+    return; // 不继续触发后续游戏逻辑
+  }
+
+  if (pauseMenuActive) {
+    // 菜单中按 R 或 Esc 继续游戏
+    if (key === 'R' || key === 'r' || keyCode === ESCAPE) {
+      pauseMenuActive = false;
+      gamePaused = false;
+    }
+
+    // 菜单中按 M 返回主菜单
+    if (key === 'M' || key === 'm') {
+      window.location.href = 'index.html'; // 主菜单页面路径
+    }
+
+    return;
   }
 
 
@@ -662,7 +732,7 @@ function keyReleased() {
   gameOver = false;
   player.hp.currentHP = player.hp.maxHP;  // 复活时满血（保险）
   player.hp.isDead = false; // 重置死亡状态
-  score = 0;                               // 保留分数 or 重置，看需要
+  resumeScore = score;                              // 保留分数 or 重置，看需要
   startTime = millis();
 
   player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
@@ -846,10 +916,13 @@ class LevelManager {
   this.currentLevel = this.levels[index];
   console.log(`加载 Level ${index + 1}`);
 
-  // 如果有上一关，继承它的 totalScore
-  if (prevLevel) {
-      this.currentLevel.startingScore = prevLevel.totalScore;
-  }
+  // // 如果有上一关，继承它的 totalScore
+  // if (prevLevel) {
+  //     this.currentLevel.startingScore = prevLevel.totalScore;
+  // }
+  this.currentLevel.startingScore = prevLevel
+    ? prevLevel.totalScore
+    : savedCumulativeScore || 0;
   this.currentLevel.start();
 
   // 👉 通知背景层更换背景图
@@ -915,9 +988,18 @@ class BaseLevel {
     bullets.length = 0;
     timeBonuses.length = 0;
 
-    if (typeof score !== 'undefined') {
-        score = this.startingScore;  // 继承上一关的 totalScore 作为新关的起点
-    }
+
+    // score = this.startingScore || 0;
+    // 优先使用 resumeScore，如果没有才使用 startingScore
+  if (resumeScore !== null) {
+    score = resumeScore;
+    console.log("使用 resumeScore 恢复分数:", score);
+    resumeScore = null;  // 用过一次就清空，防止影响后续关卡
+  } else {
+    score = this.startingScore || 0;
+    console.log("使用 startingScore 初始化分数:", score);
+}
+
 
   }
 
@@ -950,6 +1032,8 @@ class BaseLevel {
     this.baseScore = score;
     this.timeBonus = Math.floor(remainingTime) * 10;
     this.totalScore= this.baseScore + this.timeBonus;
+
+    savedCumulativeScore = this.totalScore;
   }
 
   onTimeUp() {
@@ -1042,7 +1126,7 @@ class BaseLevel {
     // 本关获得的分数
     const gained = this.totalScore;  
     // 新的累计分数
-    const newCumulative = savedCumulativeScore + gained;
+    const newCumulative = gained;
     const payload = {
       current_level : this.levelNumber,            // 下一关
       skills        : player.selectedSkills.map(s => s.name),
@@ -2104,6 +2188,15 @@ class Enemy {
       this.hp.draw(this.pos.x, this.pos.y, this.r);
     }
   }
+  drawSprite(img, x, y, r, flip) {
+    let scaleF = this.scaleFactor || 1.0;
+    push();
+    translate(x, y);
+    scale(flip ? -1 : 1, 1);
+    imageMode(CENTER);
+    image(img, 0, 0, r * 2 * scaleF, r * 2 * scaleF); 
+    pop();
+  }
 
   isExplosionFinished() {
     return this.exploding && this.explosion && this.explosion.isFinished();
@@ -2117,6 +2210,9 @@ class FollowEnemy extends Enemy {
     this.speed = 3; // 速度稍慢于玩家 
 
     this.contactDamage = 15; // 接触伤害
+    this.scaleFactor = 2;//大小
+    this.spriteImg = follow_gif;  // 比如 bulletEnemyImg
+    this.flip = false;  // 初始是否翻转，可以动态更新
   }
 
   update() {
@@ -2130,7 +2226,7 @@ class FollowEnemy extends Enemy {
       dir.setMag(this.speed);
       this.pos.add(dir);
     }
-
+    this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
     super.update(); // 死亡检测等
   }
 
@@ -2163,8 +2259,7 @@ class FollowEnemy extends Enemy {
       return;
     }
 
-    fill(255, 0, 0); // 红色敌人
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
   }
 }
@@ -2178,6 +2273,11 @@ class AmbushEnemy extends Enemy {
     this.r = 40; // ✅ 设置自己的半径
     this.hp = new HPSystem(40); // ✅ 设置自己的血量（可选）
     this.contactDamage = 15; // 接触伤害
+    this.scaleFactor = 2;//大小
+    this.ambushImg = ambush_gif;   // 伏击状态的图像
+    this.dashGif = ambushactive_gif;       // 冲刺状态的 GIF 动画
+    this.flip = player.pos.x < x; // 🟢 伏击状态：初始化翻转逻辑（只判断一次）
+    this.spriteImg = this.ambushImg; // 初始为伏击图
 
     this.isChasing = false;
     this.isDashing = false;
@@ -2197,6 +2297,7 @@ class AmbushEnemy extends Enemy {
       this.isDashing = true;
       this.dashStartTime = millis();
       this.dashDir = p5.Vector.sub(player.pos, this.pos).normalize();
+      this.spriteImg = this.dashGif;  // 激活状态切换贴图
     }
 
     if (this.isDashing) {
@@ -2221,7 +2322,7 @@ class AmbushEnemy extends Enemy {
         this.dashDir = p5.Vector.sub(player.pos, this.pos).normalize();
       }
     }
-
+    this.flip = this.dashDir.x < 0; // 如果 dashDir 朝左，flip = true
     super.update(); // ✅ 调用父类 update()，执行死亡检测
   }
 
@@ -2231,8 +2332,7 @@ class AmbushEnemy extends Enemy {
       return;
     }
     
-    fill(0, 255, 250);
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
     
   }
@@ -2244,6 +2344,9 @@ class StealthEnemy extends Enemy {
     this.r = 35;
     this.hp = new HPSystem(25);
     this.contactDamage = 20; // 接触伤害
+    this.scaleFactor = 2;//大小
+    this.spriteImg = stealth_gif;  // 比如 bulletEnemyImg
+    this.flip = false;  // 初始是否翻转，可以动态更新
 
     this.visibility = 0;
     this.detectRange = 350;
@@ -2308,7 +2411,7 @@ if (distance < this.chaseRange) {
   dir.setMag(this.slowSpeed);
   this.pos.add(dir);
   }
-
+  this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
   super.update();
 }
 
@@ -2360,8 +2463,7 @@ if (distance < this.chaseRange) {
       ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
       
 
-      fill(150, 0, 255, this.visibility);
-      ellipse(this.pos.x, this.pos.y, this.r * 2);
+      this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     
       // 血条只在可见状态下绘制（并共享透明度）
       if (this.visibility > 0) {
@@ -2383,7 +2485,9 @@ class BulletEnemy extends Enemy {
     this.lastFireTime = millis();
     
     this.hp = new HPSystem(25);
-
+    this.spriteImg = bulletenemy_gif; // 设置贴图
+    this.scaleFactor = 4;//大小
+    this.flip = false; 
   }
 
   update() {
@@ -2433,8 +2537,8 @@ class BulletEnemy extends Enemy {
     }
     
     
-      fill(255, 200, 0);
-      ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
+
       this.hp.draw(this.pos.x, this.pos.y, this.r);
     
 
@@ -2448,6 +2552,9 @@ class CommonEnemy extends Enemy {
     this.r = 20;             // 比精英怪小
     this.hp = new HPSystem(25); // 较低血量
     this.speed = 3;        // 稍快的移动速度
+    this.scaleFactor = 1.8;//大小
+    this.spriteImg = common_gif;  // 比如 bulletEnemyImg
+    this.flip = false;  // 初始是否翻转，可以动态更新
   }
 
   update() {
@@ -2461,7 +2568,7 @@ class CommonEnemy extends Enemy {
       dir.setMag(this.speed);
       this.pos.add(dir);
     }
-
+    this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
     super.update(); // 死亡检测等
   }
 
@@ -2494,8 +2601,7 @@ class CommonEnemy extends Enemy {
       return;
     }
 
-    fill(200, 200, 200); // 灰色，作为基础小怪
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
   }
 }
@@ -3917,7 +4023,11 @@ class Bullet {
     this.pos = pos.copy();
     this.r = 12;
     this.speed = 6;
-    this.direction = direction.copy().normalize();
+    this.direction = direction.copy();
+    if (this.direction.mag() === 0) {
+    this.direction = createVector(1, 0);  // 默认方向
+    }
+    this.direction.normalize();
     this.isReflected = false;
     this.alive = true;
   }
@@ -3946,7 +4056,15 @@ class Bullet {
 
   reflect() {
     this.isReflected = true;
-    this.direction.mult(-1); // 原路返回
+    // 1. 安全反向（防止方向为 0）
+  if (this.direction.mag() === 0) {
+    this.direction = createVector(-1, 0); // 默认反向
+  } else {
+    this.direction.mult(-1);
+  }
+
+  // 2. 立即小幅偏移避免连锁碰撞
+  this.pos.add(p5.Vector.mult(this.direction, this.r * 1.5));
   }
 }
 
@@ -4031,7 +4149,7 @@ class CollisionManager {
     for (let bullet of this.bullets) {
       
       if (this.checkCollision(this.player, bullet)) {
-        if (this.player.isReflecting) {
+        if (this.player.isReflecting && !bullet.isReflected) {
           bullet.reflect(); // 开启反弹
           continue;         // 跳过后续伤害处理
         }
@@ -4154,13 +4272,29 @@ class MeleeAttack {
     blendMode(ADD);
 
     // 底层大弧：偏蓝青色（HSB）
-    noStroke();
-    fill(200, 80, 100, 80);
-    arc(0, 0, R*2.2, R*2.2, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
+    // noStroke();
+    // fill(200, 80, 100, 80);
+    // arc(0, 0, R*2.2, R*2.2, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
 
     // 中层弧：明黄色
-    fill(50, 100, 100, 120);
-    arc(0, 0, R*1.7, R*1.7, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
+    // fill(50, 100, 100, 120);
+    // arc(0, 0, R*1.7, R*1.7, dirAng - arcAng/2, dirAng + arcAng/2, PIE);noStroke();
+   const ctx = drawingContext;     // p5 底层 2D Canvas context
+   ctx.save();                     // 不污染外面
+
+  // 创建径向渐变：中心 0px → 外缘 R*0.85
+   const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.85);
+   grad.addColorStop(0,  'rgba(255,255,255,0)');     // 完全透明
+   grad.addColorStop(1,  'rgba(220,220,220,0.2)');   // 50% 灰白
+
+   ctx.fillStyle = grad;
+   ctx.beginPath();
+   ctx.moveTo(0, 0);
+   ctx.arc(0, 0, R * 0.85, dirAng - arcAng/2, dirAng + arcAng/2);
+   ctx.closePath();
+   ctx.fill();
+   ctx.restore();
+   
 
     // 高亮线：白色
     stroke(0, 0, 100, 200);
