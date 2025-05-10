@@ -1692,6 +1692,13 @@ class Level5 extends BaseLevel{
               bullets.splice(i, 1);
           }
       }
+
+
+    // // 更新黑洞
+    // for (let bh of this.blackHoles) {
+    //     bh.update(player);
+    // }
+
   
       // 判断敌人是否清空 & 时间是否还在倒计时中
       if (!this.finished && enemies.length === 0 && remainingTime > 0) {
@@ -1717,6 +1724,13 @@ class Level5 extends BaseLevel{
     textAlign(CENTER, CENTER);
     textSize(28);
     // text(this.tip, windowWidth / 2, 80);
+
+    // // 显示黑洞
+    // for (let bh of this.blackHoles) {
+    //     bh.show();
+    // }
+
+
 
     // 判断是否过期：只有未过期时显示
     if (!this.tipExpireTime || millis() < this.tipExpireTime) {
@@ -2651,6 +2665,7 @@ this.currentSkill    = null;       // 正在执行的技能名字
       let px = random(-windowWidth, windowWidth);
       let py = random(-windowHeight, windowHeight);
       this.blackHoles.push(new BlackHole(px, py));
+      // levelManager.currentLevel.blackHoles.push(new BlackHole(px, py));
     }
   }
 
@@ -2765,9 +2780,9 @@ cleanupTower() {
       this.handleDashSkill();
       this.handleDashDamage();
     }
-    if (this.bhActive) {
-      this.blackHoles.forEach(bh => bh.update(player));
-    }
+
+    this.blackHoles.forEach(bh => bh.update(player));
+
   
     // 三、等待 & 触发下一个
     if (!this.isAnySkillActive()) {
