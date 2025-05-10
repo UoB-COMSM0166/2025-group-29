@@ -32,6 +32,8 @@ async function loadSaveData() {
   savedSkills = data.skills || [];
   savedCumulativeScore = data.cumulative_score || 0;
 
+  score = savedCumulativeScore; 
+
   console.log('读到存档→', { savedLevel, savedMode, savedSkills });
 }
 
@@ -40,7 +42,7 @@ let enemies = [];
 
 let zoom = 1;
 let gameOver = false;
-let score = 0; // 记录得分
+let score; // 记录得分
 let timer = 60; // 设定倒计时时间（秒）
 let startTime; // 记录游戏开始的时间
 
@@ -218,6 +220,8 @@ function setup() {
   textFont(minecraftFont);
   console.log("Canvas Width:", windowWidth, "Canvas Height:",  windowHeight); //打印调试信息
   
+
+
   // 延迟初始化
   if (!dataLoaded) {
     noLoop();
@@ -791,10 +795,13 @@ class LevelManager {
   this.currentLevel = this.levels[index];
   console.log(`加载 Level ${index + 1}`);
 
-  // 如果有上一关，继承它的 totalScore
-  if (prevLevel) {
-      this.currentLevel.startingScore = prevLevel.totalScore;
-  }
+  // // 如果有上一关，继承它的 totalScore
+  // if (prevLevel) {
+  //     this.currentLevel.startingScore = prevLevel.totalScore;
+  // }
+  this.currentLevel.startingScore = prevLevel
+    ? prevLevel.totalScore
+    : savedCumulativeScore || 0;
   this.currentLevel.start();
 
   // 👉 通知背景层更换背景图
@@ -860,9 +867,10 @@ class BaseLevel {
     bullets.length = 0;
     timeBonuses.length = 0;
 
-    if (typeof score !== 'undefined') {
-        score = this.startingScore;  // 继承上一关的 totalScore 作为新关的起点
-    }
+    // if (typeof score !== 'undefined') {
+    //     score = this.startingScore;  // 继承上一关的 totalScore 作为新关的起点
+    // }
+    score = this.startingScore || 0;
 
   }
 
@@ -895,6 +903,8 @@ class BaseLevel {
     this.baseScore = score;
     this.timeBonus = Math.floor(remainingTime) * 10;
     this.totalScore= this.baseScore + this.timeBonus;
+
+    savedCumulativeScore = this.totalScore;
   }
 
   onTimeUp() {
@@ -987,7 +997,7 @@ class BaseLevel {
     // 本关获得的分数
     const gained = this.totalScore;  
     // 新的累计分数
-    const newCumulative = savedCumulativeScore + gained;
+    const newCumulative = gained;
     const payload = {
       current_level : this.levelNumber,            // 下一关
       skills        : player.selectedSkills.map(s => s.name),
