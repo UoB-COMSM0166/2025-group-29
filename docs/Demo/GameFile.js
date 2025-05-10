@@ -442,10 +442,6 @@ if (gameOver) {
 function updateTimer() {
   let elapsedTime = (millis() - startTime) / 1000;
   remainingTime = max(0, timer - elapsedTime);
-  // if (remainingTime <= 0) {
-  //   gameOver = true;
-  //   showGameOverScreen();
-  // }
   if (remainingTime <= 0) {
     // 不再直接 Game Over，而是通知关卡
     if (levelManager && levelManager.currentLevel && typeof levelManager.currentLevel.onTimeUp === 'function') {
@@ -691,7 +687,6 @@ function generateValidEnemyPosition(minDistance) {
   return pos;
 }
 
-
 function generateOutsideViewPosition(maxAttempts = 20) {
   let attempt = 0;
 
@@ -717,6 +712,16 @@ function generateOutsideViewPosition(maxAttempts = 20) {
     player.pos.y + random([-1, 1]) * 1000
   );
 }
+
+function generateStealthEnemyAhead(playerPos, playerDir, distance = 600, spread = 200) {
+  // 预测前方路径位置
+  let base = p5.Vector.add(playerPos, p5.Vector.mult(playerDir, distance));
+  let offset = createVector(random(-spread, spread), random(-spread, spread));
+  return p5.Vector.add(base, offset);
+}
+
+
+
 //修改关卡背景zc 5.9
 function sendLevelToBackground(levelNumber) {
   const bgFrame = document.getElementById('bgFrame');
@@ -1214,7 +1219,7 @@ class Level2 extends BaseLevel {
 
     // AmbushEnemy
     for (let i = 0; i < 4; i++) {
-        let ambushPos = generateValidEnemyPosition(minSpawnDistance);
+        let ambushPos = generateValidEnemyPosition(300);
         enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
     }
 
@@ -1382,7 +1387,7 @@ class Level3 extends BaseLevel {
 
     // StealthEnemy
     for (let i = 0; i < 4; i++) {
-      let stealthPos = generateValidEnemyPosition(minSpawnDistance);
+      let stealthPos = generateAheadPosition(distance = 400, spread = 150);
       enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
     }
 
