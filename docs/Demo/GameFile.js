@@ -628,7 +628,7 @@ function showGameOverScreen() {
 function keyPressed() {
   keys[key] = true; // 记录按下的按键
 
-  if (key === 'R' || key === 'r') { // 按 R 重新开始
+  if ((key === 'R' || key === 'r') && gameOver ) { // 按 R 重新开始
     restartGame();
   }
 
