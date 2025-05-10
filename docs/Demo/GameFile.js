@@ -1397,7 +1397,7 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-/*
+
     // 刷敌人
     let minSpawnDistance = player.r * 10;
 
@@ -1406,7 +1406,7 @@ class Level3 extends BaseLevel {
       let ambushPos = generateValidEnemyPosition(minSpawnDistance);
       enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
     }
-
+/*
     // StealthEnemy
     for (let i = 0; i < 4; i++) {
       let stealthPos = generateValidEnemyPosition(minSpawnDistance);
@@ -1453,7 +1453,7 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(2); // ✅ 每帧尝试生成隐身怪
+        updateStealthSpawn(3); // ✅ 每帧尝试生成隐身怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -2189,8 +2189,8 @@ class StealthEnemy extends Enemy {
     this.contactDamage = 20; // 接触伤害
 
     this.visibility = 0;
-    this.detectRange = 300;
-    this.chaseRange = 200;
+    this.detectRange = 350;
+    this.chaseRange = 150;
     this.isChasing = false;
     this.stealthSpeed = 3;
     this.slowSpeed = 2;
@@ -2202,24 +2202,27 @@ class StealthEnemy extends Enemy {
 
   let distance = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
 
-  // ✅ 显隐逻辑（控制透明度）
-  if (distance < this.chaseRange) {
-    this.visibility = min(this.visibility + 20, 255);
-  } else if (distance < this.detectRange) {
-    this.visibility = min(this.visibility + 5, 255);
-  } else {
-    this.visibility = max(this.visibility - 5, 0);
-  }
+  // ✅ 显隐逻辑（线性渐变 0 ~ 255）
+if (distance < this.chaseRange) {
+  this.visibility = 255; // 完全显形
+} else if (distance < this.detectRange) {
+  // 距离在 chaseRange 和 detectRange 之间：线性插值
+  this.visibility = map(distance, this.detectRange, this.chaseRange, 0, 255, true);
+} else {
+  this.visibility = 0; // 超出感应范围，完全隐身
+}
 
   // ✅ 行为逻辑（控制移动）
   let dir;
   if (distance < this.chaseRange) {
     this.isChasing = true;
+    this.needsRepositioned = false;
     dir = p5.Vector.sub(player.pos, this.pos);
     dir.setMag(this.stealthSpeed); // 快速追击
     this.pos.add(dir);
   } else if (distance < this.detectRange) {
     this.isChasing = false;
+    this.needsRepositioned = false;
     if (frameCount % 60 === 0) {
       this.target = createVector(random(width * 2) - width, random(height * 2) - height);
     }
@@ -2228,9 +2231,25 @@ class StealthEnemy extends Enemy {
     this.pos.add(dir);
   } else {
     this.isChasing = false;
-    dir = p5.Vector.sub(player.pos, this.pos);
-    dir.setMag( this.slowSpeed); // 慢速尾随
-    this.pos.add(dir);
+    // 如果需要重新定位，就生成伏击点
+  if (!this.needsRepositioned) {
+  this.visibility -= 10;
+  if (this.visibility <= 0) {
+    let playerDir = player.getDirection?.() || createVector(1, 0);
+    if (playerDir.mag() < 0.01) playerDir = createVector(1, 0);
+    let newPos = generateStealthEnemyAhead(player.pos, playerDir);
+    this.pos = newPos.copy();
+    this.needsRepositioned = true;
+    
+     // ✅ 控制台打印新位置
+    console.log(`隐身敌人重新定位至：(${newPos.x.toFixed(2)}, ${newPos.y.toFixed(2)})`);
+  
+  }
+}
+  // 尾随逻辑可以保留，也可以省略
+  let dir = p5.Vector.sub(player.pos, this.pos);
+  dir.setMag(this.slowSpeed);
+  this.pos.add(dir);
   }
 
   super.update();
@@ -2272,7 +2291,7 @@ class StealthEnemy extends Enemy {
       if (this.visibility === 0) return;
     
       push(); 
-      /* // 🟣 显示紫色感应范围圆圈（调试用）
+       // 🟣 显示紫色感应范围圆圈（调试用）
       noFill();
       stroke(150, 0, 255, 255); // 低透明紫色
       strokeWeight(1);
@@ -2282,7 +2301,7 @@ class StealthEnemy extends Enemy {
       stroke(255, 0, 0, 255); // 
       strokeWeight(1);
       ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
-      */
+      
 
       fill(150, 0, 255, this.visibility);
       ellipse(this.pos.x, this.pos.y, this.r * 2);
