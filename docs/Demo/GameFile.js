@@ -425,18 +425,10 @@ if (!levelManager.currentLevel.finished) {
 }
 
 
-
 updateCamera();
  
 drawMapBorder();
 
-//updateTimeBonuses();
-
-//updateEnemies();
-
-//updateBoss();
-
-//updateBullets()
 
 // 让 LevelManager 自主管理更新 & 渲染
 if (levelManager) {
@@ -529,56 +521,10 @@ function drawMapBorder() {
   pop();
 }
 
-function updateTimeBonuses() {
-  for (let i = timeBonuses.length - 1; i >= 0; i--) {
-    timeBonuses[i].show();
-    
-  }
-}
-
-function updateEnemies() {
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    const enemy = enemies[i];
-
-    enemy.update();       // 控制逻辑（会设置死亡、生成爆炸对象）
-    enemy.show();         // 必须调用！让它画出爆炸/尸体
-
-    // ❗最后判断是否爆炸动画也结束了
-    if (enemy.isExplosionFinished()) {
-      // 如果是 CommonEnemy，就补充一个新的
-      if (enemy instanceof CommonEnemy) {
-        let pos = generateOutsideViewPosition();
-        enemies.push(new CommonEnemy(pos.x, pos.y));
-      }
-
-      enemies.splice(i, 1);
-  }
-}
-}
-
-
-
-
-function updateBullets() {
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    bullets[i].update();
-    bullets[i].show();
-    if (!bullets[i].alive) {
-      bullets.splice(i, 1);
-    }
-  }
-}
 
 function updatePlayer() {
   player.update();
   player.show();
-}
-
-function updateBoss(){
-  
-    boss.update();
-    boss.show();
-  
 }
 
 function drawInfo() {
@@ -1433,7 +1379,7 @@ class Level2 extends BaseLevel {
   update() {
     super.update();
     if (this.stage === 1) {
-      updateAmbushSpawn (4); // ✅ 每帧尝试生成伏击怪
+      updateAmbushSpawn (isHardMode ? 6 : 4); // ✅ 每帧尝试生成伏击怪
         
       // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
@@ -1569,8 +1515,8 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(3); // ✅ 每帧尝试生成隐身怪
-        updateAmbushSpawn(6); // ✅ 每帧尝试生成伏击怪
+        updateStealthSpawn(isHardMode ? 6 : 4); // ✅ 每帧尝试生成隐身怪
+        updateAmbushSpawn(isHardMode ? 6 : 4); // ✅ 每帧尝试生成伏击怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
