@@ -1834,19 +1834,6 @@ class Player {
 
 }
 
-  
-  //两个被调用来切图的方法
-  playAttackGif() {
-  this.isAttacking = true;
-  // 根据当前朝向切 GIF
-   }
-
-  resetImage() {
-  this.isAttacking = false;
-  // 切回 Idle 图
-   }
-
-
 
   update() {
     this.updateSkills(); // 更新技能状态
