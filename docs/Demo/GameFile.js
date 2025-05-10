@@ -115,7 +115,7 @@ let BOSS_DASH_GIF;        // boss 冲刺动作图
 let BOSS_DASH_EXPLODE_GIF; // 冲刺结束后沿路径依次播放的爆炸特效
 
 let BOSS_BLACKHOLE_SKILL_GIF;//boss生成黑洞动作
-
+let TRAIL_IMG;    // 冲刺残影专用贴图
 
 
 function preload() {
@@ -189,7 +189,7 @@ function preload() {
   BOSS_DASH_GIF         = loadImage("assets/media/boss/BOSS_DASH.gif");
   BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/boss/BOSS_DASH_EXPLODE.gif");
   BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/boss/BOSS_BLACKHOLE_SKILL.gif");
-
+  TRAIL_IMG = loadImage("assets/media/character/dash.png");
 
 
 }
@@ -3227,7 +3227,25 @@ class AttackBoostSkill extends Skill {
 }
 
 
-class DashSkill extends Skill {
+// class DashSkill extends Skill {
+//   constructor(player,enemies) {
+//     super("Phantom Dash", "", 8); // 冲刺技能冷却
+//     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
+//     this.isDashing = false; // 冲刺中标记
+//     this.originalSpeed = 0; // 记录冲刺前的速度
+//     this.dashedEnemies = []; // 已经撞过的敌人列表
+//     this.dashEndTime = 0; // 冲刺结束时间
+
+//     this.dashTrail = [];             // ✅ 拖影数组
+//     this.maxDashTrailLength = 20;    // ✅ 最多记录多少
+
+//     this.player = player; 
+//     this.enemies = enemies; // 保存敌人列表
+
+//     this.totalDamage = 0; // 累积冲刺造成的伤害
+//   }
+
+  class DashSkill extends Skill {
   constructor(player,enemies) {
     super("Phantom Dash", "", 8); // 冲刺技能冷却
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
@@ -3237,7 +3255,14 @@ class DashSkill extends Skill {
     this.dashEndTime = 0; // 冲刺结束时间
 
     this.dashTrail = [];             // ✅ 拖影数组
-    this.maxDashTrailLength = 20;    // ✅ 最多记录多少
+    this.maxDashTrailLength = 20;   
+    this.frameSkip = 1;       // 每 1 帧采样一次
+    this._frameCounter = 0;
+
+    this.trailImg = TRAIL_IMG;   // ← 存引用 // ✅ 最多记录多少
+    this.trailSizeHead = 0.4;  // 玩家附近：0.4 × player.r
+    this.trailSizeTail = 1.1;  // 尾端：1.1 × player.r
+    this.trailSizeMul  = 5; 
 
     this.player = player; 
     this.enemies = enemies; // 保存敌人列表
@@ -3276,25 +3301,60 @@ class DashSkill extends Skill {
     }
   }
 
-  updateTrail() {
-    this.dashTrail.push(this.player.pos.copy());
-    if (this.dashTrail.length > this.maxDashTrailLength) {
-      this.dashTrail.shift();
-    }
-  }
+  // updateTrail() {
+  //   this.dashTrail.push(this.player.pos.copy());
+  //   if (this.dashTrail.length > this.maxDashTrailLength) {
+  //     this.dashTrail.shift();
+  //   }
+  // }
 
-  showTrail() {
-    for (let i = 0; i < this.dashTrail.length; i++) {
-      let pos = this.dashTrail[i];
-      let alpha = map(i, 0, this.dashTrail.length, 50, 200);
-      let size = map(i, 0, this.dashTrail.length, player.r * 0.5, this.player.r);
-      fill(0, 255, 0, alpha);
-      noStroke();
-      ellipse(pos.x, pos.y, size * 2);
-    }
-  }
+  // showTrail() {
+  //   for (let i = 0; i < this.dashTrail.length; i++) {
+  //     let pos = this.dashTrail[i];
+  //     let alpha = map(i, 0, this.dashTrail.length, 50, 200);
+  //     let size = map(i, 0, this.dashTrail.length, player.r * 0.5, this.player.r);
+  //     fill(0, 255, 0, alpha);
+  //     noStroke();
+  //     ellipse(pos.x, pos.y, size * 2);
+  //   }
+  // }
 
-    
+    updateTrail() {
+  if ((this._frameCounter++ % this.frameSkip) !== 0) return;
+
+  this.dashTrail.push({
+    pos: this.player.pos.copy(),
+    dir: this.player.lastDirection   // "left" / "right"
+  });
+  if (this.dashTrail.length > this.maxDashTrailLength) {
+    this.dashTrail.shift();
+  }
+ }
+
+ showTrail() {
+  if (!this.trailImg || !this.dashTrail.length) return;
+
+  imageMode(CENTER);
+
+  for (let i = 0; i < this.dashTrail.length; i++) {
+    const { pos, dir } = this.dashTrail[i];
+
+    // 透明度 & 尺寸渐隐
+    const alpha = map(i, 0, this.dashTrail.length, 40, 255);
+   const size = map(i, 0, this.dashTrail.length,
+                 this.player.r * this.trailSizeHead,
+                 this.player.r * this.trailSizeTail)
+             * this.trailSizeMul;
+
+    push();
+    translate(pos.x, pos.y);
+    if (dir === "left") scale(-1, 1);
+    tint(255, alpha);
+    image(this.trailImg, 0, 0, size, size);
+    pop();
+  }
+  noTint();
+ }
   
 
   checkDashDamage() {
