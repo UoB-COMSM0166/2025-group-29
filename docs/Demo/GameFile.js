@@ -1380,7 +1380,7 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-
+/*
     // 刷敌人
     let minSpawnDistance = player.r * 10;
 
@@ -1390,11 +1390,11 @@ class Level3 extends BaseLevel {
       enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
     }
 
-    /*// StealthEnemy
+    // StealthEnemy
     for (let i = 0; i < 4; i++) {
       let stealthPos = generateValidEnemyPosition(minSpawnDistance);
       enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-    }*/
+    }
 
     // FollowEnemy
     for (let i = 0; i < 5; i++) {
@@ -1406,7 +1406,7 @@ class Level3 extends BaseLevel {
     for (let i = 0; i < 10; i++) {
       let pos = generateOutsideViewPosition();
       enemies.push(new CommonEnemy(pos.x, pos.y));
-    }
+    }*/
 
     // 刷黑洞
     for (let i = 0; i < 2; i++) {
@@ -1436,7 +1436,7 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(6); // ✅ 每帧尝试生成隐身怪
+        updateStealthSpawn(2); // ✅ 每帧尝试生成隐身怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -2186,47 +2186,51 @@ class StealthEnemy extends Enemy {
 
     this.visibility = 0;
     this.detectRange = 300;
-    this.chaseRange = 250;
-    this.hideRange = 200;
+    this.chaseRange = 200;
     this.isChasing = false;
     this.stealthSpeed = 3;
-    this.slowSpeed = 1.5;
+    this.slowSpeed = 2;
     this.target = createVector(random(width * 2) - width, random(height * 2) - height); // ✅ 必须初始化
   }
 
   update() {
-    this.applySeparation(enemies); // 加入防重叠行为
+  this.applySeparation(enemies);
 
-    let distance = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
+  let distance = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
 
-    if (distance < this.chaseRange) {
-      this.isChasing = true;
-      this.visibility = min(this.visibility + 15, 255);
-    } else if (distance < this.detectRange) {
-      this.isChasing = false;
-      this.visibility = min(this.visibility + 10, 255);
-    } else if (distance > this.hideRange) {
-      this.isChasing = false;
-      this.visibility = max(this.visibility - 15, 0);
-    }
-
-    let dir;
-    if (this.isChasing) {
-      const stopDistance = this.r + player.r;
-      if (distance > stopDistance) {
-        dir = p5.Vector.sub(player.pos, this.pos);
-        dir.setMag(this.stealthSpeed);
-        this.pos.add(dir);
-      }
-    } else {
-      // 非追击状态：阴暗尾随玩家，速度较慢，
-      dir = p5.Vector.sub(player.pos, this.pos);
-      dir.setMag(this.slowSpeed);
-      this.pos.add(dir);
-    }
-
-    super.update(); // 死亡检测
+  // ✅ 显隐逻辑（控制透明度）
+  if (distance < this.chaseRange) {
+    this.visibility = min(this.visibility + 20, 255);
+  } else if (distance < this.detectRange) {
+    this.visibility = min(this.visibility + 5, 255);
+  } else {
+    this.visibility = max(this.visibility - 5, 0);
   }
+
+  // ✅ 行为逻辑（控制移动）
+  let dir;
+  if (distance < this.chaseRange) {
+    this.isChasing = true;
+    dir = p5.Vector.sub(player.pos, this.pos);
+    dir.setMag(this.stealthSpeed); // 快速追击
+    this.pos.add(dir);
+  } else if (distance < this.detectRange) {
+    this.isChasing = false;
+    if (frameCount % 60 === 0) {
+      this.target = createVector(random(width * 2) - width, random(height * 2) - height);
+    }
+    dir = p5.Vector.sub(this.target, this.pos);
+    dir.setMag( this.slowSpeed); // 普通游走
+    this.pos.add(dir);
+  } else {
+    this.isChasing = false;
+    dir = p5.Vector.sub(player.pos, this.pos);
+    dir.setMag( this.slowSpeed); // 慢速尾随
+    this.pos.add(dir);
+  }
+
+  super.update();
+}
 
   applySeparation(others) {
     let separationForce = createVector(0, 0);
@@ -2263,7 +2267,19 @@ class StealthEnemy extends Enemy {
       // 完全隐身时不绘制
       if (this.visibility === 0) return;
     
-      push();
+      push(); 
+       // 🟣 显示紫色感应范围圆圈（调试用）
+      noFill();
+      stroke(150, 0, 255, 255); // 低透明紫色
+      strokeWeight(1);
+      ellipse(this.pos.x, this.pos.y, this.detectRange * 2);
+
+      noFill();
+      stroke(255, 0, 0, 255); // 
+      strokeWeight(1);
+      ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
+
+
       fill(150, 0, 255, this.visibility);
       ellipse(this.pos.x, this.pos.y, this.r * 2);
     
