@@ -2463,10 +2463,14 @@ if (distance < this.chaseRange) {
       ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
       
 
+      //this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
+       // ✅ 显隐贴图绘制
+      tint(255, this.visibility);
       this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
-    
+      noTint(); // 清除 tint 状态
+
       // 血条只在可见状态下绘制（并共享透明度）
-      if (this.visibility > 0) {
+      if (dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y) <= this.chaseRange) {
         this.hp.draw(this.pos.x, this.pos.y, this.r);
       }
     
