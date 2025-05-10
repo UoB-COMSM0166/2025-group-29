@@ -3936,7 +3936,11 @@ class Bullet {
     this.pos = pos.copy();
     this.r = 12;
     this.speed = 6;
-    this.direction = direction.copy().normalize();
+    this.direction = direction.copy();
+    if (this.direction.mag() === 0) {
+    this.direction = createVector(1, 0);  // 默认方向
+    }
+    this.direction.normalize();
     this.isReflected = false;
     this.alive = true;
   }
@@ -3965,7 +3969,15 @@ class Bullet {
 
   reflect() {
     this.isReflected = true;
-    this.direction.mult(-1); // 原路返回
+    // 1. 安全反向（防止方向为 0）
+  if (this.direction.mag() === 0) {
+    this.direction = createVector(-1, 0); // 默认反向
+  } else {
+    this.direction.mult(-1);
+  }
+
+  // 2. 立即小幅偏移避免连锁碰撞
+  this.pos.add(p5.Vector.mult(this.direction, this.r * 1.5));
   }
 }
 
@@ -4050,7 +4062,7 @@ class CollisionManager {
     for (let bullet of this.bullets) {
       
       if (this.checkCollision(this.player, bullet)) {
-        if (this.player.isReflecting) {
+        if (this.player.isReflecting && !bullet.isReflected) {
           bullet.reflect(); // 开启反弹
           continue;         // 跳过后续伤害处理
         }
