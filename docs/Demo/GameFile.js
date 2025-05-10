@@ -1816,20 +1816,25 @@ class Player {
 
     this.selectedSkills = []; // 玩家已装备的技能
 
-    //普攻和静态判断
-  this.lastDirection = "right";  // 记录朝向
-  this.isAttacking   = false;    // 攻击动画中
-  this.attackImage   = null;     // 当前播放的 gif
+      //普攻和静态判断
+    this.lastDirection = "right";  // 记录朝向
+    this.isAttacking   = false;    // 攻击动画中
+    this.attackImage   = null;     // 当前播放的 gif
 
-  this.isCharging = false;
-  this.damageMultiplier = 1; // 默认受伤为100%
+    this.isCharging = false;
+    this.damageMultiplier = 1; // 默认受伤为100%
 
-  //新增流派系统
-  this.faction   = "normal";              // <- 初始流派
-  this.spriteMgr = new SpriteManager(this);
-  
-  this.pendingBonusShield = 0; // 存储由电击被动转化的护盾值
-  this.isInBloodFury = false; // 是否处于血怒状态
+    //新增流派系统
+    this.faction   = "normal";              // <- 初始流派
+    this.spriteMgr = new SpriteManager(this);
+    
+    this.pendingBonusShield = 0; // 存储由电击被动转化的护盾值
+    this.isInBloodFury = false; // 是否处于血怒状态
+
+    this.defaultSpeed = 4;           // 你的正常速度值（按需修改）
+    this.inBlackHole = false;        // 是否在黑洞内
+    this.blackHoleExitTime = null;   // 上次退出黑洞的时间
+
 }
 
   
@@ -1887,7 +1892,13 @@ class Player {
     this.pos.y = constrain(this.pos.y, -height + this.r, height - this.r);
     
     
-    
+    if (this.blackHoleExitTime) {
+    if (millis() - this.blackHoleExitTime > 6000) {  // 8秒
+      this.speed = this.defaultSpeed;  // 恢复速度
+      this.blackHoleExitTime = null;   // 清除定时器
+    }
+  }
+
     
     
     
@@ -4156,6 +4167,11 @@ class BlackHole {
     this.safeRadius = safeRadius;   // 玩家进入此范围变状态
     this.dangerRadius = dangerRadius;  // 判定为“在黑洞里”的范围
     this.sparkList = [];
+
+    // this.defaultSpeed = 4;           // 你的正常速度值（按需修改）
+    // this.inBlackHole = false;        // 是否在黑洞内
+    // this.blackHoleExitTime = null;   // 上次退出黑洞的时间
+
   }
 
   update( player ) {
@@ -4165,9 +4181,22 @@ class BlackHole {
     if ( d < this.dangerRadius ) {
       if ( this.state !== "active") this.state = "active";
       this.applyEffects(player);
+
+    // 标记玩家处于黑洞中
+    if (this.type === "danger") {
+    player.inBlackHole = true;
+    }
+
+
     } else {
       this.state = "idle";
-    }
+
+    // 离开危险黑洞时记录退出时间
+    if (this.type === "danger" && player.inBlackHole) {
+    player.inBlackHole = false;
+    player.blackHoleExitTime = millis(); // 记录时间
+  }
+  }
 
 
     // 添加火花粒子
@@ -4190,6 +4219,9 @@ class BlackHole {
         this.sparkList.splice(i, 1);
       }
     }
+
+
+
   }
 
   applyEffects(player) {
