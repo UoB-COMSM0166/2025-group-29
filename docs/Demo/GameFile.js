@@ -103,6 +103,8 @@ let remainingTime; // 剩余时间（秒）
 let stealthTimer = 0;
 let ambushTimer = 0;
 
+let isHardMode = false;
+
 let pauseMenuActive = false;
 
 
@@ -1058,8 +1060,22 @@ class BaseLevel {
         }
     }
 }
-  
-
+  updateBlackHoles() {
+  // 黑洞更新（可为空）
+  for (let bh of this.blackHoles || []) {
+    bh.update(player);
+    bh.show();
+  } 
+}
+  updateBullets() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      bullets[i].update();
+      bullets[i].show();
+      if (!bullets[i].alive) {
+        bullets.splice(i, 1);
+      }
+    }
+  }
 
   // 通用结算画面
   showSummaryScreen() {
@@ -1212,16 +1228,6 @@ class Level1 extends BaseLevel {
           // 结算分数
           this.finalizeScore();
 
-      }
-  
-  
-      // 更新子弹（如果有的话）
-      for (let i = bullets.length - 1; i >= 0; i--) {
-          bullets[i].update();
-          bullets[i].show();
-          if (!bullets[i].alive) {
-              bullets.splice(i, 1);
-          }
       }
   
       // 判断敌人是否清空 & 时间是否还在倒计时中
@@ -1396,12 +1402,6 @@ class Level2 extends BaseLevel {
 
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
-    // AmbushEnemy
-    for (let i = 0; i < 4; i++) {
-        let ambushPos = generateValidEnemyPosition(300);
-        enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
-    }
-
     // FollowEnemy
     for (let i = 0; i < 5; i++) {
         let followPos = generateOutsideViewPosition();
@@ -1432,7 +1432,9 @@ class Level2 extends BaseLevel {
   update() {
     super.update();
     if (this.stage === 1) {
-        // 检查黑洞提示是否触发
+      updateAmbushSpawn (4); // ✅ 每帧尝试生成伏击怪
+        
+      // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
             gamePaused = true;
             this.tip = "Seek out the black holes🌀— some heal, some hurt!";
@@ -1451,23 +1453,9 @@ class Level2 extends BaseLevel {
             this.finalizeScore();
         }
 
+        this.updateBlackHoles();  // 更新黑洞
+
         
-
-        // 更新黑洞
-        for (let bh of this.blackHoles) {
-            bh.update(player);
-            bh.show();
-        }
-
-
-        // 更新子弹
-        for (let i = bullets.length - 1; i >= 0; i--) {
-            bullets[i].update();
-            bullets[i].show();
-            if (!bullets[i].alive) {
-                bullets.splice(i, 1);
-            }
-        }
     }
 }
   
@@ -1536,25 +1524,13 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-/*
+
     // 刷敌人
     let minSpawnDistance = player.r * 10;
 
-    // AmbushEnemy
-    for (let i = 0; i < 4; i++) {
-      let ambushPos = generateValidEnemyPosition(minSpawnDistance);
-      enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
-    }
-
-    // StealthEnemy
-    for (let i = 0; i < 4; i++) {
-      let stealthPos = generateValidEnemyPosition(minSpawnDistance);
-      enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-    }
-
     // FollowEnemy
     for (let i = 0; i < 5; i++) {
-      let followPos = generateValidEnemyPosition(minSpawnDistance);
+      let followPos = generateOutsideViewPosition();
       enemies.push(new FollowEnemy(followPos.x, followPos.y));
     }
 
@@ -1562,7 +1538,7 @@ class Level3 extends BaseLevel {
     for (let i = 0; i < 10; i++) {
       let pos = generateOutsideViewPosition();
       enemies.push(new CommonEnemy(pos.x, pos.y));
-    }*/
+    }
 
     // 刷黑洞
     for (let i = 0; i < 2; i++) {
@@ -1605,20 +1581,7 @@ class Level3 extends BaseLevel {
       }
 
 
-      // 更新黑洞
-      for (let bh of this.blackHoles) {
-        bh.update(player);
-        bh.show();
-      }
-
-      // 更新子弹
-      for (let i = bullets.length - 1; i >= 0; i--) {
-        bullets[i].update();
-        bullets[i].show();
-        if (!bullets[i].alive) {
-          bullets.splice(i, 1);
-        }
-      }
+     this.updateBlackHoles();  // 更新黑洞
 }        
   }
 
@@ -1687,21 +1650,10 @@ class Level4 extends BaseLevel{
         enemies.push(new BulletEnemy(pos.x, pos.y, 35));
       }
   
-      /*// AmbushEnemy
-      for (let i = 0; i < 4; i++) {
-        let ambushPos = generateValidEnemyPosition(minSpawnDistance);
-        enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
-      }
-  
-      // StealthEnemy
-      for (let i = 0; i < 4; i++) {
-        let stealthPos = generateValidEnemyPosition(minSpawnDistance);
-        enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-      }
   
       // FollowEnemy
       for (let i = 0; i < 5; i++) {
-        let followPos = generateValidEnemyPosition(minSpawnDistance);
+        let followPos = generateOutsideViewPosition();
         enemies.push(new FollowEnemy(followPos.x, followPos.y));
       }
   
@@ -1709,7 +1661,7 @@ class Level4 extends BaseLevel{
       for (let i = 0; i < 10; i++) {
         let pos = generateOutsideViewPosition();
         enemies.push(new CommonEnemy(pos.x, pos.y));
-      }*/
+      }
   
       // 刷黑洞
       for (let i = 0; i < 2; i++) {
@@ -1750,24 +1702,9 @@ update() {
     }
 
 
-    // 更新黑洞
-    for (let bh of this.blackHoles) {
-      bh.update(player);
-      bh.show();
-    }
+     this.updateBlackHoles();  // 更新黑洞
 
-    // 更新子弹
-    for (let i = bullets.length - 1; i >= 0; i--) {
-      bullets[i].update();
-      bullets[i].show();
-      if (!bullets[i].alive) {
-        bullets.splice(i, 1);
-      }
-    }
-
-  
-
-
+     this.updateBullets();  // 更新子弹
   }
 }
 
@@ -2127,6 +2064,11 @@ class Player {
   }
 
   receiveDamage(rawDamage) {
+    // 应用困难难度倍率
+    if (isHardMode) {
+    rawDamage *= 1.5;
+    }
+  
     // 1️⃣ 技能优先判断（如限量护盾/反弹）
     for (let skill of this.selectedSkills) {
       if (skill.absorbDamage && skill.absorbDamage(rawDamage)) {
@@ -2398,7 +2340,7 @@ class StealthEnemy extends Enemy {
 
     this.visibility = 0;
     this.detectRange = 350;
-    this.chaseRange = 150;
+    this.chaseRange = 200;
     this.isChasing = false;
     this.stealthSpeed = 3;
     this.slowSpeed = 2;
@@ -2431,11 +2373,9 @@ if (distance < this.chaseRange) {
   } else if (distance < this.detectRange) {
     this.isChasing = false;
     this.needsRepositioned = false;
-    if (frameCount % 60 === 0) {
-      this.target = createVector(random(width * 2) - width, random(height * 2) - height);
-    }
-    dir = p5.Vector.sub(this.target, this.pos);
-    dir.setMag( this.slowSpeed); // 普通游走
+    // 慢速跟随
+    dir = p5.Vector.sub(player.pos, this.pos);
+    dir.setMag(this.slowSpeed); 
     this.pos.add(dir);
   } else {
     this.isChasing = false;
@@ -2499,7 +2439,7 @@ if (distance < this.chaseRange) {
       if (this.visibility === 0) return;
     
       push(); 
-       // 🟣 显示紫色感应范围圆圈（调试用）
+       /*// 🟣 显示紫色感应范围圆圈（调试用）
       noFill();
       stroke(150, 0, 255, 255); // 低透明紫色
       strokeWeight(1);
@@ -2509,7 +2449,7 @@ if (distance < this.chaseRange) {
       stroke(255, 0, 0, 255); // 
       strokeWeight(1);
       ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
-      
+      */
 
       //this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
        // ✅ 显隐贴图绘制
@@ -4579,7 +4519,7 @@ class BlackHole {
     if (this.type == "danger") {
 
 
-      player.hp.takeDamage(0.2); // 每帧小幅掉血
+      player.receiveDamage(0.2); // 每帧小幅掉血
       // 用 player.isInvincible 判断冲刺状态
       if (!player.isInvincible && player.speed > 2) {
         player.speed = 2;
