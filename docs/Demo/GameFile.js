@@ -1901,6 +1901,54 @@ class Level5 extends BaseLevel{
     }
   }
 
+  getFinalRank(score) {
+  if (score >= 1500) return 'S';
+  if (score >= 1000) return 'A';
+  return 'B';
+}
+
+  getFinalComment(rank) {
+  switch (rank) {
+    case 'S': return "S for Space legend!";
+    case 'A': return "A for Almost perfect.";
+    case 'B': return "Aliens laughed, but some died.";
+    default:  return "";
+  }
+}
+
+  showSummaryScreen() {
+  fill(0, 180);
+  rect(0, 0, windowWidth, windowHeight);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+
+  textSize(28);
+  text(`Total Score: ${this.totalScore}`, windowWidth / 2, windowHeight / 2 - 60);
+
+  const rank = this.getFinalRank(this.totalScore);
+  const comment = this.getFinalComment(rank);
+
+  textSize(36);
+  text(`Your Rank: ${rank}`, windowWidth / 2, windowHeight / 2 + 0);
+
+  textSize(24);
+  text(comment, windowWidth / 2, windowHeight / 2 + 50);
+
+  textSize(20);
+  text(`Press M to return to main menu`, windowWidth / 2, windowHeight / 2 + 110);
+}
+
+handleKeyPressed(key) {
+  // 游戏完成后允许 M 返回主页
+  if (this.finished && (key === 'M' || key === 'm')) {
+    window.location.href = 'index.html'; // ⬅️ 改为你的主菜单路径
+    return;
+  }
+
+  // 其他按键交给父类处理（保存、继续等）
+  super.handleKeyPressed(key);
+}
 
 
 
