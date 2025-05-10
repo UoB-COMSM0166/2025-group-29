@@ -43,6 +43,7 @@ let enemies = [];
 let zoom = 1;
 let gameOver = false;
 let score; // 记录得分
+let resumeScore = null;
 let timer = 60; // 设定倒计时时间（秒）
 let startTime; // 记录游戏开始的时间
 
@@ -627,7 +628,7 @@ function showGameOverScreen() {
 function keyPressed() {
   keys[key] = true; // 记录按下的按键
 
-  if (key === 'R' || key === 'r') { // 按 R 重新开始
+  if ((key === 'R' || key === 'r') && gameOver ) { // 按 R 重新开始
     restartGame();
   }
 
@@ -677,7 +678,7 @@ function keyReleased() {
   gameOver = false;
   player.hp.currentHP = player.hp.maxHP;  // 复活时满血（保险）
   player.hp.isDead = false; // 重置死亡状态
-  score = 0;                               // 保留分数 or 重置，看需要
+  resumeScore = score;                              // 保留分数 or 重置，看需要
   startTime = millis();
 
   player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
@@ -880,10 +881,18 @@ class BaseLevel {
     bullets.length = 0;
     timeBonuses.length = 0;
 
-    // if (typeof score !== 'undefined') {
-    //     score = this.startingScore;  // 继承上一关的 totalScore 作为新关的起点
-    // }
+
+    // score = this.startingScore || 0;
+    // 优先使用 resumeScore，如果没有才使用 startingScore
+  if (resumeScore !== null) {
+    score = resumeScore;
+    console.log("使用 resumeScore 恢复分数:", score);
+    resumeScore = null;  // 用过一次就清空，防止影响后续关卡
+  } else {
     score = this.startingScore || 0;
+    console.log("使用 startingScore 初始化分数:", score);
+}
+
 
   }
 
