@@ -130,7 +130,8 @@ let ambushactive_gif;
 let stealth_gif;
 let bulletenemy_gif;
 let common_gif;
-
+let bossBulletImg;
+let enemyBulletImg;
 
 function preload() {
 
@@ -148,7 +149,7 @@ function preload() {
   skillIcons["反弹"] = null;
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
-  bulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
+  bossBulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
   //loadImage("弹幕1.gif");
   //这里的注释是为了测试方便，加载图片不是必须的，传入null可以只测试代码功能。
   bulletReflectedImg = loadImage("assets/media/bullet/Character-rebound-bullet.gif");
@@ -211,7 +212,7 @@ function preload() {
   stealth_gif = loadImage("assets/media/monster/Invisible-monster.gif");
   bulletenemy_gif = loadImage("assets/media/monster/Danmaku-monster.gif");
   common_gif = loadImage("assets/media/monster/normal-monster.gif");
-
+  enemyBulletImg = loadImage("assets/media/bullet/Monster-bullet.gif");
 
 }
 
@@ -2573,7 +2574,7 @@ class BulletEnemy extends Enemy {
     }
 
     for (let dir of directions) {
-      bullets.push(new Bullet(this.pos.copy(), dir));
+      bullets.push(new Bullet(this.pos.copy(), dir, "enemy"));
     }
   }
 
@@ -2663,7 +2664,7 @@ class Boss extends Enemy {
     super(x, y);
 
     /* ───── 基本属性 ───── */
-    this.r  = 50;
+    this.r  = 100;
     this.hp = new HPSystem(100);
     this.contactDamage = 40;
 
@@ -2731,10 +2732,10 @@ class Boss extends Enemy {
 
     //统一管理技能触发
     this.unlockedSkills = [];          // [ 'earthquake', 'barrage', ... ]
-this.waitingForNext  = false;      // 正在空白期，等下一个技能触发
-this.idleStart       = 0;          // 空白期开始时刻
-this.idleDelay       = 4000;       // 空白期长度 (ms)
-this.currentSkill    = null;       // 正在执行的技能名字
+    this.waitingForNext  = false;      // 正在空白期，等下一个技能触发
+    this.idleStart       = 0;          // 空白期开始时刻
+    this.idleDelay       = 4000;       // 空白期长度 (ms)
+    this.currentSkill    = null;       // 正在执行的技能名字
   }
 
   /* ──────────────────────── 召唤伏击怪 ─ */
@@ -2836,7 +2837,7 @@ this.currentSkill    = null;       // 正在执行的技能名字
           let dir = d + this.towerAngleOffset;
           for (let s = -spreadSteps; s <= spreadSteps; s++) {
             let ang = dir + s * spreadAngle;
-            let b = new Bullet(this.pos.copy(), p5.Vector.fromAngle(ang));
+            let b = new Bullet(this.pos.copy(), p5.Vector.fromAngle(ang), "boss");
             b.r = 15;       // 子弹半径
             bullets.push(b);
           }
@@ -3175,6 +3176,7 @@ cleanupTower() {
   }
 
   show() {
+    const S = 1.2;
     if (this.exploding && this.explosion) { super.show(); return; }
 
     /* 先画震波，以免被 Boss 本体挡住 */
@@ -3201,7 +3203,7 @@ pop();
 
     if(this.bhActive){
       
-      const S = 0.4;
+      
       image(
         this.bhGif,
         this.pos.x, this.pos.y,
@@ -3238,12 +3240,11 @@ if (this.dashPhase === 'explode') {
      
       // 先画 idle 背景（或一个底图）
       if (this.idleImg) {
-        const S0 = 0.4;
         image(
           this.idleImg,
           this.pos.x, this.pos.y,
-          this.idleImg.width  * S0,
-          this.idleImg.height * S0
+          this.idleImg.width  * S,
+          this.idleImg.height * S
         );
       } else {
         fill(255, 140, 0);
@@ -3254,7 +3255,6 @@ if (this.dashPhase === 'explode') {
        || this.dashPhase === 'dashing'
        || this.dashPhase === 'hold'
       ) {
-        const S = 0.4;
         image(
           this.dashGif,
           this.pos.x, this.pos.y,
@@ -3265,7 +3265,6 @@ if (this.dashPhase === 'explode') {
       pop();
     }
     else if (this.waveActive && this.bossWaveGif) {
-      const S = 0.4;  // 或根据需要再调
       image(
         this.bossWaveGif,
         this.pos.x, this.pos.y,
@@ -3274,7 +3273,6 @@ if (this.dashPhase === 'explode') {
       );
     /* 召唤中用 summonGif，否则用 idleImg / fallback */  
     }else if (this.towerActive && this.bossTowerGif) {
-      const S = 0.4;
       image(
         this.bossTowerGif,
         this.pos.x, this.pos.y,
@@ -3285,11 +3283,9 @@ if (this.dashPhase === 'explode') {
     // ─── 原有 summon/idle/fallback 分支 ───
     }else if (this.summoning) {
       /* 召唤 GIF */
-      const S = 0.4;
       image(this.summonGif, this.pos.x, this.pos.y,
             this.summonGif.width*S, this.summonGif.height*S);
     } else if (this.idleImg) {
-      const S = 0.4;
       image(this.idleImg, this.pos.x, this.pos.y,
             this.idleImg.width*S, this.idleImg.height*S);
     } else {
@@ -4210,7 +4206,7 @@ if (totalDamage > 0) {
 
 //弹幕
 class Bullet {
-  constructor(pos, direction) {
+  constructor(pos, direction, sourceType = "enemy") {
     this.pos = pos.copy();
     this.r = 12;
     this.speed = 6;
@@ -4221,6 +4217,7 @@ class Bullet {
     this.direction.normalize();
     this.isReflected = false;
     this.alive = true;
+    this.sourceType = sourceType;  // 🔥 新增字段，记录是谁发射的
   }
 
   update() {
@@ -4236,12 +4233,13 @@ class Bullet {
   show() {
     imageMode(CENTER);
     if (this.isReflected && bulletReflectedImg) {
-      image(bulletReflectedImg, this.pos.x, this.pos.y, this.r * 2, this.r * 2);
-    } else if (!this.isReflected && bulletImg) {
-      image(bulletImg, this.pos.x, this.pos.y, this.r * 2, this.r * 2);
+      image(bulletReflectedImg, this.pos.x, this.pos.y, this.r * 5, this.r * 5);
     } else {
-      fill(this.isReflected ? [0, 255, 255] : [255, 0, 255]);
-      ellipse(this.pos.x, this.pos.y, this.r * 2);
+      if (this.sourceType === "boss" && bossBulletImg) {
+        image(bossBulletImg, this.pos.x, this.pos.y, this.r * 3.5, this.r * 3.5);
+      } else if (this.sourceType === "enemy" && enemyBulletImg) {
+        image(enemyBulletImg, this.pos.x, this.pos.y, this.r * 7, this.r * 7);
+      } 
     }
   }
 
@@ -4991,12 +4989,9 @@ class Tower extends Enemy {
       if (this.gif) {
         push();
         imageMode(CENTER);
-        image(this.gif, this.pos.x, this.pos.y, this.r*2, this.r*2);
+        image(this.gif, this.pos.x, this.pos.y, this.r*3.5, this.r*3.5);
         pop();
-      } else {
-        fill(100);
-        ellipse(this.pos.x, this.pos.y, this.r*2);
-      }
+      } 
       this.hp.draw(this.pos.x, this.pos.y, this.r);
     }
   }
