@@ -1837,6 +1837,22 @@ class Level5 extends BaseLevel{
           this.finalizeScore();
       }
     }
+
+    if (!this.finished && boss && boss.hp.isDead) {
+      this.finished = true;
+      this.tip = "Victory!";
+      this.finalizeScore(); // 正常计算 totalScore
+  }
+
+
+
+
+
+  }
+
+
+  onTimeUp() {
+    
   }
 
   getFinalRank(score) {
