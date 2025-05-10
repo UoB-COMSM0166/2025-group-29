@@ -2607,7 +2607,7 @@ class Boss extends Enemy {
     super(x, y);
 
     /* ───── 基本属性 ───── */
-    this.r  = 100;
+    this.r  = 115;
     this.hp = new HPSystem(100);
     this.contactDamage = 40;
 
@@ -4337,7 +4337,7 @@ class MeleeAttack {
     this.currentFrame = 0;
     this.frameDuration = 100;      // 每帧时长 ms
     this.frameStartTime = 0;
-    this.damageDone = false;       // 当帧到达时只造成一次伤害
+    this.hitEnemies = new Set(); // ✅ 每次攻击开始前清空
   }
 
   trigger() {
@@ -4349,7 +4349,7 @@ class MeleeAttack {
     this.inProgress    = true;
     this.currentFrame  = 0;
     this.frameStartTime= millis();
-    this.damageDone    = false;
+    this.hitEnemies.clear(); // ✅ 初始化已击中敌人列表
     this.player.isAttacking = true;   // 切到攻击 GIF流派系统改动
   }
 
@@ -4362,18 +4362,8 @@ class MeleeAttack {
       this.frameStartTime += this.frameDuration;
     }
 
-      // 在第1帧造成一次伤害
-      if (this.currentFrame === 0 && !this.damageDone) {
-        this.dealDamage();
-        this.damageDone = true;
-      }
-  
-
-    // 在第 2 帧造成一次伤害
-    if (this.currentFrame === 1 && !this.damageDone) {
-      this.dealDamage();
-      this.damageDone = true;
-    }
+      // 每帧都判伤，但只判一次每个敌人
+    this.dealDamage(this.currentFrame);
 
   
     // 4 帧完毕后，恢复 Idle
@@ -4452,55 +4442,46 @@ class MeleeAttack {
   }
 
   // 伤害判定
-  dealDamage() {
+  dealDamage(frame) {
     const C      = this.player.pos;
     const dirAng = this.player.lastDirection === "left" ? PI : 0;
     const arcAng = radians(240);
-    const R      = 60 * (1 + 1 * 0.25); // 在帧 1 时的实际半径
+    const baseR  = 60;
+    const R      = baseR * (1 + frame * 0.3);  // ✅ 动态半径
 
-    let totalDamage = 0; // ✅ 初始化总伤害
+    let totalDamage = 0;
 
     for (let e of this.enemies) {
       if (!e.hp || !e.hp.isAlive()) continue;
+      if (this.hitEnemies.has(e)) continue;
 
-      // 距离判定
       const d = dist(C.x, C.y, e.pos.x, e.pos.y);
       if (d > R + e.r) continue;
 
-      // 方向判定
       let ang = atan2(e.pos.y - C.y, e.pos.x - C.x);
-      let diff = (ang - dirAng + PI*3) % (PI*2) - PI; 
-      if (abs(diff) <= arcAng/2) {
-
-        // ✅ 使用统一伤害计算器
+      let diff = (ang - dirAng + PI * 3) % (PI * 2) - PI;
+      if (abs(diff) <= arcAng / 2) {
         const attackInfo = {
-        source: "melee",                          // 普通攻击
-        player: this.player,
-        baseDamage: this.player.buffAttack,      //
-        target: e
-      };
-
-      let damageDone = DamageCalculator.calculate(attackInfo);
-      totalDamage += damageDone; // ✅ 累加到总伤害
-      console.log(`Melee hit! 敌人扣血 ${damageDone}`);
-
+          source: "melee",
+          player: this.player,
+          baseDamage: this.player.buffAttack,
+          target: e
+        };
+        let damageDone = DamageCalculator.calculate(attackInfo);
+        totalDamage += damageDone;
+        this.hitEnemies.add(e);
+        console.log(`Melee hit! 第${frame + 1}帧 - 敌人扣血 ${damageDone}`);
       }
     }
 
-    // ✅ 攻击结束，报告总伤害值
-  if (totalDamage > 0) {
-    console.log(`✅ 本次普攻总伤害: ${totalDamage}`);
-
-    for (let skill of this.player.selectedSkills) {
-      if (skill instanceof LifestealSkill) {
-        skill.onDamageDealt(totalDamage, "melee"); // 或 "melee"、"charged"
+    if (totalDamage > 0) {
+      console.log(`✅ 第 ${frame + 1} 帧：总伤害 ${totalDamage}`);
+      for (let skill of this.player.selectedSkills) {
+        if (skill instanceof LifestealSkill) {
+          skill.onDamageDealt(totalDamage, "melee");
+        }
       }
     }
-    
-
-  }
-    
-  
   }
 }
 
