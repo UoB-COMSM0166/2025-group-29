@@ -2282,7 +2282,7 @@ class StealthEnemy extends Enemy {
       if (this.visibility === 0) return;
     
       push(); 
-       // 🟣 显示紫色感应范围圆圈（调试用）
+      /* // 🟣 显示紫色感应范围圆圈（调试用）
       noFill();
       stroke(150, 0, 255, 255); // 低透明紫色
       strokeWeight(1);
@@ -2292,7 +2292,7 @@ class StealthEnemy extends Enemy {
       stroke(255, 0, 0, 255); // 
       strokeWeight(1);
       ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
-
+      */
 
       fill(150, 0, 255, this.visibility);
       ellipse(this.pos.x, this.pos.y, this.r * 2);
