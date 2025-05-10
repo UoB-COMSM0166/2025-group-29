@@ -2368,9 +2368,12 @@ if (distance < this.chaseRange) {
   if (distance < this.chaseRange) {
     this.isChasing = true;
     this.needsRepositioned = false;
-    dir = p5.Vector.sub(player.pos, this.pos);
+     let minDist = this.r + player.r;
+    if (distance >= minDist) {
+    let dir = p5.Vector.sub(player.pos, this.pos);
     dir.setMag(this.stealthSpeed); // 快速追击
     this.pos.add(dir);
+    }
   } else if (distance < this.detectRange) {
     this.isChasing = false;
     this.needsRepositioned = false;
