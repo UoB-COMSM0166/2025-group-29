@@ -3131,10 +3131,21 @@ cleanupTower() {
     push();
     imageMode(CENTER);
     
-// 再画所有黑洞实例
+    function resetDrawingStyle() {
+      fill(255);
+      stroke(0);
+      strokeWeight(1);
+      imageMode(CORNER);  // 避免 imageMode(CENTER) 残留
+    }
+// ✅ 黑洞绘制隔离：防止染色污染
+push();
 for (let bh of this.blackHoles) {
-  bh.show();    // 如果 BlackHole 类里有 show 方法
+  push();                     // 每个黑洞独立 push
+  resetDrawingStyle();        // 可选：重置样式
+  bh.show();                  // 黑洞绘制
+  pop();
 }
+pop();
 
     if(this.bhActive){
       
