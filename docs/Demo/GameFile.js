@@ -3399,7 +3399,6 @@ class AttackBoostSkill extends Skill {
   castSkillEffect() {
     console.log("快速攻击发动！攻击力提升3秒");
     this.player.buffAttack = 30; // 技能发动时，攻击力变成30
-
     setTimeout(() => {
       this.player.buffAttack = player.baseAttack; // 3秒后恢复原来的基础攻击
       console.log("攻击加成结束，恢复基础伤害");
