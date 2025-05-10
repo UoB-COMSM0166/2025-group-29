@@ -1436,7 +1436,7 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(8); // ✅ 每帧尝试生成隐身怪
+        updateStealthSpawn(6); // ✅ 每帧尝试生成隐身怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -1536,11 +1536,11 @@ class Level4 extends BaseLevel{
         enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y));
       }
   
-      // StealthEnemy
+      /*// StealthEnemy
       for (let i = 0; i < 4; i++) {
         let stealthPos = generateValidEnemyPosition(minSpawnDistance);
         enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y));
-      }
+      }*/
   
       // FollowEnemy
       for (let i = 0; i < 5; i++) {
@@ -1580,6 +1580,7 @@ class Level4 extends BaseLevel{
 update() {
   super.update();
   if (this.stage === 1) {
+    updateStealthSpawn(8);
     // 检查完成
     if (!this.finished && remainingTime <= 0) {
       this.stage = 2;
@@ -2171,11 +2172,11 @@ class StealthEnemy extends Enemy {
 
     this.visibility = 0;
     this.detectRange = 300;
-    this.chaseRange = 200;
-    this.hideRange = 350;
+    this.chaseRange = 250;
+    this.hideRange = 200;
     this.isChasing = false;
-    this.stealthspeed = 2;
-    this.speed = 1.5;
+    this.stealthSpeed = 3;
+    this.slowSpeed = 1.5;
     this.target = createVector(random(width * 2) - width, random(height * 2) - height); // ✅ 必须初始化
   }
 
@@ -2186,7 +2187,7 @@ class StealthEnemy extends Enemy {
 
     if (distance < this.chaseRange) {
       this.isChasing = true;
-      this.visibility = min(this.visibility + 20, 255);
+      this.visibility = min(this.visibility + 15, 255);
     } else if (distance < this.detectRange) {
       this.isChasing = false;
       this.visibility = min(this.visibility + 10, 255);
@@ -2200,15 +2201,13 @@ class StealthEnemy extends Enemy {
       const stopDistance = this.r + player.r;
       if (distance > stopDistance) {
         dir = p5.Vector.sub(player.pos, this.pos);
-        dir.setMag(this.stealthspeed);
+        dir.setMag(this.stealthSpeed);
         this.pos.add(dir);
       }
     } else {
-      if (frameCount % 60 === 0) {
-        this.target = createVector(random(width * 2) - width, random(height * 2) - height);
-      }
-      dir = p5.Vector.sub(this.target, this.pos);
-      dir.setMag(this.speed);
+      // 非追击状态：阴暗尾随玩家，速度较慢，
+      dir = p5.Vector.sub(player.pos, this.pos);
+      dir.setMag(this.slowSpeed);
       this.pos.add(dir);
     }
 
