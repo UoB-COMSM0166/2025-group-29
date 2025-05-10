@@ -101,6 +101,9 @@ let gamePaused = false;
 
 let remainingTime; // 剩余时间（秒）
 
+let pauseMenuActive = false;
+
+
 const GIF_POOL = {
   normal: { idle:{}, attack:{} },
   agile : { idle:{}, attack:{} },
@@ -379,9 +382,9 @@ function setEnemies() {
 
 
 function draw() {
-  if (!levelManager || !levelManager.currentLevel) {
+if (!levelManager || !levelManager.currentLevel) {
     return;
-  }
+}
  // 只修正四个方向键的状态
 keys["ArrowUp"]    = keyIsDown(UP_ARROW);
 keys["ArrowDown"]  = keyIsDown(DOWN_ARROW);
@@ -392,6 +395,11 @@ keys["ArrowRight"] = keyIsDown(RIGHT_ARROW);
 if (gameOver) {
   showGameOverScreen();
   return;
+}
+
+if (gamePaused) {
+    drawPauseMenu();  // 渲染暂停界面
+    return;           // 停止后续更新与渲染
 }
 
 
@@ -455,7 +463,29 @@ if (gameOver) {
   showGameOverScreen();
 }
 
+
+
 }
+
+
+function drawPauseMenu() {
+  push();
+  resetMatrix();
+  fill(0, 180);
+  rect(0, 0, windowWidth, windowHeight);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(36);
+  text("⏸ Paused", windowWidth / 2, windowHeight / 2 - 100);
+
+  textSize(24);
+  text("Press R or Esc to Resume", windowWidth / 2, windowHeight / 2 - 20);
+  text("Press M to Return to Main Menu", windowWidth / 2, windowHeight / 2 + 30);
+
+  pop();
+}
+
 
 function updateTimer() {
   let elapsedTime = (millis() - startTime) / 1000;
@@ -630,6 +660,28 @@ function keyPressed() {
 
   if ((key === 'R' || key === 'r') && gameOver ) { // 按 R 重新开始
     restartGame();
+  }
+
+    // 暂停/恢复 游戏
+  if (keyCode === ESCAPE) {
+    pauseMenuActive = !pauseMenuActive;
+    gamePaused = pauseMenuActive;
+    return; // 不继续触发后续游戏逻辑
+  }
+
+  if (pauseMenuActive) {
+    // 菜单中按 R 或 Esc 继续游戏
+    if (key === 'R' || key === 'r' || keyCode === ESCAPE) {
+      pauseMenuActive = false;
+      gamePaused = false;
+    }
+
+    // 菜单中按 M 返回主菜单
+    if (key === 'M' || key === 'm') {
+      window.location.href = 'index.html'; // 主菜单页面路径
+    }
+
+    return;
   }
 
 
