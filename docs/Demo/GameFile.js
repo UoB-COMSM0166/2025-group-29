@@ -597,7 +597,11 @@ function showGameOverScreen() {
   text("Game Over", windowWidth / 2, windowHeight / 2 - 50);
 
   textSize(30);
-  text("Final Score: " + score, windowWidth / 2, windowHeight / 2);
+
+  const finalScore = (levelManager.currentLevel && levelManager.currentLevel.totalScore)
+                 ? levelManager.currentLevel.totalScore
+                 : score;  // 如果没有关卡就用当前 score
+  text("Final Score: " + finalScore, windowWidth / 2, windowHeight / 2);
   text("Press 'R' to Restart", windowWidth / 2, windowHeight / 2 + 40);
 
   pop();
@@ -754,8 +758,14 @@ class LevelManager {
   // }
   //修改关卡背景zc5.9
   loadLevel(index) {
+  const prevLevel = this.currentLevel; 
   this.currentLevel = this.levels[index];
   console.log(`加载 Level ${index + 1}`);
+
+  // 如果有上一关，继承它的 totalScore
+  if (prevLevel) {
+      this.currentLevel.startingScore = prevLevel.totalScore;
+  }
   this.currentLevel.start();
 
   // 👉 通知背景层更换背景图
@@ -802,6 +812,7 @@ class BaseLevel {
     this.baseScore = 0;
     this.timeBonus = 0;
     this.totalScore= 0;
+    this.startingScore = 0;  // 进入本关时的“起点分数”
     this.blackHoles = [];
     this.finished       = false;   // 关卡是否已结束
     this.postGameStage  = 0;       // 0‑结算信息；1‑Save / Continue
@@ -820,6 +831,9 @@ class BaseLevel {
     bullets.length = 0;
     timeBonuses.length = 0;
 
+    if (typeof score !== 'undefined') {
+        score = this.startingScore;  // 继承上一关的 totalScore 作为新关的起点
+    }
 
   }
 
