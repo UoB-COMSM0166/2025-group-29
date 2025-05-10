@@ -118,6 +118,12 @@ let BOSS_DASH_EXPLODE_GIF; // 冲刺结束后沿路径依次播放的爆炸特�
 
 let BOSS_BLACKHOLE_SKILL_GIF;//boss生成黑洞动作
 let TRAIL_IMG;    // 冲刺残影专用贴图
+let follow_gif;
+let ambush_gif;
+let ambushactive_gif;
+let stealth_gif;
+let bulletenemy_gif;
+let common_gif;
 
 
 function preload() {
@@ -191,7 +197,14 @@ function preload() {
   BOSS_DASH_GIF         = loadImage("assets/media/boss/BOSS_DASH.gif");
   BOSS_DASH_EXPLODE_GIF = loadImage("assets/media/boss/BOSS_DASH_EXPLODE.gif");
   BOSS_BLACKHOLE_SKILL_GIF = loadImage("assets/media/boss/BOSS_BLACKHOLE_SKILL.gif");
+
   TRAIL_IMG = loadImage("assets/media/character/dash.png");
+  follow_gif = loadImage("assets/media/monster/Follow-monster.gif");
+  ambush_gif = loadImage("assets/media/monster/Ambush-monster-idle.gif");
+  ambushactive_gif = loadImage("assets/media/monster/Ambush-monster-attack.gif");
+  stealth_gif = loadImage("assets/media/monster/Invisible-monster.gif");
+  bulletenemy_gif = loadImage("assets/media/monster/Danmaku-monster.gif");
+  common_gif = loadImage("assets/media/monster/normal-monster.gif");
 
 
 }
@@ -2057,6 +2070,15 @@ class Enemy {
       this.hp.draw(this.pos.x, this.pos.y, this.r);
     }
   }
+  drawSprite(img, x, y, r, flip) {
+    let scaleF = this.scaleFactor || 1.0;
+    push();
+    translate(x, y);
+    scale(flip ? -1 : 1, 1);
+    imageMode(CENTER);
+    image(img, 0, 0, r * 2 * scaleF, r * 2 * scaleF); 
+    pop();
+  }
 
   isExplosionFinished() {
     return this.exploding && this.explosion && this.explosion.isFinished();
@@ -2070,6 +2092,9 @@ class FollowEnemy extends Enemy {
     this.speed = 3; // 速度稍慢于玩家 
 
     this.contactDamage = 15; // 接触伤害
+    this.scaleFactor = 2;//大小
+    this.spriteImg = follow_gif;  // 比如 bulletEnemyImg
+    this.flip = false;  // 初始是否翻转，可以动态更新
   }
 
   update() {
@@ -2083,7 +2108,7 @@ class FollowEnemy extends Enemy {
       dir.setMag(this.speed);
       this.pos.add(dir);
     }
-
+    this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
     super.update(); // 死亡检测等
   }
 
@@ -2116,8 +2141,7 @@ class FollowEnemy extends Enemy {
       return;
     }
 
-    fill(255, 0, 0); // 红色敌人
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
   }
 }
@@ -2131,6 +2155,11 @@ class AmbushEnemy extends Enemy {
     this.r = 40; // ✅ 设置自己的半径
     this.hp = new HPSystem(40); // ✅ 设置自己的血量（可选）
     this.contactDamage = 15; // 接触伤害
+    this.scaleFactor = 2;//大小
+    this.ambushImg = ambush_gif;   // 伏击状态的图像
+    this.dashGif = ambushactive_gif;       // 冲刺状态的 GIF 动画
+    this.flip = player.pos.x < x; // 🟢 伏击状态：初始化翻转逻辑（只判断一次）
+    this.spriteImg = this.ambushImg; // 初始为伏击图
 
     this.isChasing = false;
     this.isDashing = false;
@@ -2150,6 +2179,7 @@ class AmbushEnemy extends Enemy {
       this.isDashing = true;
       this.dashStartTime = millis();
       this.dashDir = p5.Vector.sub(player.pos, this.pos).normalize();
+      this.spriteImg = this.dashGif;  // 激活状态切换贴图
     }
 
     if (this.isDashing) {
@@ -2174,7 +2204,7 @@ class AmbushEnemy extends Enemy {
         this.dashDir = p5.Vector.sub(player.pos, this.pos).normalize();
       }
     }
-
+    this.flip = this.dashDir.x < 0; // 如果 dashDir 朝左，flip = true
     super.update(); // ✅ 调用父类 update()，执行死亡检测
   }
 
@@ -2184,8 +2214,7 @@ class AmbushEnemy extends Enemy {
       return;
     }
     
-    fill(0, 255, 250);
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
     
   }
@@ -2197,6 +2226,9 @@ class StealthEnemy extends Enemy {
     this.r = 35;
     this.hp = new HPSystem(25);
     this.contactDamage = 20; // 接触伤害
+    this.scaleFactor = 2;//大小
+    this.spriteImg = stealth_gif;  // 比如 bulletEnemyImg
+    this.flip = false;  // 初始是否翻转，可以动态更新
 
     this.visibility = 0;
     this.detectRange = 300;
@@ -2242,7 +2274,7 @@ class StealthEnemy extends Enemy {
     dir.setMag( this.slowSpeed); // 慢速尾随
     this.pos.add(dir);
   }
-
+  this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
   super.update();
 }
 
@@ -2294,8 +2326,7 @@ class StealthEnemy extends Enemy {
       ellipse(this.pos.x, this.pos.y, this.chaseRange * 2);
       */
 
-      fill(150, 0, 255, this.visibility);
-      ellipse(this.pos.x, this.pos.y, this.r * 2);
+      this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     
       // 血条只在可见状态下绘制（并共享透明度）
       if (this.visibility > 0) {
@@ -2317,7 +2348,9 @@ class BulletEnemy extends Enemy {
     this.lastFireTime = millis();
     
     this.hp = new HPSystem(25);
-
+    this.spriteImg = bulletenemy_gif; // 设置贴图
+    this.scaleFactor = 4;//大小
+    this.flip = false; 
   }
 
   update() {
@@ -2367,8 +2400,8 @@ class BulletEnemy extends Enemy {
     }
     
     
-      fill(255, 200, 0);
-      ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
+
       this.hp.draw(this.pos.x, this.pos.y, this.r);
     
 
@@ -2382,6 +2415,9 @@ class CommonEnemy extends Enemy {
     this.r = 20;             // 比精英怪小
     this.hp = new HPSystem(25); // 较低血量
     this.speed = 3;        // 稍快的移动速度
+    this.scaleFactor = 1.8;//大小
+    this.spriteImg = common_gif;  // 比如 bulletEnemyImg
+    this.flip = false;  // 初始是否翻转，可以动态更新
   }
 
   update() {
@@ -2395,7 +2431,7 @@ class CommonEnemy extends Enemy {
       dir.setMag(this.speed);
       this.pos.add(dir);
     }
-
+    this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
     super.update(); // 死亡检测等
   }
 
@@ -2428,8 +2464,7 @@ class CommonEnemy extends Enemy {
       return;
     }
 
-    fill(200, 200, 200); // 灰色，作为基础小怪
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
     this.hp.draw(this.pos.x, this.pos.y, this.r);
   }
 }
