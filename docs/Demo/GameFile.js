@@ -1025,8 +1025,6 @@ class BaseLevel {
 
   onTimeUp() {
     if (!this.finished) {
-      // console.log(`${this.name} 时间到，正常结算`);
-      // this.stage = 2;  
       this.tip = "Finished！";
       this.tipExpireTime = null;
       this.finished = true;
@@ -1230,7 +1228,7 @@ class Level1 extends BaseLevel {
     this.remainingTime = 60;  // 1 分钟
     this.completed = false;
 
-    this.tipExpireTime = null;  // 🆕 提示语消失的时间戳（单位：毫秒）
+    this.tipExpireTime = null;  // 提示语消失的时间戳（单位：毫秒）
     this.finished = false;  // 标记关卡是否结束
 
     this.postGameStage = 0;  // 0=结算等待任意键，1=显示“Save/Continue”界面，2=存档界面
@@ -1486,8 +1484,6 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-    // this.blackHoles = [];
-    // this.postGameStage = 0;
   }
 
   start() {
@@ -1569,10 +1565,6 @@ class Level4 extends BaseLevel{
   
       this.tip = "Something wicked this way comes! Dodge their bullets!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-      // this.finished = false;
-  
-      // this.blackHoles = [];
-      // this.postGameStage = 0;
     }
 
     start() {
