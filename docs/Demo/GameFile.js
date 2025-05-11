@@ -102,6 +102,8 @@ let gamePaused = false;
 let remainingTime; // 剩余时间（秒）
 let stealthTimer = 0;
 let ambushTimer = 0;
+let stealthSpawnedCount = 0; // 生成的隐形敌人数量
+let ambushSpawnedCount = 0; // 生成的伏击怪数量
 
 let isHardMode = false; // 是否开启困难模式
 
@@ -783,43 +785,37 @@ function generateAmbushOutsideViewPosition(playerPos, playerDir, baseDistance = 
 
 
 
-
-
-function updateStealthSpawn(max = 6) {
+function updateStealthSpawn(max) {
   stealthTimer++;
-  if (stealthTimer % 120 === 0) { // 120 帧 = 2 秒
+  if (stealthTimer % 120 === 0) { // 每2秒
+    if (stealthSpawnedCount >= max) return;
+
     let dir = player.getDirection();
     if (dir.mag() < 0.01) return;
 
-    const stealthCount = enemies.filter(e => e instanceof StealthEnemy).length;
-    if (stealthCount >= max) return;
-
-      let pos = generateStealthEnemyAhead(player.pos, dir);
-      enemies.push(new StealthEnemy(pos.x, pos.y));
-      console.log("生成隐形敌人", pos);
-    }
+    let pos = generateStealthEnemyAhead(player.pos, dir);
+    enemies.push(new StealthEnemy(pos.x, pos.y));
+    stealthSpawnedCount++; // ✅ 每生成一个就增加
+    console.log(`生成隐形敌人 ${stealthSpawnedCount}/${max}`, pos);
   }
+}
+  
 
 
-
-
-
-function updateAmbushSpawn(max = 6) {
+function updateAmbushSpawn(max) {
   ambushTimer++;
 
-  if (ambushTimer % 360 === 0) { // 120 帧 = 2 秒
-    // 当前伏击怪数量
-    const ambushCount = enemies.filter(e => e instanceof AmbushEnemy).length;
-    console.log("伏击怪数量", ambushCount);
-    if (ambushCount >= max) return; // 已达上限
+  if (ambushTimer % 360 === 0) { // 每 6 秒
+    if (ambushSpawnedCount >= max) return;
 
-   let dir = player.getDirection?.() || createVector(1, 0);
-  if (dir.mag() < 0.01) dir = createVector(1, 0); // 保底方向
+    let dir = player.getDirection?.() || createVector(1, 0);
+    if (dir.mag() < 0.01) dir = createVector(1, 0); // 保底方向
 
-  const spawnPos = generateAmbushOutsideViewPosition(player.pos, dir);
+    const spawnPos = generateAmbushOutsideViewPosition(player.pos, dir);
 
-  enemies.push(new AmbushEnemy(spawnPos.x, spawnPos.y));
-  console.log("🗡️ 伏击怪生成于", spawnPos);
+    enemies.push(new AmbushEnemy(spawnPos.x, spawnPos.y));
+    ambushSpawnedCount++; // ✅ 每生成一个就加1
+    console.log(`伏击怪生成 ${ambushSpawnedCount}/${max} 于`, spawnPos);
   }
 }
 
@@ -1511,10 +1507,9 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-
+/*
     // 刷敌人
-    let minSpawnDistance = player.r * 10;
-
+    
     // FollowEnemy
     this.generateFollowEnemy(isHardMode? 8 : 5); 
 
@@ -1528,6 +1523,7 @@ class Level3 extends BaseLevel {
 
     // 刷奖励物
     this.generateTimeBonus(3); // 刷奖励物
+    */
 
     // 设置倒计时
     timer = 90;
@@ -1541,7 +1537,7 @@ class Level3 extends BaseLevel {
     if (this.stage === 1) {
 
         updateStealthSpawn(isHardMode ? 6 : 4); // ✅ 每帧尝试生成隐身怪
-        updateAmbushSpawn(isHardMode ? 6 : 4); // ✅ 每帧尝试生成伏击怪
+        updateAmbushSpawn(isHardMode ? 6 : 8); // ✅ 每帧尝试生成伏击怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -2362,9 +2358,8 @@ if (distance < this.chaseRange) {
     this.needsRepositioned = true;
     
      // ✅ 控制台打印新位置
-    console.log(`隐身敌人重新定位至：(${newPos.x.toFixed(2)}, ${newPos.y.toFixed(2)})`);
-  
-  }
+    console.log(`隐身敌人重新定位至：(${newPos.x.toFixed(2)}, ${newPos.y.toFixed(2)})`); 
+}
 }
   // 尾随逻辑可以保留，也可以省略
   let dir = p5.Vector.sub(player.pos, this.pos);
@@ -4197,17 +4192,44 @@ class HPSystem {
   }
 
   draw(x, y, r, width = 50, height = 6) {
-    noStroke();
-  
-    // 红色背景条
-    fill(255, 0, 0);
-    rect(x - width / 2, y - r - 15, width, height);  // 注意是居中对齐 + 悬浮在圆圈上方
-  
-    // 绿色血量条
-    fill(0, 255, 0);
-    let w = map(this.currentHP, 0, this.maxHP, 0, width);
-    rect(x - width / 2, y - r - 15, w, height);  // 同样位置
+  const barX = x - width / 2;
+  const barY = y - r - 15;
+  const radius = 0.5;
+
+  // 背景条（半透明深灰）
+  noStroke();
+  fill(0, 0, 0, 120); // 半透明黑背景
+  rect(barX - 1, barY - 1, width + 2, height + 2, radius); // 背景带边缘
+
+  // 红色背景（最大血量）
+  fill(150, 0, 0); // 深红色底条
+  rect(barX, barY, width, height, radius);
+
+  // 绿色当前血量
+  fill(0, 200, 80); // 柔和绿色
+  const hpWidth = map(this.currentHP, 0, this.maxHP, 0, width);
+  rect(barX, barY, hpWidth, height, radius);
+
+  // 🔵 蓝色护盾（延长部分）
+  if (ReflectSkill?.remainingShieldHP > 0) {
+    const shield = ReflectSkill.remainingShieldHP;
+    const maxShield = ReflectSkill.shieldHP || shield;
+    const shieldWidth = map(shield, 0, maxShield, 0, width); // 护盾条宽度同样基于 width 比例
+
+    fill(0, 180, 255); // 蓝色
+    rect(barX + hpWidth, barY, shieldWidth, height, radius); // 直接拼接在绿色条右侧
+    console.log("护盾条宽度:", shieldWidth);
+    console.log("护盾条位置:", barX + hpWidth, barY);
   }
+
+  // 边框（白色微边框）
+  stroke(255);
+  strokeWeight(0.5);
+  noFill();
+  rect(barX, barY, width, height, radius);
+  noStroke();
+}
+
 }
 
 
