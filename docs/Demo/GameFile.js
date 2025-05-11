@@ -648,6 +648,11 @@ function keyReleased() {
 
   player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
 
+ // 🟢 清空敌人、子弹、奖励
+  enemies.length = 0;
+  bullets.length = 0;
+  timeBonuses.length = 0;
+
 
   // 获取当前关卡索引
   const currentIndex = levelManager.levels.indexOf(levelManager.currentLevel);
@@ -817,7 +822,7 @@ class LevelManager {
     ? prevLevel.totalScore
     : savedCumulativeScore || 0;
   this.currentLevel.start();
-  this.currentLevel.update();
+
 
   // 通知背景层更换背景图
   sendLevelToBackground(this.currentLevel.levelNumber);
