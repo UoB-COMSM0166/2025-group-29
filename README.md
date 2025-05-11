@@ -179,6 +179,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 - System architecture. Class diagrams, behavioural diagrams. 
 [Back to Table of Contents](#table-of-contents)
 
+---
 类图
 
 在游戏开发的初期，类图能够帮助我们把握游戏结构，明确核心类、模块及其对应的职责。这有助于我们能够在原代码中规划良好的面向对象设计（OOD），例如合理拆分功能，降低开发人员之间的重复沟通成本。我们采用的GitHub+VS Code集成开发方法可据此划定feature分支（如feature/player, feature/BlackHole）。团队成员可以基于类图对类实现进行审查，让多人同时开发不同模块变得可控。
@@ -202,6 +203,8 @@ Game Structure
 - SkillSystem: Controls all skill activations, cooldowns, HUD displays, and more. Manages different skill subclasses, such as Dash skill, Blood fury skill, and so on.
 - loadSaveData: Controls the archive system, used to read archives from Supabase and load them into the game environment.
 - Other key classes: CollisionManager (detects player collisions with enemies, black holes, bullets, etc.) Bullet (manages all flying bullets for enemies and bosses to share) MeleeAttack class (manages interactions between enemies and players)
+### Class Diagram
+![Class Diagram](docs/Datas/Class%20Diagram.png)
 
 
 
@@ -338,68 +341,23 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 
 - Teamwork. How did you work together, what tools did you use. Did you have team roles? Reflection on how you worked together.
 
-- 中文
-- 在本项目的开发过程中，我们团队采用了敏捷开发（Agile Development）方法，并以Scrum 框架组织协作。我们将开发周期划分为若干个 Sprint，借助每日 Standup Meeting 明确进度与障碍，通过 Sprint Planning 和 Sprint Retrospective 反思流程，迭代优化代码结构与任务分配。借助 GitHub 管理源代码和任务分支，我们有效实现了协同开发与代码质量控制。
+Throughout the development of our real-time combat survival game, our team collaborated efficiently by embracing an Agile-inspired methodology. From the outset, we prioritized flexibility and iterative progress. To manage tasks effectively, we created a digital Kanban board with four clear columns: “Not Start,” “In Progress,” “Parked,” and “Done.” This visual approach allowed us to track precisely which tasks had yet to begin, which were actively being worked on, which tasks had temporarily stalled, and which were completed. The Kanban structure helped us break the development into manageable segments, clearly linking short-term tasks with broader project milestones.
 
-团队成员基于敏捷角色进行了分工：
-	•	Product Owner 负责将“动作游戏”的核心体验（如打击感、战斗节奏）转化为需求，拆解为可执行的 User Stories；
-	•	Scrum Master 协调任务优先级、保障迭代节奏，主持回顾与冲刺评估；
-	•	Developer & Tester 团队共同参与模块设计、功能开发与手动测试，注重测试驱动开发思想（如技能系统模块就采用逐步实现 + 实战测试验证的方式）。
+Regular updates to the board occurred via our WeChat group. Team members either posted screenshots or directly updated task statuses, ensuring real-time alignment across the team. Additionally, we captured key board snapshots periodically to include in our final report for retrospective analysis.
 
-在开发流程中，我们使用了：
-	•	Git + GitHub 分支管理 进行多人代码协作；
-	•	Figma 与 Google Docs 完成技能效果草图与平衡性数据表；
-	•	自定义 Kanban 看板 明确任务状态（To Do / In Progress / Done），透明管理优先级。
+For version control, we primarily used GitHub. Initially, we committed directly to the main branch, which quickly created issues such as merge conflicts and inconsistencies between versions. Realizing these challenges, we shifted to a trunk-based development model. Each team member managed their own feature branch, pulling and rebasing from the main branch upon completing a task, resolving conflicts locally, and then submitting a pull request. This approach significantly reduced integration issues, resulting in a stable and consistent codebase. Pull request discussions became essential for bug tracking, addressing architectural concerns, and documenting critical design decisions.
 
-项目的系统架构采用高度模块化设计，核心逻辑拆分为玩家系统（Player + HPSystem + MeleeAttack）、敌人系统（多类型继承 Enemy 类）、技能系统（Skill + SkillSystem）、碰撞系统（CollisionManager）与弹幕系统（BulletEnemy + Bullet 类），各模块职责清晰、松耦合高内聚。
+Although we did not formally assign team roles, responsibilities naturally emerged during the project's progression. One member specialized in developing the skill system and cooldown mechanics, while another concentrated on enemy AI and visual effects like trailing shadows and particle animations. This self-organized division of labor enabled us to remain agile and quickly adapt when obstacles arose. For particularly challenging tasks, such as the dash-reflect mechanics or timed skill triggers, we frequently employed pair programming. This practice improved debugging efficiency and encouraged knowledge sharing across the team.
 
-开发过程中，我们也遇到了多个实际挑战，例如：
-	•	技能系统初期扩展性差，新增“吸血”、“反弹”等技能时逻辑混乱，后通过引入统一 Skill 类与子类继承结构，并结合 cooldown、trigger、update 三阶段模型解决；
-	•	冲刺判定与伤害结算耦合混乱，引入了 DamageCalculator 工具类统一处理来源伤害与技能反馈；
-	•	多人同时修改核心类（如 Player、CollisionManager）时频繁产生冲突，后来通过明确模块职责与接口约定，减少重叠、提高并行效率。
+Throughout the project, WeChat served as our primary communication tool. It provided rapid feedback and troubleshooting capabilities, enabling immediate responses to bugs or implementation questions. For broader design discussions—such as managing player death states or score displays—we held brief face-to-face meetings after our weekly Software Engineering lab sessions. These in-person interactions were particularly helpful for clarifying directions and reallocating tasks. During the reading week, we organized two dedicated UI design meetings to finalize front-end layouts and HUD placements. These sessions established a cohesive visual style early on, significantly reducing later adjustments.
 
-我们也特别重视技能间联动与特效反馈的打磨，例如：
-	•	“减速领域”与“电击领域”采用组合技能模式，并通过 shared reference 实现联动；
-	•	所有攻击均使用统一接口向 LifestealSkill 上报伤害，实现战斗与恢复的耦合；
-	•	普攻特效使用 HSB + Arc 渲染动态扇形击打区域，增强视觉反馈；
-	•	拖影、状态色、反弹子弹贴图则增强了技能状态感知。
+As the semester progressed and workloads from other modules increased, we adapted our workflow to maintain productivity. Although we deliberately avoided assigning report writing or video editing tasks during the Easter break, we strategically utilized the pre-exam period for these deliverables. This timing enabled us to integrate key course concepts—such as usability heuristics and modular architecture principles—into our final report and reflections, enhancing both academic and practical quality.
 
-通过这一阶段的开发与协作，我们不仅完成了具备完整游戏逻辑的系统，更深入理解了软件工程中模块解耦、职责划分、版本控制与用户体验反馈迭代的重要性。
+A key strength of our team was our open and supportive communication culture. We comfortably provided direct feedback, whether on UI clarity or balancing game mechanics, and regularly revised gameplay elements based on test feedback. However, we identified one notable shortcoming: our reliance on WeChat sometimes caused our Kanban board to lag behind actual progress. To address this issue in future projects, we plan to assign a rotating “Kanban manager” role to maintain accurate and up-to-date task tracking.
 
-- English
-- Throughout the development of our real-time, skill-based combat survival game, our team adopted an Agile Development approach using the Scrum framework to structure our collaboration. This allowed us to iterate rapidly, adapt to challenges dynamically, and maintain continuous communication across all stages of the project lifecycle—from ideation to implementation and polish.
+Ultimately, this project provided valuable, hands-on experience with Agile principles, collaborative workflows, and team-based problem-solving. By effectively utilizing tools such as Kanban boards, Git branch workflows, code reviews, and flexible scheduling, we delivered a polished, feature-complete game on time. Most importantly, the lessons learned in teamwork, transparency, and iterative design will undoubtedly benefit us in future academic and professional endeavors.
+![image](https://github.com/user-attachments/assets/2e1dd967-2b86-4867-b88f-5fa2026f46b4)
 
-- Our team began with a Sprint Planning session, where we defined the project scope and broke down our high-level goals into actionable user stories. These stories were centered around key gameplay pillars: responsive player control, diverse enemy behavior, dynamic skill systems, and immersive visual feedback. We assigned story points based on estimated complexity and then allocated these tasks across our customized Kanban board with stages like “To Do,” “In Progress,” “Code Review,” and “Done.”
-
-- We held daily stand-up meetings (mostly online due to availability constraints) where we discussed what each member had accomplished, their current blockers, and what they planned to tackle next. This kept everyone aligned and helped surface integration issues early.
-
-- Our roles were defined following Scrum best practices:
-	- •	The Product Owner was responsible for articulating the vision of a fast-paced and visually rich combat experience, translating qualitative goals (like “the dash should feel punchy” or “skills must offer meaningful choices”) into concrete user stories and design priorities.
-	- •	The Scrum Master facilitated team coordination, maintained a sustainable sprint pace, resolved merge conflicts, and organized retrospectives at the end of each sprint to help us reflect on what worked and what needed improvement.
-	- •	All members acted as Developers and Testers, working in full-stack fashion across p5.js code, animations, mechanics, and system integration. We followed test-driven development principles in key modules such as the skill and collision systems.
-
-- Our main development tools included:
-	- •	Git + GitHub for version control with clear branch naming conventions (feature/, bugfix/, refactor/) and Pull Requests with inline reviews;
-	- •	Google Docs and Figma for collaborative specification of skills, enemy logic, damage values, and UI layout sketches;
-	- •	Manual playtesting sessions, often recorded and shared within the team, to help us identify unexpected edge cases or balance problems.
-
-- Team responsibilities were distributed based on domain expertise and interest:
-	- •	One member focused on the Player System, implementing Player, HPSystem, and MeleeAttack logic. They also designed the input system using WASD and directional keys, integrated player states like isAttacking and isCharging, and handled camera follow logic (updateCamera).
-	- •	Another led the development of the Skill System, designing an abstract Skill class and implementing a polymorphic hierarchy for active (e.g., DashSkill, ReflectSkill) and passive skills (e.g., LifestealSkill, BloodFurySkill). This included cooldown management, input bindings, and cooldown visualization via drawIcon() overlays.
-	- •	A third teammate focused on the Enemy System, coding multiple AI types with different behaviors: FollowEnemy for direct pursuit, AmbushEnemy for high-speed dashes, StealthEnemy for cloaked evasion, and BulletEnemy for ranged attacks. Each class had its own update logic and visual identity.
-
-- One of our most integrated efforts was the design of the CollisionManager, which orchestrated real-time interaction between the player, enemies, bullets, and power-ups (TimeBonus). We defined a shared checkCollision() method that used consistent data formats (position vectors, radii) to simplify hit detection. Managing reflected bullets, dash hits, and passive effects like lifesteal all required careful coordination.
-
-- We also learned the importance of interface contracts. Early in development, multiple team members inadvertently modified shared state (such as bullets[] or player.selectedSkills), resulting in regressions and merge conflicts. To mitigate this, we clearly scoped access rules—e.g., all skills must be selected via SkillSystem, and only CollisionManager could remove bullets or resolve bonuses.
-
-- From a collaboration standpoint, we reflected on several key takeaways:
-	- •	Strengths: Our communication was transparent and frequent. Everyone respected their scope while staying available for cross-support. We regularly reviewed each other’s pull requests and gave constructive feedback.
-	- •	Improvements: Earlier in the project, some code lacked consistency in naming conventions or formatting, which caused confusion during integration. After Sprint 1, we agreed on shared style guidelines and inline documentation standards.
-	- •	Growth: We developed a deeper appreciation for modularity and responsibility segregation. Refactoring the skill system into fully encapsulated classes not only reduced bugs but also allowed us to quickly add new functionality (like chaining SlowField with electric pulses via SlowFieldBonusDamage).
-
-- Toward the final sprints, our workflow matured. New features became plug-and-play thanks to consistent interfaces and reusable components. Final sprint activities included difficulty balancing, particle optimization, and edge case testing—such as verifying that ReflectSkill and DashSkill didn’t conflict under high-intensity gameplay.
-
-- Overall, the project not only tested our technical skills but also helped us mature as a team. Through collaborative design, shared testing, and iterative refinement, we achieved a high-functioning, extensible system that integrated gameplay design with sound software engineering principles.
 [Back to Table of Contents](#table-of-contents)
 # 8 Conclusion
 
