@@ -62,14 +62,14 @@ Character design is combined with the skill tree system. Players can freely choo
 #### Skill and attack effects
 Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
 
-| Image                                                             | Name           | Description                                                                           |
-|-------------------------------------------------------------------|----------------|---------------------------------------------------------------------------------------|
-|![image](docs/Demo/assets/media/character/normal-attack-base.gif)  | Attack         | The normal state of the battle mecha when no skill tree branch or style is activated. |
-|![image](docs/Demo/assets/media/character/normal-idle-boost.gif)   | Ghost Cutter   | The normal state of the battle mecha when no skill tree branch or style is activated. |
-|![image](docs/Demo/assets/media/character/normal-idle-shield.gif)  | Iron Reversal  | The state of the battle mecha when the power-type skill tree branch is activated.     |
-|![image](docs/Demo/assets/media/character/normal-idle-steal.gif)   | Crimson Drain  |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
-|![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | The state of the battle mecha when the agile-type skill tree branch is activated.     |
-|![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| The state of the battle mecha when the agile-type skill tree branch is activated.     |
+| Image                                                             | Name           | Description                                                                                                                         |
+|-------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/character/normal-attack-base.gif)  | Attack         | The animation of the character’s normal attack.                                                                                     |
+|![image](docs/Demo/assets/media/character/normal-idle-boost.gif)   | Ghost Cutter   | An attack boost. Increases attack power for a short time.                                                                           |
+|![image](docs/Demo/assets/media/character/normal-idle-shield.gif)  | Iron Reversal  | A shield skill. Creates a shield that blocks damage and can reflect bullet attacks.                                                 |
+|![image](docs/Demo/assets/media/character/normal-idle-steal.gif)   | Crimson Drain  | A lifesteal skill. Attacks restore some health.                                                                                     | 
+|![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
+|![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
 
 
 - 5% ~250 words 
