@@ -34,6 +34,15 @@ async function loadSaveData() {
 
   score = savedCumulativeScore; 
 
+  //同步设置当前难度状态
+  if (savedMode === 'hard') {
+    isHardMode = true;
+    console.log('当前难度：困难');
+  }else {
+    isHardMode = false; 
+    console.log('当前难度：简单');
+  }
+
   console.log('读到存档→', { savedLevel, savedMode, savedSkills });
 }
 
@@ -466,7 +475,7 @@ function updateCamera() {
 
 function drawMapBorder() {
   push();
-  stroke(255, 0, 0);
+  stroke(0, 0, 0);
   strokeWeight(5);
   noFill();
   rectMode(CENTER);
@@ -1344,7 +1353,7 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 5 : 3); 
+    this.generateFollowEnemy(isHardMode? 10 : 5); 
     // CommonEnemy
     this.generateCommonEnemy(isHardMode? 10 : 6); 
 
@@ -1432,7 +1441,7 @@ class Level3 extends BaseLevel {
 
 
     // 刷敌人
-    /*
+    
     // FollowEnemy
     this.generateFollowEnemy(isHardMode? 8 : 5); 
 
@@ -1445,7 +1454,7 @@ class Level3 extends BaseLevel {
    this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
 
     // 刷奖励物
-    this.generateTimeBonus(3); // 刷奖励物*/
+    this.generateTimeBonus(3); // 刷奖励物
     
 
     // 设置倒计时
