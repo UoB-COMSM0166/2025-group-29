@@ -134,6 +134,24 @@
 
 ===== SKIPPED (binary) ./assets/media/BG5.png =====
 
+===== SKIPPED (binary) ./assets/media/boss/BOSS_BLACKHOLE_SKILL.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_DASH.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_DASH_EXPLODE.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_IDLE.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_SUMMON.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_TOWER_SKILL.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_WAVE.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/BOSS_WAVE_BOSS.gif =====
+
+===== SKIPPED (binary) ./assets/media/boss/TOWER.gif =====
+
 ===== SKIPPED (binary) ./assets/media/bullet/Boss-bullet.gif =====
 
 ===== SKIPPED (binary) ./assets/media/bullet/Character-rebound-bullet.gif =====
@@ -149,6 +167,8 @@
 ===== SKIPPED (binary) ./assets/media/character/agile-idle-boost.gif =====
 
 ===== SKIPPED (binary) ./assets/media/character/agile-idle-dash.gif =====
+
+===== SKIPPED (binary) ./assets/media/character/dash.png =====
 
 ===== SKIPPED (binary) ./assets/media/character/normal-attack-base.gif =====
 
@@ -188,6 +208,8 @@
 
 ===== SKIPPED (binary) ./assets/media/character/tank-idle-shield.gif =====
 
+===== SKIPPED (binary) ./assets/media/final/final.gif =====
+
 ===== SKIPPED (binary) ./assets/media/intro/1.png =====
 
 ===== SKIPPED (binary) ./assets/media/intro/2-1.png =====
@@ -215,6 +237,8 @@
 ===== SKIPPED (binary) ./assets/media/monster/normal-monster.gif =====
 
 ===== SKIPPED (binary) ./assets/media/start.png =====
+
+===== SKIPPED (binary) ./assets/media/time/time.gif =====
 
 ===== SKIPPED (binary) ./assets/media/titled-3.png =====
 
@@ -371,15 +395,10 @@ canvas {
 }
 
 ===== ./export_all.sh =====
-#!/usr/bin/env bash
-
-# 输出文件
 output="all.txt"
 
-# 如果已经存在，就先清空
 > "$output"
 
-# 遍历所有文件，排除 all.txt、GameFile.js，以及任意 node_modules 目录
 find . \
   \( \
     -path '*/node_modules/*' \
@@ -387,7 +406,7 @@ find . \
     -o -name "GameFile.js" \
   \) -prune \
   -o -type f -print | sort | while IFS= read -r file; do
-  # 用 file 判断是不是文本
+
   if file "$file" | grep -qE 'text|empty'; then
     printf "===== %s =====\n" "$file" >> "$output"
     cat "$file" >> "$output"
@@ -397,7 +416,7 @@ find . \
   fi
 done
 
-echo "✅ 已将所有文本文件的路径和内容输出到 $output，二进制文件已被跳过。"
+echo "✅ Success $output"
 
 ===== ./game.html =====
 <!DOCTYPE html>
@@ -1132,18 +1151,29 @@ export const IntroScreen = {
     this.el.id = 'introScreen';
     this.el.innerHTML = `
       <img id="titleImage" src="assets/media/titled-3.png" alt="Title Image" />
-      <div id="continueText">Press any key to continue</div>
+      <div id="continueText">Press any key or click to continue</div>
     `;
     document.body.appendChild(this.el);
-    window.addEventListener('keydown', this.onKey);
+
+    // 绑定键盘和鼠标事件
+    window.addEventListener('keydown', this._onInput);
+    window.addEventListener('mousedown', this._onInput);
   },
   hide() {
-    window.removeEventListener('keydown', this.onKey);
+    // 清除监听
+    window.removeEventListener('keydown', this._onInput);
+    window.removeEventListener('mousedown', this._onInput);
     this.el.remove();
   },
-  onKey(event) {
-    // 如果引导遮罩还在，就不响应“任何键继续”
-    if (document.getElementById('introOverlay')) return;
+
+  /**
+   * 当用户按键或点击时触发。
+   * 如果 #introOverlay 还存在，则忽略；否则进入主菜单。
+   */
+  _onInput(event) {
+    if (document.getElementById('introOverlay')) {
+      return; // 仍在播放引导，先等它消失
+    }
     advanceTo('MAIN_MENU');
   }
 };
