@@ -34,6 +34,15 @@ async function loadSaveData() {
 
   score = savedCumulativeScore; 
 
+  //同步设置当前难度状态
+  if (savedMode === 'hard') {
+    isHardMode = true;
+    console.log('当前难度：困难');
+  }else {
+    isHardMode = false; 
+    console.log('当前难度：简单');
+  }
+
   console.log('读到存档→', { savedLevel, savedMode, savedSkills });
 }
 
@@ -136,6 +145,7 @@ let bulletenemy_gif;
 let common_gif;
 let bossBulletImg;
 let enemyBulletImg;
+let gifImg;
 
 function preload() {
 
@@ -217,6 +227,7 @@ function preload() {
   bulletenemy_gif = loadImage("assets/media/monster/Danmaku-monster.gif");
   common_gif = loadImage("assets/media/monster/normal-monster.gif");
   enemyBulletImg = loadImage("assets/media/bullet/Monster-bullet.gif");
+  gifImg = loadImage("assets/media/time/time.gif");
 
 }
 
@@ -321,10 +332,6 @@ function setSkillSystem() {
     }
   } 
  
- /*skillSystem.selectSkill(skillSystem.allSkills[6]);
- skillSystem.selectSkill(skillSystem.allSkills[7]);
- skillSystem.selectSkill(skillSystem.allSkills[8]);
-*/
   player.selectedSkills = skillSystem.selectedSkills;
 
 }
@@ -334,43 +341,6 @@ function setPlayer() {
   player = new Player(0, 0, 30);
   startTime = millis();
 }
-
-function setEnemies() {
-  
-    enemies = [];
-    let minSpawnDistance = player.r * 10;//**敌人生成的最小距离（确保不在玩家附近生成）
-   
-    // **追踪敌人
-    for (let i = 0; i < 3; i++) {
-      let wanderPos = generateValidEnemyPosition(minSpawnDistance);
-      enemies.push(new FollowEnemy(wanderPos.x, wanderPos.y));
-    }
-  
-    // **伏击型敌人
-    for (let i = 0; i < 4; i++) {
-      let ambushPos = generateValidEnemyPosition(minSpawnDistance);
-      enemies.push(new AmbushEnemy(ambushPos.x, ambushPos.y, 45));
-    }
-  
-    // **隐形敌人
-    for (let i = 0; i < 30; i++) {
-      let stealthPos = generateValidEnemyPosition(minSpawnDistance);
-      enemies.push(new StealthEnemy(stealthPos.x, stealthPos.y, 40));
-    }
-  
-    // **弹幕怪
-    for (let i = 0; i < 3; i++) {
-      let pos = generateValidEnemyPosition(200);
-      enemies.push(new BulletEnemy(pos.x, pos.y, 35));
-    }
-
-      // 普通小怪一开始生成多个
-  for (let i = 0; i < 10; i++) {
-    let pos = generateOutsideViewPosition();
-    enemies.push(new CommonEnemy(pos.x, pos.y));
-  }
-
-  }
   
 
   function setTimeBonuses() {
@@ -381,10 +351,6 @@ function setEnemies() {
   timeBonuses.push(new TimeBonus(random(-width, width), random(-height, height), 30));
   timeBonuses.push(new TimeBonus(random(-width, width), random(-height, height), 45));
 }
-
-
-
-
 
 
 
@@ -449,10 +415,6 @@ if (!levelManager.currentLevel.finished) {
   collisionManager.update();
 }
 
-/*updatePlayer();
-    // … 更新、绘制玩家后 …
-player.meleeAttack.update();
-collisionManager.update();*/
 
 // HUD & 碰撞
 drawInfo();
@@ -515,7 +477,7 @@ function updateCamera() {
 
 function drawMapBorder() {
   push();
-  stroke(255, 0, 0);
+  stroke(0, 0, 0);
   strokeWeight(5);
   noFill();
   rectMode(CENTER);
@@ -631,7 +593,7 @@ function keyPressed() {
 
     // 菜单中按 M 返回主菜单
     if (key === 'M' || key === 'm') {
-      window.location.href = 'index.html'; // 主菜单页面路径
+      window.location.href = 'index.html?directMain=1';
     }
 
     return;
@@ -857,6 +819,7 @@ class LevelManager {
     ? prevLevel.totalScore
     : savedCumulativeScore || 0;
   this.currentLevel.start();
+  this.currentLevel.update();
 
   // 通知背景层更换背景图
   sendLevelToBackground(this.currentLevel.levelNumber);
@@ -1392,7 +1355,7 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 5 : 3); 
+    this.generateFollowEnemy(isHardMode? 10 : 5); 
     // CommonEnemy
     this.generateCommonEnemy(isHardMode? 10 : 6); 
 
@@ -1561,7 +1524,7 @@ class Level4 extends BaseLevel{
   
   
      
-  
+  /*
       // BulletEnemy（弹幕怪）追击玩家
       this.generateBulletEnemy(isHardMode? 5 : 3); // 刷弹幕怪
   
@@ -1578,6 +1541,7 @@ class Level4 extends BaseLevel{
   
       // 刷奖励物
       this.generateTimeBonus(3); // 刷奖励物
+      */
   
       // 设置倒计时
       timer = 60;
@@ -1588,8 +1552,8 @@ class Level4 extends BaseLevel{
 update() {
   super.update();
   if (this.stage === 1) {
-    updateStealthSpawn(8);
-    updateAmbushSpawn (6); // ✅ 每帧尝试生成伏击怪
+    updateStealthSpawn(10);
+    updateAmbushSpawn (0); // ✅ 每帧尝试生成伏击怪
     // 检查完成
     if (!this.finished && remainingTime <= 0) {
       this.stage = 2;
@@ -1701,11 +1665,7 @@ class Level5 extends BaseLevel{
       }
 
 
-    // // 更新黑洞
-    // for (let bh of this.blackHoles) {
-    //     bh.update(player);
-    // }
-
+   
   
       // 判断敌人是否清空 & 时间是否还在倒计时中
       if (!this.finished && enemies.length === 0 && remainingTime > 0) {
@@ -1804,7 +1764,7 @@ class Player {
 
 
     
-    this.hp = new HPSystem(1000); // 初始血量100
+    this.hp = new HPSystem(100); // 初始血量100
     
 
     this.baseAttack = 15;  // 原本的基础攻击力
@@ -1831,13 +1791,55 @@ class Player {
     this.inBlackHole = false;        // 是否在黑洞内
     this.blackHoleExitTime = null;   // 上次退出黑洞的时间
 
+    this.furyParticles = []; // 血怒火焰粒子数组
+
 }
 
 
   update() {
-    this.updateSkills(); // 更新技能状态
+    if (this.isInBloodFury) {
+  // 每帧添加一颗火焰粒子
+  const p = {
+    pos: this.pos.copy().add(p5.Vector.random2D().mult(random(10, 25))), // ← 更远的半径范围
+vel: createVector(random(-1, 1), random(-2, -1)), // ← 更强的上飘速度
+    alpha: 255,
+    size: random(6, 10),
+    color: color(255, random(80, 120), 0)
+  };
+  this.furyParticles.push(p);
+}
     
-    if (this.isCharging) return; // ✅ 蓄力中，完全不能移动
+    this.updateSkills(); // 更新技能状态
+
+    
+    this.updateMovement(); // 更新移动状态
+
+    // 更新粒子
+  for (let p of this.furyParticles) {
+    p.pos.add(p.vel);
+    p.alpha -= 5;
+    p.size *= 0.95;
+  }
+    this.furyParticles = this.furyParticles.filter(p => p.alpha > 0);
+  
+  }
+
+    
+    
+    
+  
+  
+
+  updateSkills() {
+    for (let skill of this.selectedSkills) {
+      if (skill && typeof skill.update === 'function') {
+        skill.update(); // 调用技能自身的 update 方法
+      }
+    }
+  }
+  
+  updateMovement() {
+     if (this.isCharging) return; // ✅ 蓄力中，完全不能移动
     
     let move = createVector(0, 0);
 
@@ -1881,22 +1883,7 @@ class Player {
       this.blackHoleExitTime = null;   // 清除定时器
     }
   }
-
-    
-    
-    
-  
-  }
-
-  updateSkills() {
-    for (let skill of this.selectedSkills) {
-      if (skill && typeof skill.update === 'function') {
-        skill.update(); // 调用技能自身的 update 方法
-      }
-    }
-  }
-  
-
+}
   
   show() {
     // ✅ 先画拖影
@@ -1905,6 +1892,15 @@ class Player {
       skill.showTrail();
     }
   }
+    if (this.isInBloodFury) {
+  push();
+  noStroke();
+  for (let p of this.furyParticles) {
+    fill(p.color.levels[0], p.color.levels[1], p.color.levels[2], p.alpha);
+    ellipse(p.pos.x, p.pos.y, p.size);
+  }
+  pop();
+}
     
     //加载玩家贴图
      // 1️⃣ 选 GIF，不要再读 this.attackImage 了，直接用右向资源
@@ -1987,13 +1983,10 @@ class Player {
   this.prevPos = this.pos.copy();
   return dir;
 }
+  
 
 
 }
-
-
-
-
 
 
 class Enemy {
@@ -2244,7 +2237,7 @@ if (distance < this.chaseRange) {
 } else {
   this.visibility = 0; // 超出感应范围，完全隐身
 }
-
+/*
   // ✅ 行为逻辑（控制移动）
   let dir;
   if (distance < this.chaseRange) {
@@ -2279,13 +2272,67 @@ if (distance < this.chaseRange) {
     console.log(`隐身敌人重新定位至：(${newPos.x.toFixed(2)}, ${newPos.y.toFixed(2)})`); 
 }
 }
-  // 尾随逻辑可以保留，也可以省略
-  let dir = p5.Vector.sub(player.pos, this.pos);
-  dir.setMag(this.slowSpeed);
-  this.pos.add(dir);
   }
   this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
   super.update();
+}*/
+
+// ✅ 行为逻辑（控制移动）
+let dir;
+
+if (distance < this.chaseRange) {
+  this.isChasing = true;
+  this.needsRepositioned = false;
+
+  let minDist = this.r + player.r;
+  if (distance >= minDist) {
+    dir = p5.Vector.sub(player.pos, this.pos);
+    dir.setMag(this.stealthSpeed); // 快速追击
+    this.pos.add(dir);
+  }
+
+} else if (distance < this.detectRange) {
+  this.isChasing = false;
+  this.needsRepositioned = false;
+
+  // 慢速跟随
+  dir = p5.Vector.sub(player.pos, this.pos);
+  dir.setMag(this.slowSpeed);
+  this.pos.add(dir);
+
+} else {
+  this.isChasing = false;
+
+  if (!this.needsRepositioned) {
+    this.visibility -= 10;
+    if (this.visibility <= 0) {
+      let playerDir = player.getDirection?.() || createVector(1, 0);
+      if (playerDir.mag() < 0.01) playerDir = createVector(1, 0);
+      let newPos = generateStealthEnemyAhead(player.pos, playerDir);
+      
+      this.needsRepositioned = true;
+      this.pos = newPos.copy();
+
+      // ✅ ✅ ✅ 加上以下代码：解除减速状态！
+  if (this.originalStealthSpeed !== undefined) {
+    this.stealthSpeed = 3;
+    
+    console.log("隐身敌人恢复正常追击速度", this.stealthSpeed);
+  }
+  if (this.originalSlowSpeed !== undefined) {
+    this.slowSpeed = 2;
+    
+     console.log("隐身敌人恢复正常跟随速度", this.slowSpeed);
+  }
+  
+      console.log(`隐身敌人重新定位至：(${newPos.x.toFixed(2)}, ${newPos.y.toFixed(2)})`);
+    }
+  }
+}
+
+this.flip = (player.pos.x > this.pos.x);
+super.update();
+  
 }
 
   applySeparation(others) {
@@ -3133,13 +3180,11 @@ class TimeBonus {
     this.pos = createVector(x, y);
     this.r = 30;
     this.bonusTime = bonusTime; // 奖励的时间（秒）
+    this.gifImg = gifImg;       // ✅ 新增：GIF 图像
   }
 
   show() {
-    fill(0, 255, 255);
-    stroke(255);
-    strokeWeight(2);
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    image(this.gifImg, this.pos.x, this.pos.y, this.r * 3, this.r * 3);
     
     fill(0);
     noStroke();
@@ -3779,12 +3824,17 @@ class SlowFieldSkill extends Skill {
     }
 
     //  新增：StealthEnemy 特殊处理
-    if (enemy instanceof StealthEnemy) {
-    enemy.originalStealthSpeed = enemy.stealthSpeed;
-    enemy.originalSlowSpeed    = enemy.slowSpeed;
+     // StealthEnemy ✅ 修复重点：
+  if (enemy instanceof StealthEnemy) {
+   
+      enemy.originalStealthSpeed = enemy.stealthSpeed;
+      
+      
+    
 
-    enemy.stealthSpeed *= this.slowMul;
-    enemy.slowSpeed    *= this.slowMul;
+    enemy.stealthSpeed = 0.3;
+    console.log("隐身敌人现在速度为:", enemy.stealthSpeed);
+    
   }
 
     this.slowed.add(enemy);
@@ -3824,6 +3874,16 @@ else if (this.slowed.has(enemy)) {
     if (enemy instanceof AmbushEnemy) {
       enemy.dushSpeed    = enemy.originalDash;
       enemy.maxDashSpeed = enemy.originalMaxDash;
+    }
+
+     if (enemy instanceof StealthEnemy) {
+      
+        enemy.stealthSpeed = 3.5; // 恢复原速度
+        console.log("隐身敌人速度恢复为:", enemy.stealthSpeed);
+      
+
+        
+      
     }
   }
 

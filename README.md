@@ -43,13 +43,33 @@ Add a group photo here!
 | Mengqiu Yan  | zj24391@bristol.ac.uk | zj24391          |
 | Chen Zhang   | ov24336@bristol.ac.uk | ov24336          |
 
-## Project Report
+# Project Report
+## Table of Contents
+- [1 Introduction](#1-introduction)
+  - [1.1 Overview](#11-overview)
+- [2 Art Design and Innovation](#2-art-design-and-innovation)
+  - [2.1 Character State](#21-character-state)
+  - [2.2 Skill And Attack Effects](#22-skill-and-attack-effects)
+  - [2.3 Monster And Time Item Appearances](#23-monster-and-time-item-appearances)
+  - [2.4 Bullet Types](#24-bullet-types)
+  - [2.5 Visual Effects](#25-visual-effects)
+- [3 Requirements](#3-requirements)
+- [4 Design](#4-design)
+- [5 Implementation](#5-implementation)
+- [6 Evaluation](#6-evaluation)
+- [7 Process](#7-process)
+- [8 Conclusion](#8-conclusion)
+- [9 Contribution Statement](#9-contribution-statement)
+- [10 Additional Marks](#10-additional-marks)
 
-### Introduction
-#### Art Design and Innovation
+# 1 Introduction
+- 5% ~250 words 
+- Describe your game, what is based on, what makes it novel? 
+[Back to Table of Contents](#table-of-contents)
+# 2 Art Design and Innovation
 We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
 
-#### Character State
+## 2.1 Character State
 Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
 
 | Image                                                           | Name        | Description                                                                           |
@@ -59,7 +79,7 @@ Character design is combined with the skill tree system. Players can freely choo
 |![image](docs/Demo/assets/media/character/power-idle-base.gif)   | Power mode  | The state of the battle mecha when the power-type skill tree branch is activated.     |
 |![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
 
-#### Skill And Attack Effects
+## 2.2 Skill And Attack Effects
 Skill animations and effects are combined with art to make the game more immersive and fun for players.
 
 | Image                                                             | Name           | Description                                                                                                                         |
@@ -71,7 +91,7 @@ Skill animations and effects are combined with art to make the game more immersi
 |![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
 |![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
 
-#### Monster Appearances
+## 2.3 Monster And Time Item Appearances
 Carefully designed monster appearances match the game’s theme and make players feel more involved.
 
 | Image                                                               | Name             | Description                                                                                                                         |
@@ -83,8 +103,10 @@ Carefully designed monster appearances match the game’s theme and make players
 |![image](docs/Demo/assets/media/monster/Danmaku-monster.gif)         | Danmaku-monster  | Shoots bullet attacks at the player.                                                                                                |
 |![image](docs/Demo/assets/media/boss/TOWER.gif)                      | Tower            | A device summoned by the boss.                                                                                                      |
 |![image](docs/Demo/assets/media/boss/BOSS_IDLE.gif)                  | Boss             | Has many attack moves and effects, and includes game mechanics that players need to figure out.                                     |
+|![image](docs/Demo/assets/media/time/time.gif)                       | Time             | Players can touch it to get extra time and earn more points.                                                                        |
 
-#### Bullet Types
+
+## 2.4 Bullet Types
 Many kinds of bullets with different targets. This makes the visuals more interesting and improves the game experience.
 
 | Image                                                               | Name                      | Description                                                                                                                         |
@@ -93,7 +115,7 @@ Many kinds of bullets with different targets. This makes the visuals more intere
 |![image](docs/Demo/assets/media/bullet/Character-rebound-bullet.gif) | Character-rebound-bullet  | Bullets reflected by player skills.                                                                                                 |
 |![image](docs/Demo/assets/media/bullet/Boss-bullet.gif)              | Boss-bullet               | Special bullet patterns from the boss.                                                                                              |
 
-#### Visual Effects
+## 2.5 Visual Effects
 Rich visual effects make the game more fun and improve the player’s experience.
 
 | Image                                                               | Description              | Image                                                                 |        Description                                                   |
@@ -106,11 +128,10 @@ Rich visual effects make the game more fun and improve the player’s experience
 |![image](docs/Demo/assets/media/Visualeffect/boss-wave.gif)          | boss-wave                | 
 
 
+[Back to Table of Contents](#table-of-contents)
 
-- 5% ~250 words 
-- Describe your game, what is based on, what makes it novel? 
 
-### Requirements 
+# 3 Requirements 
 
 - **As a player**
     
@@ -151,20 +172,23 @@ Rich visual effects make the game more fun and improve the player’s experience
     
     > “ I want to immerse myself in the game as quickly as possible after entering the main interface. “
     >
-
-### Design
+[Back to Table of Contents](#table-of-contents)
+# 4 Design
 
 - 15% ~750 words 
 - System architecture. Class diagrams, behavioural diagrams. 
-
-### Implementation
+[Back to Table of Contents](#table-of-contents)
+# 5 Implementation
 
 - 15% ~750 words
 
 - Describe implementation of your game, in particular highlighting the three areas of challenge in developing your game.
 - 技能系统；存档系统；Boss战
 
-### Evaluation
+
+[Back to Table of Contents](#table-of-contents)
+
+# 6 Evaluation
 
 - 15% ~750 words
 
@@ -254,8 +278,8 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 
 ![NASA-TLX 工作负荷趋势 (SVG)](docs/Datas/nasa_tlx_post_balancing.svg)
 **Cool! Scores belows 68 and great balance!!!**
-
-### Process 
+[Back to Table of Contents](#table-of-contents)
+# 7 Process 
 
 - 15% ~750 words
 
@@ -323,8 +347,8 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 - Toward the final sprints, our workflow matured. New features became plug-and-play thanks to consistent interfaces and reusable components. Final sprint activities included difficulty balancing, particle optimization, and edge case testing—such as verifying that ReflectSkill and DashSkill didn’t conflict under high-intensity gameplay.
 
 - Overall, the project not only tested our technical skills but also helped us mature as a team. Through collaborative design, shared testing, and iterative refinement, we achieved a high-functioning, extensible system that integrated gameplay design with sound software engineering principles.
-
-### Conclusion
+[Back to Table of Contents](#table-of-contents)
+# 8 Conclusion
 
 - 10% ~500 words
 
@@ -369,12 +393,12 @@ p5.js 提供了灵活的图形接口，但对复杂状态控制和大规模对�
 	- •	Build a leaderboard system to track high scores and survival times for long-term player motivation.
 
 - In summary, this project not only helped us develop a functionally rich and structurally complex game, but also gave us a deeper appreciation for design patterns, collaboration practices, technical precision, and iterative UX improvement. It served as a comprehensive training ground for large-scale system development and has prepared us well for future projects in software and game development alike.
-
-### Contribution Statement
+[Back to Table of Contents](#table-of-contents)
+# 9 Contribution Statement
 
 - Provide a table of everyone's contribution, which may be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Let us know as soon as possible if there are any issues with teamwork as soon as they are apparent. 
-
-### Additional Marks
+[Back to Table of Contents](#table-of-contents)
+# 10 Additional Marks
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
@@ -385,3 +409,6 @@ You can delete this section in your own repo, it's just here for information. in
 
   - Is your repo clearly organised? 
   - Is code well commented throughout?
+
+
+[Back to Table of Contents](#table-of-contents)

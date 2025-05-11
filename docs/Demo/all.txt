@@ -134,6 +134,28 @@
 
 ===== SKIPPED (binary) ./assets/media/BG5.png =====
 
+===== SKIPPED (binary) ./assets/media/Visualeffect/boost.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/boss-blackhole.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/boss-dash-explore.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/boss-puff.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/boss-summon.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/boss-wave.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/character-dash-puff.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/character-idle-puff.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/charge.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/shield.gif =====
+
+===== SKIPPED (binary) ./assets/media/Visualeffect/steal.gif =====
+
 ===== SKIPPED (binary) ./assets/media/boss/BOSS_BLACKHOLE_SKILL.gif =====
 
 ===== SKIPPED (binary) ./assets/media/boss/BOSS_DASH.gif =====
