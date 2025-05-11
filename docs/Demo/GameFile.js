@@ -155,12 +155,15 @@ function preload() {
     dataLoaded = true;
   });
 
-  skillIcons["闪现"] = null;
-  skillIcons["火球"] = null;
-  skillIcons["护盾"] = null;
-  skillIcons["治疗"] = null;
-  skillIcons["冰冻"] = null;
-  skillIcons["反弹"] = null;
+  skillIcons["Phantom Dash"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Ghost Cutter"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Runner’s Instinct"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Crimson Drain"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Wrath Unchained"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Berserker’s Blood"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Iron Reversal"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Anchor Field"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Guardian’s Will"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
   bossBulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
