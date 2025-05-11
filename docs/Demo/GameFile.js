@@ -34,6 +34,15 @@ async function loadSaveData() {
 
   score = savedCumulativeScore; 
 
+  //同步设置当前难度状态
+  if (savedMode === 'hard') {
+    isHardMode = true;
+    console.log('当前难度：困难');
+  }else {
+    isHardMode = false; 
+    console.log('当前难度：简单');
+  }
+
   console.log('读到存档→', { savedLevel, savedMode, savedSkills });
 }
 
@@ -466,7 +475,7 @@ function updateCamera() {
 
 function drawMapBorder() {
   push();
-  stroke(255, 0, 0);
+  stroke(0, 0, 0);
   strokeWeight(5);
   noFill();
   rectMode(CENTER);
@@ -1161,7 +1170,7 @@ class Level1 extends BaseLevel {
 
     this.countdownStarted = false;
     this.countdownStartTime = 0;
-    this.remainingTime = 1;  // 1 分钟
+    this.remainingTime = 60;  // 1 分钟
     this.completed = false;
 
     this.tipExpireTime = null;  // 提示语消失的时间戳（单位：毫秒）
@@ -1272,7 +1281,7 @@ class Level1 extends BaseLevel {
     this.countdownStarted = true;
 
     // 启动全局倒计时（利用已有的 updateTimer 机制）
-    timer = 1;  // 设置全局 60 秒
+    timer = 60;  // 设置全局 60 秒
     startTime = millis();  // 重置全局倒计时起点
 
     // 不要重新赋值新数组，而是清空原有数组内容
@@ -1344,7 +1353,7 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 5 : 3); 
+    this.generateFollowEnemy(isHardMode? 10 : 5); 
     // CommonEnemy
     this.generateCommonEnemy(isHardMode? 10 : 6); 
 
@@ -1356,7 +1365,7 @@ class Level2 extends BaseLevel {
     this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
 
     // 设置倒计时
-    timer = 1;
+    timer = 60;
     startTime = millis();
 
     this.stage = 1;  // 切换到正式战斗阶段
@@ -1432,7 +1441,7 @@ class Level3 extends BaseLevel {
 
 
     // 刷敌人
-    /*
+    
     // FollowEnemy
     this.generateFollowEnemy(isHardMode? 8 : 5); 
 
@@ -1445,7 +1454,7 @@ class Level3 extends BaseLevel {
    this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
 
     // 刷奖励物
-    this.generateTimeBonus(3); // 刷奖励物*/
+    this.generateTimeBonus(3); // 刷奖励物
     
 
     // 设置倒计时
@@ -1654,11 +1663,7 @@ class Level5 extends BaseLevel{
       }
 
 
-    // // 更新黑洞
-    // for (let bh of this.blackHoles) {
-    //     bh.update(player);
-    // }
-
+   
   
       // 判断敌人是否清空 & 时间是否还在倒计时中
       if (!this.finished && enemies.length === 0 && remainingTime > 0) {
