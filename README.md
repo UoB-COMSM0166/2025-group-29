@@ -48,20 +48,25 @@ Add a group photo here!
 - [1 Introduction](#1-introduction)
   - [1.1 Overview](#11-overview)
 - [2 Art Design and Innovation](#2-art-design-and-innovation)
+  - [2.1 Character State](#21-character-state)
+  - [2.2 Skill And Attack Effects](#22-skill-and-attack-effects)
+  - [2.3 Monster And Time Item Appearances](#23-monster-and-time-item-appearances)
+  - [2.4 Bullet Types](#24-bullet-types)
+  - [2.5 Visual Effects](#25-visual-effects)
 - [3 Requirements](#3-requirements)
 - [4 Design](#4-design)
 - [5 Implementation](#5-implementation)
 - [6 Evaluation](#6-evaluation)
 - [7 Process](#7-process)
 - [8 Conclusion](#8-conclusion)
-- [9 Contribution Statement](#9-contribution-statementn)
+- [9 Contribution Statement](#9-contribution-statement)
 - [10 Additional Marks](#10-additional-marks)
 
 # 1 Introduction
 # 2 Art Design and Innovation
 We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
 
-## Character State
+## 2.1 Character State
 Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
 
 | Image                                                           | Name        | Description                                                                           |
@@ -71,7 +76,7 @@ Character design is combined with the skill tree system. Players can freely choo
 |![image](docs/Demo/assets/media/character/power-idle-base.gif)   | Power mode  | The state of the battle mecha when the power-type skill tree branch is activated.     |
 |![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
 
-## Skill And Attack Effects
+## 2.2 Skill And Attack Effects
 Skill animations and effects are combined with art to make the game more immersive and fun for players.
 
 | Image                                                             | Name           | Description                                                                                                                         |
@@ -83,7 +88,7 @@ Skill animations and effects are combined with art to make the game more immersi
 |![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
 |![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
 
-## Monster And Time Item Appearances
+## 2.3 Monster And Time Item Appearances
 Carefully designed monster appearances match the game’s theme and make players feel more involved.
 
 | Image                                                               | Name             | Description                                                                                                                         |
@@ -98,7 +103,7 @@ Carefully designed monster appearances match the game’s theme and make players
 |![image](docs/Demo/assets/media/time/time.gif)                       | Time             | Players can touch it to get extra time and earn more points.                                                                        |
 
 
-## Bullet Types
+## 2.4 Bullet Types
 Many kinds of bullets with different targets. This makes the visuals more interesting and improves the game experience.
 
 | Image                                                               | Name                      | Description                                                                                                                         |
@@ -107,7 +112,7 @@ Many kinds of bullets with different targets. This makes the visuals more intere
 |![image](docs/Demo/assets/media/bullet/Character-rebound-bullet.gif) | Character-rebound-bullet  | Bullets reflected by player skills.                                                                                                 |
 |![image](docs/Demo/assets/media/bullet/Boss-bullet.gif)              | Boss-bullet               | Special bullet patterns from the boss.                                                                                              |
 
-## Visual Effects
+## 2.5 Visual Effects
 Rich visual effects make the game more fun and improve the player’s experience.
 
 | Image                                                               | Description              | Image                                                                 |        Description                                                   |
