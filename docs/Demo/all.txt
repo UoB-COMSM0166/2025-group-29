@@ -436,6 +436,31 @@ canvas {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Pause Menu Styles */
+.pauseContainer {
+    /* 与 .menuContainer 保持一致 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.pauseContainer h1 {
+    margin: 0 0 16px;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 按钮依然使用 .menuButton，已含 hover 和 transform 效果 */
+
 ===== ./export_all.sh =====
 output="all.txt"
 
@@ -468,93 +493,45 @@ echo "✅ Success $output"
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My P5 Game</title>
   <style>
-    html, body {
-      margin: 0; padding: 0;
-      width: 100vw; height: 100vh;
-      overflow: hidden;
-      background: black;
-    }
-
-    /* 背景 iframe */
-    #bgFrame {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      border: none;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* p5.js 的画布 */
-    canvas {
-      position: absolute !important;
-      top: 0 !important; left: 0 !important;
-      z-index: 1 !important;
-      background: transparent !important;
-    }
-
-    /* 暂停菜单 iframe */
-    #pauseFrame {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      z-index: 10000;
-      border: none;
-    }
+    html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden;background:#000}
+    #bgFrame{position:absolute;top:0;left:0;width:100vw;height:100vh;border:none;z-index:0;pointer-events:none}
+    canvas{position:absolute!important;top:0!important;left:0!important;z-index:1!important;background:transparent!important}
+    #pauseFrame{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;border:none}
   </style>
-
-  <!-- 1. 拿 URL 中的 saveId -->
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const saveId = params.get('saveId');
-    if (!saveId) {
-      console.error('Missing saveId in URL');
-      alert('存档 ID 缺失，无法继续');
-    }
-    window.APP_SAVE_ID = saveId;
-  </script>
+    const MAIN_URL='index.html?directMain=1';
+    function goToMainMenu(){window.location.href=MAIN_URL}
 
-  <!-- 2. p5.js 与游戏脚本 -->
+    const params=new URLSearchParams(window.location.search);
+    const saveId=params.get('saveId');
+    if(!saveId){console.error('Missing saveId in URL');alert('存档 ID 缺失，无法继续')}
+    window.APP_SAVE_ID=saveId;
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
   <script type="module" src="GameFile.js"></script>
 </head>
-
 <body>
-  <!-- ESC 弹窗界面 -->
   <iframe id="pauseFrame" src="pause.html"></iframe>
-
-  <!-- 背景层 -->
   <iframe id="bgFrame" src="BG.html"></iframe>
-
   <script>
-    const bg = document.getElementById('bgFrame');
-    const pauseFrame = document.getElementById('pauseFrame');
+    const bg=document.getElementById('bgFrame');
+    const pauseFrame=document.getElementById('pauseFrame');
 
-    // 将按键事件转发给背景
-    window.addEventListener('keydown', e => {
-      bg.contentWindow.postMessage({ type: 'keydown', key: e.key }, '*');
-
-      if (e.key === 'Escape') {
-        pauseFrame.style.display = 'block';
-      }
+    window.addEventListener('keydown',e=>{
+      bg.contentWindow.postMessage({type:'keydown',key:e.key},'*');
+      if(e.key==='Escape'){pauseFrame.style.display='block'}
     });
-    window.addEventListener('keyup', e => {
-      bg.contentWindow.postMessage({ type: 'keyup', key: e.key }, '*');
+    window.addEventListener('keyup',e=>{
+      bg.contentWindow.postMessage({type:'keyup',key:e.key},'*')
     });
 
-    // ESC 页面发回来的动作处理
-    window.addEventListener('message', e => {
-      if (e.data?.type === 'pause_action') {
-        pauseFrame.style.display = 'none';
-        const action = e.data.action;
-        if (action === 'resume') {
-          // 返回游戏
-        } else if (action === 'save') {
-          // 触发保存逻辑（待补）
-        } else if (action === 'quit') {
-          window.location.href = 'index.html';
-        }
+    window.addEventListener('message',e=>{
+      if(e.data?.type==='pause_action'){
+        pauseFrame.style.display='none';
+        const action=e.data.action;
+        if(action==='resume'){}
+        else if(action==='save'){}
+        else if(action==='quit'){goToMainMenu()}
       }
     });
   </script>
@@ -977,56 +954,45 @@ export function showPrivacyConsent(callback) {
 }
 
 ===== ./js/router.js =====
-// js/router.js
-import { startFlight } from './background.js';
-import { IntroScreen }   from './ui/introScreen.js';
-import { MainMenu }      from './ui/mainMenu.js';
-import { LoadMenu }      from './ui/loadMenu.js';
-import { SaveMenu }      from './ui/saveMenu.js';
-import { ExitConfirm }   from './ui/exitConfirm.js';
+import { startFlight } from './background.js'
+import { IntroScreen } from './ui/introScreen.js'
+import { MainMenu } from './ui/mainMenu.js'
+import { LoadMenu } from './ui/loadMenu.js'
+import { SaveMenu } from './ui/saveMenu.js'
+import { ExitConfirm } from './ui/exitConfirm.js'
 
 const modules = {
-  INTRO:        IntroScreen,
-  MAIN_MENU:    MainMenu,
-  LOAD_MENU:    LoadMenu,
-  SAVE_MENU:    SaveMenu,
+  INTRO: IntroScreen,
+  MAIN_MENU: MainMenu,
+  LOAD_MENU: LoadMenu,
+  SAVE_MENU: SaveMenu,
   EXIT_CONFIRM: ExitConfirm
-};
+}
 
-let currentState = null;
+let currentState = null
 
-/**
- * I initialize the router. If the URL contains ?directMain=1,
- * I skip intro and privacy and go straight to MAIN_MENU.
- */
-export function initRouter() {
-  const params = new URLSearchParams(window.location.search);
+export function initRouter () {
+  const params = new URLSearchParams(window.location.search)
   if (params.get('directMain')) {
-    switchTo('MAIN_MENU');
+    switchTo('MAIN_MENU')
   } else {
-    switchTo('INTRO');
+    switchTo('INTRO')
   }
 }
 
-/**
- * I switch from the current state to the given state module.
- */
-export function switchTo(state) {
-  if (currentState) modules[currentState].hide();
-  currentState = state;
-  modules[state].show();
+export function switchTo (state) {
+  if (currentState) modules[currentState].hide()
+  currentState = state
+  modules[state].show()
 }
 
-/**
- * I advance to the next state by flying the background first.
- */
-export function advanceTo(state) {
+export function advanceTo (state) {
   const handler = () => {
-    window.removeEventListener('flightComplete', handler);
-    switchTo(state);
-  };
-  window.addEventListener('flightComplete', handler);
-  startFlight();
+    window.removeEventListener('flightComplete', handler)
+    switchTo(state)
+  }
+  window.addEventListener('flightComplete', handler)
+  startFlight()
 }
 
 ===== ./js/shop.js =====
@@ -1242,61 +1208,63 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 ===== ./js/ui/escMenu.js =====
-// js/ui/escMenu.js
-import { switchTo } from '../router.js';
+import { switchTo } from '../router.js'
+
+const MAIN_URL = 'index.html?directMain=1'
+function goToMainMenu () { window.location.href = MAIN_URL }
 
 export const EscMenu = {
   el: null,
-  show({ onResume }) {
-    this.el = document.createElement('div');
-    this.el.className = 'menuContainer';
+  show ({ onResume } = {}) {
+    this.el = document.createElement('div')
+    this.el.className = 'menuContainer'
     this.el.innerHTML = `
       <h2>Paused</h2>
       <button class="menuButton" id="resumeBtn">Resume</button>
       <button class="menuButton" id="saveBtn">Save</button>
       <button class="menuButton" id="loadBtn">Load</button>
       <button class="menuButton" id="exitBtn">Exit</button>
-    `;
-    document.body.appendChild(this.el);
+    `
+    document.body.appendChild(this.el)
     document.getElementById('resumeBtn').onclick = () => {
-      this.hide();
-      onResume?.();
-    };
-    document.getElementById('saveBtn').onclick   = () => { this.hide(); switchTo('SAVE_MENU'); };
-    document.getElementById('loadBtn').onclick   = () => { this.hide(); switchTo('LOAD_MENU'); };
-    document.getElementById('exitBtn').onclick   = () => window.location.href = 'index.html';
+      this.hide()
+      onResume?.()
+    }
+    document.getElementById('saveBtn').onclick = () => {
+      this.hide()
+      switchTo('SAVE_MENU')
+    }
+    document.getElementById('loadBtn').onclick = () => {
+      this.hide()
+      switchTo('LOAD_MENU')
+    }
+    document.getElementById('exitBtn').onclick = () => goToMainMenu()
   },
-  hide() { this.el?.remove(); }
-};
+  hide () { this.el?.remove() }
+}
 
 ===== ./js/ui/exitConfirm.js =====
-// js/ui/exitConfirm.js
-import { switchTo } from '../router.js';
+import { switchTo } from '../router.js'
+
+const MAIN_URL = 'index.html?directMain=1'
+function goToMainMenu () { window.location.href = MAIN_URL }
 
 export const ExitConfirm = {
   el: null,
-  show() {
-    this.el = document.createElement('div');
-    this.el.className = 'menuContainer';
+  show () {
+    this.el = document.createElement('div')
+    this.el.className = 'menuContainer'
     this.el.innerHTML = `
       <h2>Exit to Main Menu?</h2>
       <button class="menuButton" id="yesExit">Yes</button>
       <button class="menuButton" id="noExit">No</button>
-    `;
-    document.body.appendChild(this.el);
-
-    // 点击 Yes 时刷新当前页面
-    document.getElementById('yesExit').onclick = () => {
-      window.location.reload();
-    };
-
-    // 点击 No 时回到主菜单
-    document.getElementById('noExit').onclick  = () => switchTo('MAIN_MENU');
+    `
+    document.body.appendChild(this.el)
+    document.getElementById('yesExit').onclick = () => goToMainMenu()
+    document.getElementById('noExit').onclick = () => switchTo('MAIN_MENU')
   },
-  hide() {
-    this.el?.remove();
-  }
-};
+  hide () { this.el?.remove() }
+}
 
 ===== ./js/ui/introScreen.js =====
 // js/ui/introScreen.js
@@ -1612,34 +1580,20 @@ export const SummaryMenu = {
 ===== SKIPPED (binary) ./package-lock.json =====
 
 ===== ./pause.html =====
-<!-- pause.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>Pause Menu</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <style>
-    body {
-      margin: 0; background: rgba(0,0,0,0.9); color: white;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      font-family: 'Minecraft', Arial, sans-serif;
-    }
-    h1 { margin-bottom: 20px; }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-  <h1>Game Paused</h1>
-  <button onclick="parent.postMessage({type:'pause_action', action:'resume'}, '*')">Resume</button>
-  <button onclick="parent.postMessage({type:'pause_action', action:'save'}, '*')">Save</button>
-  <button onclick="parent.postMessage({type:'pause_action', action:'quit'}, '*')">Quit</button>
+  <div class="pauseContainer">
+    <h1>Game Paused​</h1>
+    <button class="menuButton" onclick="…">Resume</button>
+    <button class="menuButton" onclick="…">Save</button>
+    <button class="menuButton" onclick="…">Quit</button>
+  </div>
 </body>
 </html>
 

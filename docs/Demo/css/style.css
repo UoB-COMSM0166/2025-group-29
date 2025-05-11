@@ -148,3 +148,28 @@ canvas {
 .loadTable th {
     background: rgba(255, 255, 255, 0.1);
 }
+
+/* Pause Menu Styles */
+.pauseContainer {
+    /* 与 .menuContainer 保持一致 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.pauseContainer h1 {
+    margin: 0 0 16px;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* 按钮依然使用 .menuButton，已含 hover 和 transform 效果 */
