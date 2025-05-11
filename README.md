@@ -60,16 +60,39 @@ Character design is combined with the skill tree system. Players can freely choo
 |![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
 
 #### Skill and attack effects
-Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
+Skill animations and effects are combined with art to make the game more immersive and fun for players.
 
-| Image                                                             | Name           | Description                                                                           |
-|-------------------------------------------------------------------|----------------|---------------------------------------------------------------------------------------|
-|![image](docs/Demo/assets/media/character/normal-attack-base.gif)  | Attack         | The normal state of the battle mecha when no skill tree branch or style is activated. |
-|![image](docs/Demo/assets/media/character/normal-idle-boost.gif)   | Ghost Cutter   | The normal state of the battle mecha when no skill tree branch or style is activated. |
-|![image](docs/Demo/assets/media/character/normal-idle-shield.gif)  | Iron Reversal  | The state of the battle mecha when the power-type skill tree branch is activated.     |
-|![image](docs/Demo/assets/media/character/normal-idle-steal.gif)   | Crimson Drain  |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
-|![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | The state of the battle mecha when the agile-type skill tree branch is activated.     |
-|![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| The state of the battle mecha when the agile-type skill tree branch is activated.     |
+| Image                                                             | Name           | Description                                                                                                                         |
+|-------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/character/normal-attack-base.gif)  | Attack         | The animation of the character’s normal attack.                                                                                     |
+|![image](docs/Demo/assets/media/character/normal-idle-boost.gif)   | Ghost Cutter   | An attack boost. Increases attack power for a short time.                                                                           |
+|![image](docs/Demo/assets/media/character/normal-idle-shield.gif)  | Iron Reversal  | A shield skill. Creates a shield that blocks damage and can reflect bullet attacks.                                                 |
+|![image](docs/Demo/assets/media/character/normal-idle-steal.gif)   | Crimson Drain  | A lifesteal skill. Attacks restore some health.                                                                                     | 
+|![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
+|![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
+
+#### Monster appearances
+Carefully designed monster appearances match the game’s theme and make players feel more involved.
+
+| Image                                                               | Name             | Description                                                                                                                         |
+|---------------------------------------------------------------------|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/monster/normal-monster.gif)          | Normal-monster   | Moves around within a set area.                                                                                                     |
+|![image](docs/Demo/assets/media/monster/Follow-monster.gif)          | Follow-monster   | Follows and attacks the player.                                                                                                     |
+|![image](docs/Demo/assets/media/monster/Invisible-monster.gif)       | Invisible-monster| Becomes visible only when the player gets close, then follows and attacks.                                                          |
+|![image](docs/Demo/assets/media/monster/Ambush-monster-attack.gif)   | Ambush-monster   | Rushes to attack the player quickly when close.                                                                                     | 
+|![image](docs/Demo/assets/media/monster/Danmaku-monster.gif)         | Danmaku-monster  | Shoots bullet attacks at the player.                                                                                                |
+|![image](docs/Demo/assets/media/boss/TOWER.gif)                      | Tower            | A device summoned by the boss.                                                                                                      |
+|![image](docs/Demo/assets/media/boss/BOSS_IDLE.gif)                  | Boss             | Has many attack moves and effects, and includes game mechanics that players need to figure out.                                     |
+
+#### Bullet Types
+Many kinds of bullets with different targets. This makes the visuals more interesting and improves the game experience.
+
+| Image                                                               | Name                      | Description                                                                                                                         |
+|---------------------------------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/bullet/Monster-bullet.gif)           | Monster-bullet            | Bullets shot by Danmaku-monsters.                                                                                                   |
+|![image](docs/Demo/assets/media/bullet/Character-rebound-bullet.gif) | Character-rebound-bullet  | Bullets reflected by player skills.                                                                                                 |
+|![image](docs/Demo/assets/media/bullet/Boss-bullet.gif)              | Boss-bullet               | Special bullet patterns from the boss.                                                                                              |
+
 
 
 - 5% ~250 words 
