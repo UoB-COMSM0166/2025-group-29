@@ -60,7 +60,7 @@ Character design is combined with the skill tree system. Players can freely choo
 |![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
 
 #### Skill and attack effects
-Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
+Skill animations and effects are combined with art to make the game more immersive and fun for players.
 
 | Image                                                             | Name           | Description                                                                                                                         |
 |-------------------------------------------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------|
