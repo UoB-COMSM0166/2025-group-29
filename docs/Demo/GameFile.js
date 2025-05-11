@@ -155,15 +155,15 @@ function preload() {
     dataLoaded = true;
   });
 
-  skillIcons["Phantom Dash"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Ghost Cutter"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Runner’s Instinct"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Crimson Drain"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Wrath Unchained"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Berserker’s Blood"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Iron Reversal"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Anchor Field"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
-  skillIcons["Guardian’s Will"] = loadImage("assets/media/boss/BOSS_IDLE.gif"); 
+  skillIcons["Phantom Dash"] = loadImage("assets/media/icon/icon8.PNG"); 
+  skillIcons["Ghost Cutter"] = loadImage("assets/media/icon/icon5.PNG"); 
+  skillIcons["Runner’s Instinct"] = loadImage("assets/media/icon/icon4.PNG"); 
+  skillIcons["Crimson Drain"] = loadImage("assets/media/icon/icon7.PNG"); 
+  skillIcons["Wrath Unchained"] = loadImage("assets/media/icon/icon2.PNG"); 
+  skillIcons["Berserker’s Blood"] = loadImage("assets/media/icon/icon9.PNG"); 
+  skillIcons["Iron Reversal"] = loadImage("assets/media/icon/icon3.PNG"); 
+  skillIcons["Anchor Field"] = loadImage("assets/media/icon/icon1.PNG"); 
+  skillIcons["Guardian’s Will"] = loadImage("assets/media/icon/icon6.PNG"); 
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
   bossBulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
