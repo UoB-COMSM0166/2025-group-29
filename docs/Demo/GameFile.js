@@ -1723,10 +1723,10 @@ class Player {
 
 
     
-    this.hp = new HPSystem(100); // 初始血量100
+    this.hp = new HPSystem(600); // 初始血量100
     
 
-    this.baseAttack = 15;  // 原本的基础攻击力
+    this.baseAttack = 40;  // 原本的基础攻击力
     this.buffAttack = this.baseAttack; // 当前生效的攻击力（默认 = 基础）
 
     this.selectedSkills = []; // 玩家已装备的技能
@@ -1951,7 +1951,7 @@ vel: createVector(random(-1, 1), random(-2, -1)), // ← 更强的上飘速度
 class Enemy {
   constructor(x, y) {
     this.pos = createVector(x, y);  // Initial position of enemies
-    this.hp = new HPSystem(30);     
+    this.hp = new HPSystem(100);     
     this.dead = false;              // Death Mark
   
     this.exploding = false; // Whether to play death effects
@@ -2096,7 +2096,7 @@ class AmbushEnemy extends Enemy {
   constructor(x, y) {
     super(x, y); // ✅ 删除 r 和 mode 参数
     this.r = 40; // ✅ 设置自己的半径
-    this.hp = new HPSystem(40); // ✅ 设置自己的血量（可选）
+    this.hp = new HPSystem(80); // ✅ 设置自己的血量（可选）
     this.contactDamage = 15; // 接触伤害
     this.scaleFactor = 2;//大小
     this.ambushImg = ambush_gif;   // 伏击状态的图像
@@ -2167,7 +2167,7 @@ class StealthEnemy extends Enemy {
   constructor(x, y) {
     super(x, y); // ✅ 简化构造函数
     this.r = 35;
-    this.hp = new HPSystem(25);
+    this.hp = new HPSystem(100);
     this.contactDamage = 20; // 接触伤害
     this.scaleFactor = 2;//大小
     this.spriteImg = stealth_gif;  // 比如 bulletEnemyImg
@@ -2367,7 +2367,7 @@ class BulletEnemy extends Enemy {
     this.fireCooldown = 2000; // 每次发射的间隔（ms）
     this.lastFireTime = millis();
     
-    this.hp = new HPSystem(25);
+    this.hp = new HPSystem(170);
     this.spriteImg = bulletenemy_gif; // 设置贴图
     this.scaleFactor = 4;//大小
     this.flip = false; 
@@ -2433,7 +2433,7 @@ class CommonEnemy extends Enemy {
   constructor(x, y) {
     super(x, y);
     this.r = 20;             // 比精英怪小
-    this.hp = new HPSystem(25); // 较低血量
+    this.hp = new HPSystem(60); // 较低血量
     this.speed = 3;        // 稍快的移动速度
     this.scaleFactor = 1.8;//大小
     this.spriteImg = common_gif;  // 比如 bulletEnemyImg
@@ -2495,7 +2495,7 @@ class Boss extends Enemy {
 
     /* ───── 基本属性 ───── */
     this.r  = 115;
-    this.hp = new HPSystem(100);
+    this.hp = new HPSystem(2800);
     this.contactDamage = 40;
 
     /* ───── idle / 召唤图片 ───── */
@@ -2524,7 +2524,7 @@ class Boss extends Enemy {
     };
 
         /* ───── 塔防战技能 ───── */
-        this.towerDur        = 10000;      // 持续 30s
+        this.towerDur        = 20000;      // 持续 30s
         this.towerActive     = false;
         this.towerStart      = 0;
         //this.towerStart = -(this.towerCD + this.towerDur);//-90000
@@ -2628,7 +2628,7 @@ class Boss extends Enemy {
   
     const d = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
     if (d >= innerR && d <= outerR) {
-      player.receiveDamage(40);
+      player.receiveDamage(100);
       this.ringHitOnce.add(ringIdx);
       console.log(`⚡ Wave hit! ring ${ringIdx}`);
     }
@@ -2678,23 +2678,24 @@ class Boss extends Enemy {
         // 保持在 0～2π 之间，可选
         this.towerAngleOffset %= TWO_PI;
       }
-    }else {
-      // 30s 到，清理塔并结算
-      this.towerActive = false;
-      // 还活着的塔
-      const alive = this.towers.filter(t => t.hp.isAlive());
-      if (alive.length) {
-        // 有没被炸掉的塔 → 全部清除并伤害玩家
-        alive.forEach(t => t.hp.takeDamage(t.hp.currentHP));
-        player.receiveDamage(50);
-      } else {
-        // 全部被玩家拆掉 → boss 受伤
-        this.hp.takeDamage(200);
-      }
-      this.towers = [];
-      // ★ 杀掉残留子弹，避免血条继续被打 —— 
-      bullets.length = 0;
     }
+    // else {
+    //   // 30s 到，清理塔并结算
+    //   this.towerActive = false;
+    //   // 还活着的塔
+    //   const alive = this.towers.filter(t => t.hp.isAlive());
+    //   if (alive.length) {
+    //     // 有没被炸掉的塔 → 全部清除并伤害玩家
+    //     alive.forEach(t => t.hp.takeDamage(t.hp.currentHP));
+    //     player.receiveDamage(100);
+    //   } else {
+    //     // 全部被玩家拆掉 → boss 受伤
+    //     this.hp.takeDamage(500);
+    //   }
+    //   this.towers = [];
+    //   // ★ 杀掉残留子弹，避免血条继续被打 —— 
+    //   bullets.length = 0;
+    // }
   }
 
   //冲刺技能----------------------------------------------------
@@ -2768,7 +2769,7 @@ class Boss extends Enemy {
     const d = dist(P.x, P.y, closest.x, closest.y);
 
     if (d <= this.dashBarThickness/2) {
-      player.receiveDamage(40);
+      player.receiveDamage(100);
       this.dashDamageDone = true;
     }
   }
@@ -2818,8 +2819,8 @@ selectAndTriggerSkill() {
   let stageSkill;
   if      (ratio <= 0.25) stageSkill = 'earthquake';
   else if (ratio <= 0.50) stageSkill = 'barrage';
-  else if (ratio <= 0.75) stageSkill = 'dash';
-  else if (ratio <= 0.95) stageSkill = 'summon';
+  else if (ratio <= 0.73) stageSkill = 'dash';
+  else if (ratio <= 0.88) stageSkill = 'summon';
   else                    stageSkill = 'blackhole';
 
   // 如果这个阶段的技能还没解锁，就只触发它，并加入池子
@@ -2854,10 +2855,10 @@ cleanupTower() {
   if (alive.length) {
     // 有没被拆的塔：把它们都爆掉并伤害玩家
     alive.forEach(t => t.hp.takeDamage(t.hp.currentHP));
-    player.receiveDamage(50);
+    player.receiveDamage(100);
   } else {
     // 全部都被玩家拆了：Boss 受伤
-    this.hp.takeDamage(200);
+    this.hp.takeDamage(500);
   }
   // 最后清空塔和子弹列表
   this.towers = [];
@@ -4146,7 +4147,7 @@ class CollisionManager {
           bullet.reflect(); // 开启反弹
           continue;         // 跳过后续伤害处理
         }
-          this.player.receiveDamage(5); // 包含伤害判断和 gameOver 判定
+          this.player.receiveDamage(10); // 包含伤害判断和 gameOver 判定
           bullet.alive = false;
           console.log("玩家被子弹击中！");
         
@@ -4760,7 +4761,7 @@ class Tower extends Enemy {
   constructor(x, y) {
     super(x, y);
     this.r   = 30;
-    this.hp  = new HPSystem(5);      // 一下子就能被拆
+    this.hp  = new HPSystem(70);      // 两下子就能被拆
     this.gif = TOWER_IMG;
   }
   update() {
