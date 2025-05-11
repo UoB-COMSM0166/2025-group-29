@@ -1423,11 +1423,10 @@ class Level2 extends BaseLevel {
         
       // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
-            gamePaused = true;
+            // gamePaused = true;
             this.tip = "Seek out the black holes🌀— some heal, some hurt!";
+            this.tipExpireTime = millis() + 8000;  // 自动显示 8 秒
             this.pauseShown = true;
-            this.pausedForBlackHoleTip = true;
-            this.tipExpireTime = null;  // 让它一直显示，直到按键继续
         }
 
         // 检查完成
@@ -1469,15 +1468,7 @@ draw() {
 
 // 外部事件监听
 handleKeyPressed(key) {
-  // 黑洞提示暂停状态，按任意键继续
-  if (this.pausedForBlackHoleTip) {
-      gamePaused = false;
-      this.tip = "";
-      this.pausedForBlackHoleTip = false;
-  } else {
-    // 其他按键转发给 BaseLevel，处理 Save / Continue 等逻辑
     super.handleKeyPressed(key);
-}
 }
 
 
