@@ -179,6 +179,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 - System architecture. Class diagrams, behavioural diagrams. 
 [Back to Table of Contents](#table-of-contents)
 
+---
 类图
 
 在游戏开发的初期，类图能够帮助我们把握游戏结构，明确核心类、模块及其对应的职责。这有助于我们能够在原代码中规划良好的面向对象设计（OOD），例如合理拆分功能，降低开发人员之间的重复沟通成本。我们采用的GitHub+VS Code集成开发方法可据此划定feature分支（如feature/player, feature/BlackHole）。团队成员可以基于类图对类实现进行审查，让多人同时开发不同模块变得可控。
@@ -202,6 +203,8 @@ Game Structure
 - SkillSystem: Controls all skill activations, cooldowns, HUD displays, and more. Manages different skill subclasses, such as Dash skill, Blood fury skill, and so on.
 - loadSaveData: Controls the archive system, used to read archives from Supabase and load them into the game environment.
 - Other key classes: CollisionManager (detects player collisions with enemies, black holes, bullets, etc.) Bullet (manages all flying bullets for enemies and bosses to share) MeleeAttack class (manages interactions between enemies and players)
+### Class Diagram
+![Class Diagram](docs/Datas/Class%20Diagram.png)
 
 
 
