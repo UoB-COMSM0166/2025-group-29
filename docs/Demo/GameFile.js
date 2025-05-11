@@ -2025,7 +2025,7 @@ class Enemy {
 
      // Each enemy has its own attack cooldown time
      this.nextHitTime = 0;
-     this.hitCooldown = 500; 
+     this.hitCooldown = 1000;
 
      this.contactDamage = 10; // Default contact damage
   
@@ -4317,14 +4317,7 @@ class MeleeAttack {
     translate(C.x, C.y);
     blendMode(ADD);
 
-    // 底层大弧：偏蓝青色（HSB）
-    // noStroke();
-    // fill(200, 80, 100, 80);
-    // arc(0, 0, R*2.2, R*2.2, dirAng - arcAng/2, dirAng + arcAng/2, PIE);
-
-    // 中层弧：明黄色
-    // fill(50, 100, 100, 120);
-    // arc(0, 0, R*1.7, R*1.7, dirAng - arcAng/2, dirAng + arcAng/2, PIE);noStroke();
+  
    const ctx = drawingContext;     // p5 底层 2D Canvas context
    ctx.save();                     // 不污染外面
 
