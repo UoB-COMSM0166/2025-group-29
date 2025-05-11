@@ -2084,21 +2084,21 @@ class Player {
 
 class Enemy {
   constructor(x, y) {
-    this.pos = createVector(x, y);  // 所有敌人都需要位置
-    this.hp = new HPSystem(30);     // 血量系统（子类可覆盖）
-    this.dead = false;              // 死亡标记
+    this.pos = createVector(x, y);  // Initial position of enemies
+    this.hp = new HPSystem(30);     
+    this.dead = false;              // Death Mark
   
-    this.exploding = false; // ✅ 是否在播放死亡特效
-    this.explodeStartTime = 0; // ✅ 记录开始时间
-    this.explodeDuration = 1000; // 毫秒
+    this.exploding = false; // Whether to play death effects
+    this.explodeStartTime = 0; // Death animation start time
+    this.explodeDuration = 1000; 
 
     this.explosion = null;
 
-     // ✅ 每个敌人自己有攻击冷却时间
+     // Each enemy has its own attack cooldown time
      this.nextHitTime = 0;
-     this.hitCooldown = 500; // 500ms
+     this.hitCooldown = 500; 
 
-     this.contactDamage = 10; // ✅ 默认接触伤害
+     this.contactDamage = 10; // Default contact damage
   
   
   }
