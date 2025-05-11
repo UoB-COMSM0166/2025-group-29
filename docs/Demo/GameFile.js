@@ -508,10 +508,20 @@ function drawInfo() {
   // **修正计时器在右上角**
   textAlign(RIGHT, TOP);
   text("Time: " + nf(remainingTime, 2, 1) + "s", windowWidth - 20, 20); // **改为 windowWidth**
+  
+  // print level
   if (levelManager && levelManager.currentLevel) {
   let lv = levelManager.currentLevel.levelNumber ?? "?";
   text("Level: " + lv, windowWidth - 20, 50);  // 比 time 向下20~30像素
   }
+
+  //print mode
+   // 打印难度
+  let modeText = isHardMode ? "Hard" : "Easy";
+  text("Current Mode: " + modeText, windowWidth - 20, 80);
+
+
+  //
   skillSystem.drawIcon();  // ✅ 画技能图标
   
   
