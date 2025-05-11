@@ -668,6 +668,12 @@ function keyReleased() {
   bullets.length = 0;
   timeBonuses.length = 0;
 
+   // 🟢 重置计数器
+  ambushSpawnedCount = 0;
+  stealthSpawnedCount = 0;
+  ambushTimer = 0;
+  stealthTimer = 0;
+
 
   // 获取当前关卡索引
   const currentIndex = levelManager.levels.indexOf(levelManager.currentLevel);
@@ -1100,7 +1106,7 @@ generateHealBlackHole(max) {
       // 第二步：保存/继续界面
       textSize(24);
       text("Save current progress(press 'S')", windowWidth / 2, windowHeight / 2);
-      text("Countinue without saving(press 'C')", windowWidth / 2, windowHeight / 2 + 40);
+      
     }
   }
 
@@ -1127,9 +1133,7 @@ generateHealBlackHole(max) {
         await this.saveProgressToSupabase();   // 存档
         levelManager.loadNextLevel();          // 下一关
       }
-      if (key === 'C' || key === 'c') {
-        levelManager.loadNextLevel();          // 直接下一关
-      }
+      
     }
   }
 
