@@ -46,9 +46,11 @@ Add a group photo here!
 ## Project Report
 
 ### Introduction
-Art Design and Innovation
+#### Art Design and Innovation
+We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
 
-Character Specialization
+#### Character state
+Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
 
 | Image                                                           | Name        | Description                                                                           |
 |-----------------------------------------------------------------|-------------|---------------------------------------------------------------------------------------|
@@ -56,6 +58,18 @@ Character Specialization
 |![image](docs/Demo/assets/media/character/agile-idle-base.gif)   | Agile mode  | The state of the battle mecha when the agile-type skill tree branch is activated.     |
 |![image](docs/Demo/assets/media/character/power-idle-base.gif)   | Power mode  | The state of the battle mecha when the power-type skill tree branch is activated.     |
 |![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
+
+#### Skill and attack effects
+Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
+
+| Image                                                             | Name           | Description                                                                           |
+|-------------------------------------------------------------------|----------------|---------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/character/normal-attack-base.gif)  | Attack         | The normal state of the battle mecha when no skill tree branch or style is activated. |
+|![image](docs/Demo/assets/media/character/normal-idle-boost.gif)   | Ghost Cutter   | The normal state of the battle mecha when no skill tree branch or style is activated. |
+|![image](docs/Demo/assets/media/character/normal-idle-shield.gif)  | Iron Reversal  | The state of the battle mecha when the power-type skill tree branch is activated.     |
+|![image](docs/Demo/assets/media/character/normal-idle-steal.gif)   | Crimson Drain  |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
+|![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | The state of the battle mecha when the agile-type skill tree branch is activated.     |
+|![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| The state of the battle mecha when the agile-type skill tree branch is activated.     |
 
 
 - 5% ~250 words 
