@@ -114,7 +114,7 @@ Add a group photo here!
 
 - Description of how code was tested. 
 
-# Qualitative evaluation – Think Aloud and Heuristic Evaluations
+# Evaluation – Think Aloud and NASA-TLX
 
 在实验课上 我们邀请了  
 
@@ -175,7 +175,11 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 
 相比之下，Build B 在多个 NASA-TLX 维度上的得分明显偏高，尤其是在 努力程度 和 挫败感 上表现突出。数据与玩家反馈一致表明，这一流派被普遍认为压力过重、体验曲线过于陡峭，因此被我们识别为需要调整的异常点。
 
-基于此结果，我们已着手对 Build B 进行迭代优化，目标是降低其不必要的认知负担，并平滑其难度提升过程。后续改进将包括：简化输入操作逻辑、调整挑战节奏曲线、增强游戏内反馈提示的清晰度等。
+基于此结果，我们已着手对 Build B 进行迭代优化，目标是降低其不必要的认知负担，并平滑其难度提升过程。我们认为问题的关键在于 反弹技能仅对远程攻击有效，实用性较低，这在对战中显著增加了玩家的操作难度。同时，该技能在释放后的特效表现较为简陋，反馈不明显，从而加重了玩家的认知负担，影响了使用体验。
+
+针对上述问题，我们对反弹机制进行了优化，增强了其触发效果与进展反馈。特别地，我们重点修改了 Build B 的技能树，提升技能表现力，以更好地支撑其核心玩法节奏。
+
+在完成上述调整后，我们开展了最后一轮均衡性测试以验证改进成效。
 
 ---
 
@@ -183,7 +187,13 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 
 **In contrast, Build B consistently scored significantly higher across multiple NASA-TLX dimensions, especially in Effort and Frustration. The data and player feedback aligned to indicate that this playstyle was perceived as overwhelmingly demanding, leading to a noticeably steeper cognitive load curve. Based on this, we identified Build B as a workload outlier in need of tuning.**
 
-**As a result, we are now iterating on Build B’s design to reduce unnecessary mental overhead and smooth out sharp difficulty spikes. Planned adjustments include streamlining input complexity, pacing challenge progression more gradually, and clarifying in-game feedback mechanisms.**
+**As a result, we are now iterating on Build B’s design to reduce unnecessary mental overhead and smooth out sharp difficulty spikes. We believe the core issue lies in the rebound ability, which only applies to ranged attacks. Its limited practicality likely contributed to the increased difficulty during combat. Additionally, the lack of impactful visual or audio feedback after activation may have increased the player’s cognitive load and reduced perceived effectiveness.**
+
+**To address this, we strengthened the rebound mechanic by enhancing its in-game effects and progression clarity。**
+**Specifically, we reworked Build B’s skill tree to improve feedback responsiveness and better support its core playstyle.Following these adjustments, a final round of balance testing was conducted to verify improvements.**
+
+![NASA-TLX 工作负荷趋势 (SVG)](docs/Datas/nasa_tlx_post_balancing.svg)
+**Cool! Scores belows 68 and great balance!!!**
 
 ### Process 
 
