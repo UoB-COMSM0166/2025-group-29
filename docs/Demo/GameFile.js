@@ -582,7 +582,7 @@ function keyPressed() {
 
     // 菜单中按 M 返回主菜单
     if (key === 'M' || key === 'm') {
-      window.location.href = 'index.html'; // 主菜单页面路径
+      window.location.href = 'index.html?directMain=1';
     }
 
     return;

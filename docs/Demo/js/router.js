@@ -16,16 +16,31 @@ const modules = {
 
 let currentState = null;
 
+/**
+ * I initialize the router. If the URL contains ?directMain=1,
+ * I skip intro and privacy and go straight to MAIN_MENU.
+ */
 export function initRouter() {
-  switchTo('INTRO');
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('directMain')) {
+    switchTo('MAIN_MENU');
+  } else {
+    switchTo('INTRO');
+  }
 }
 
+/**
+ * I switch from the current state to the given state module.
+ */
 export function switchTo(state) {
   if (currentState) modules[currentState].hide();
   currentState = state;
   modules[state].show();
 }
 
+/**
+ * I advance to the next state by flying the background first.
+ */
 export function advanceTo(state) {
   const handler = () => {
     window.removeEventListener('flightComplete', handler);
