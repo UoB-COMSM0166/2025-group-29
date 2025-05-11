@@ -1170,7 +1170,7 @@ class Level1 extends BaseLevel {
 
     this.countdownStarted = false;
     this.countdownStartTime = 0;
-    this.remainingTime = 1;  // 1 分钟
+    this.remainingTime = 60;  // 1 分钟
     this.completed = false;
 
     this.tipExpireTime = null;  // 提示语消失的时间戳（单位：毫秒）
@@ -1281,7 +1281,7 @@ class Level1 extends BaseLevel {
     this.countdownStarted = true;
 
     // 启动全局倒计时（利用已有的 updateTimer 机制）
-    timer = 1;  // 设置全局 60 秒
+    timer = 60;  // 设置全局 60 秒
     startTime = millis();  // 重置全局倒计时起点
 
     // 不要重新赋值新数组，而是清空原有数组内容
@@ -1365,7 +1365,7 @@ class Level2 extends BaseLevel {
     this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
 
     // 设置倒计时
-    timer = 1;
+    timer = 60;
     startTime = millis();
 
     this.stage = 1;  // 切换到正式战斗阶段
@@ -1663,11 +1663,7 @@ class Level5 extends BaseLevel{
       }
 
 
-    // // 更新黑洞
-    // for (let bh of this.blackHoles) {
-    //     bh.update(player);
-    // }
-
+   
   
       // 判断敌人是否清空 & 时间是否还在倒计时中
       if (!this.finished && enemies.length === 0 && remainingTime > 0) {
