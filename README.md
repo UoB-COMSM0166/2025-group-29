@@ -45,8 +45,8 @@ Add a group photo here!
 
 ## Project Report
 
-### Introduction
-#### Art Design and Innovation
+### 1.Introduction
+### 2.Art Design and Innovation
 We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
 
 #### Character State
@@ -112,7 +112,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 - 5% ~250 words 
 - Describe your game, what is based on, what makes it novel? 
 
-### Requirements 
+### 3.Requirements 
 
 - **As a player**
     
@@ -154,19 +154,19 @@ Rich visual effects make the game more fun and improve the player’s experience
     > “ I want to immerse myself in the game as quickly as possible after entering the main interface. “
     >
 
-### Design
+### 4.Design
 
 - 15% ~750 words 
 - System architecture. Class diagrams, behavioural diagrams. 
 
-### Implementation
+### 5.Implementation
 
 - 15% ~750 words
 
 - Describe implementation of your game, in particular highlighting the three areas of challenge in developing your game.
 - 技能系统；存档系统；Boss战
 
-### Evaluation
+### 6.Evaluation
 
 - 15% ~750 words
 
@@ -257,7 +257,7 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 ![NASA-TLX 工作负荷趋势 (SVG)](docs/Datas/nasa_tlx_post_balancing.svg)
 **Cool! Scores belows 68 and great balance!!!**
 
-### Process 
+### 7.Process 
 
 - 15% ~750 words
 
@@ -326,7 +326,7 @@ Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib li
 
 - Overall, the project not only tested our technical skills but also helped us mature as a team. Through collaborative design, shared testing, and iterative refinement, we achieved a high-functioning, extensible system that integrated gameplay design with sound software engineering principles.
 
-### Conclusion
+### 8.Conclusion
 
 - 10% ~500 words
 
@@ -372,11 +372,11 @@ p5.js 提供了灵活的图形接口，但对复杂状态控制和大规模对�
 
 - In summary, this project not only helped us develop a functionally rich and structurally complex game, but also gave us a deeper appreciation for design patterns, collaboration practices, technical precision, and iterative UX improvement. It served as a comprehensive training ground for large-scale system development and has prepared us well for future projects in software and game development alike.
 
-### Contribution Statement
+### 9.Contribution Statement
 
 - Provide a table of everyone's contribution, which may be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Let us know as soon as possible if there are any issues with teamwork as soon as they are apparent. 
 
-### Additional Marks
+### 10.Additional Marks
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
