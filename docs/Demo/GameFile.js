@@ -145,6 +145,7 @@ let bulletenemy_gif;
 let common_gif;
 let bossBulletImg;
 let enemyBulletImg;
+let gifImg;
 
 function preload() {
 
@@ -154,12 +155,15 @@ function preload() {
     dataLoaded = true;
   });
 
-  skillIcons["闪现"] = null;
-  skillIcons["火球"] = null;
-  skillIcons["护盾"] = null;
-  skillIcons["治疗"] = null;
-  skillIcons["冰冻"] = null;
-  skillIcons["反弹"] = null;
+  skillIcons["Phantom Dash"] = loadImage("assets/media/icon/icon8.PNG"); 
+  skillIcons["Ghost Cutter"] = loadImage("assets/media/icon/icon5.PNG"); 
+  skillIcons["Runner’s Instinct"] = loadImage("assets/media/icon/icon4.PNG"); 
+  skillIcons["Crimson Drain"] = loadImage("assets/media/icon/icon7.PNG"); 
+  skillIcons["Wrath Unchained"] = loadImage("assets/media/icon/icon2.PNG"); 
+  skillIcons["Berserker’s Blood"] = loadImage("assets/media/icon/icon9.PNG"); 
+  skillIcons["Iron Reversal"] = loadImage("assets/media/icon/icon3.PNG"); 
+  skillIcons["Anchor Field"] = loadImage("assets/media/icon/icon1.PNG"); 
+  skillIcons["Guardian’s Will"] = loadImage("assets/media/icon/icon6.PNG"); 
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
   bossBulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
@@ -226,6 +230,7 @@ function preload() {
   bulletenemy_gif = loadImage("assets/media/monster/Danmaku-monster.gif");
   common_gif = loadImage("assets/media/monster/normal-monster.gif");
   enemyBulletImg = loadImage("assets/media/bullet/Monster-bullet.gif");
+  gifImg = loadImage("assets/media/time/time.gif");
 
 }
 
@@ -591,7 +596,7 @@ function keyPressed() {
 
     // 菜单中按 M 返回主菜单
     if (key === 'M' || key === 'm') {
-      window.location.href = 'index.html'; // 主菜单页面路径
+      window.location.href = 'index.html?directMain=1';
     }
 
     return;
@@ -3183,13 +3188,11 @@ class TimeBonus {
     this.pos = createVector(x, y);
     this.r = 30;
     this.bonusTime = bonusTime; // 奖励的时间（秒）
+    this.gifImg = gifImg;       // ✅ 新增：GIF 图像
   }
 
   show() {
-    fill(0, 255, 255);
-    stroke(255);
-    strokeWeight(2);
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    image(this.gifImg, this.pos.x, this.pos.y, this.r * 3, this.r * 3);
     
     fill(0);
     noStroke();
