@@ -145,6 +145,7 @@ let bulletenemy_gif;
 let common_gif;
 let bossBulletImg;
 let enemyBulletImg;
+let gifImg;
 
 function preload() {
 
@@ -226,6 +227,7 @@ function preload() {
   bulletenemy_gif = loadImage("assets/media/monster/Danmaku-monster.gif");
   common_gif = loadImage("assets/media/monster/normal-monster.gif");
   enemyBulletImg = loadImage("assets/media/bullet/Monster-bullet.gif");
+  gifImg = loadImage("assets/media/time/time.gif");
 
 }
 
@@ -3178,13 +3180,11 @@ class TimeBonus {
     this.pos = createVector(x, y);
     this.r = 30;
     this.bonusTime = bonusTime; // 奖励的时间（秒）
+    this.gifImg = gifImg;       // ✅ 新增：GIF 图像
   }
 
   show() {
-    fill(0, 255, 255);
-    stroke(255);
-    strokeWeight(2);
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    image(this.gifImg, this.pos.x, this.pos.y, this.r * 3, this.r * 3);
     
     fill(0);
     noStroke();
