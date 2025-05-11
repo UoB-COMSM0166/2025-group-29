@@ -198,9 +198,35 @@ Rich visual effects make the game more fun and improve the player’s experience
 
 - Description of how code was tested. 
 
-# Evaluation – Think Aloud and NASA-TLX
+# 🧠 Think-Aloud Testing: Iterative Feedback and In-Game Adjustments  
+## 🎮 出声思考测试：迭代反馈与游戏内调整  
 
-在实验课上 我们邀请了  
+We conducted a Think-Aloud usability test with six participants (N = 6), who played through the first two levels while narrating their thoughts aloud. Verbal expressions were transcribed, tagged, and analyzed to extract user needs and usability pain points. Based on repeated themes—**confusion**, **uncertainty**, **overwhelm**, and **cognitive load**—we derived a set of actionable design responses to improve player experience.  
+我们对6位用户进行了出声思考测试，让他们在游玩前两个关卡时同步表达想法。我们对其言语进行转录与标注，识别出“困惑”“不确定”“压力大”和“认知负担”等高频反馈主题，并据此提出针对性的设计优化方案。
+
+---
+
+### 🔍 Key Observations and Design Responses | 用户观察与设计回应  
+
+### 🎮 Think-Aloud Feedback and Design Responses | 出声思考反馈与设计响应（中英双语）
+
+| **User Observation**<br>用户观察 | **Design Response**<br>设计回应 |
+|----------------------------|-----------------------------|
+| **“Why isn’t this button responding? Did I press the wrong thing?”**<br>**“为什么这个按钮没有反应？我是不是点错了？”** | Added a skill indicator icon in the bottom-left corner to show cooldown status.<br>左下角增加技能指示图标，显示技能冷却状态。 |
+| **“Should I keep fighting or keep running?”**<br>**“我现在应该继续打还是继续跑？”** | Moved the player's health bar to the top for easier risk evaluation.<br>把玩家血条放置到顶部，让玩家自主判断风险。 |
+| **“I’m not quite sure what the goal is—is it to survive longer or to kill more?”**<br>**“我不太清楚目标是什么——是活得更久还是杀更多？”** | Added a score system and real-time feedback to clarify high-score objectives.<br>增加分数显示和实时反馈机制，让玩家明确目标是获得高分。 |
+| **“So that’s how this skill works—I didn’t realize it before.”**<br>**“原来这个技能是这样用的，我刚才没看出来。”** | Enabled tooltip-on-hover on the skill shop interface.<br>技能商店界面支持悬停查看技能说明。 |
+| **“This is so intense—I feel like danger is coming from every direction.”**<br>**“现在压力好大，感觉四面八方都有危险。”** | Ensured a minimum safe radius around player spawn to avoid instant ambush.<br>保证怪物生成与玩家有一定安全距离，避免“刷脸”突袭。 |
+| **“I think I’m gradually getting the hang of the game’s rhythm.”**<br>**“我觉得我正在慢慢掌握这游戏的节奏。”** | No changes needed—this indicates pacing is working as intended.<br>无需调整，表明当前节奏设计合理。 |
+| **“The pace suddenly picked up in this level—I’m kind of panicking.”**<br>**“这关节奏突然变快，我有点慌。”** | Rebalanced enemy spawn frequency and added a mid-level checkpoint.<br>调整敌人刷新频率，在关卡中段加入检查点。 |
+| **“It’s starting to feel a bit repetitive—just run, fight, run.”**<br>**“现在有点重复了，一直逃、打、逃。”** | Introduced new non-combat segments and mechanics in Level 3 to vary the experience.<br>第3关加入非战斗互动机制，打破重复循环。 |
+
+---
+![alt text](image-1.png)
+
+## 🧩 Insights & Impact  
+These real-time voice comments enabled us to uncover pain points in *navigation, clarity, pacing,* and *player motivation*. Iterative adjustments based on these Think-Aloud observations significantly improved early-game experience and onboarding effectiveness.  
+这些即时语音反馈帮助我们揭示了“导航”、“目标清晰度”、“节奏”和“玩家动机”等多个设计盲点。基于出声思考测试的迭代优化显著提升了前期游戏体验与引导效果。
 
 **NASA-TLX Workload Comparison:**  
 
