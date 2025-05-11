@@ -103,7 +103,7 @@ let remainingTime; // 剩余时间（秒）
 let stealthTimer = 0;
 let ambushTimer = 0;
 
-let isHardMode = false;
+let isHardMode = false; // 是否开启困难模式
 
 let pauseMenuActive = false;
 
@@ -1024,8 +1024,56 @@ class BaseLevel {
     }
   }
 
-  // 通用结算画面
-  showSummaryScreen() {
+  generateCommonEnemy(max) {
+  for (let i = 0; i < max; i++) {
+    let pos = generateOutsideViewPosition();  
+    enemies.push(new CommonEnemy(pos.x, pos.y));
+  }
+
+  console.log("生成普通小怪,数量:", max);
+}
+
+  generateFollowEnemy(max) {
+  for (let i = 0; i < max; i++) {
+    let pos = generateOutsideViewPosition();  
+    enemies.push(new FollowEnemy(pos.x, pos.y));
+  }
+  console.log("生成跟随怪,数量:", max);
+}
+
+  generateBulletEnemy(max) {
+  for (let i = 0; i < max; i++) {
+    let pos = generateValidEnemyPosition(300); 
+    enemies.push(new BulletEnemy(pos.x, pos.y));  
+  }
+  console.log("生成弹幕怪,数量:", max);
+}
+
+generateDangerBlackHole(max) {
+  for (let i = 0; i < max; i++) {
+    let pos = generateValidEnemyPosition(300);
+    this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
+  }
+  console.log("生成危险黑洞,数量:", max);
+}
+
+generateHealBlackHole(max) {
+  for (let i = 0; i < max; i++) {
+    let pos = generateValidEnemyPosition(300);
+    this.blackHoles.push(new BlackHole(pos.x, pos.y, "heal"));
+  }
+  console.log("生成回血黑洞,数量:", max);
+}
+
+  generateTimeBonus(max) {
+    for (let i = 0; i < max; i++) {
+      let pos = generateValidEnemyPosition(300);  // 
+      timeBonuses.push(new TimeBonus(pos.x, pos.y, 15));
+    }
+    console.log("生成时间奖励,数量:", max);
+  }  // 通用结算画面
+  
+    showSummaryScreen() {
     fill(0, 150);
     rect(0, 0, windowWidth, windowHeight);
 
@@ -1350,24 +1398,16 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    for (let i = 0; i < 5; i++) {
-        let followPos = generateOutsideViewPosition();
-        enemies.push(new FollowEnemy(followPos.x, followPos.y));
-    }
-
+    this.generateFollowEnemy(isHardMode? 5 : 3); 
     // CommonEnemy
-    for (let i = 0; i < 8; i++) {
-        let pos = generateOutsideViewPosition();
-        enemies.push(new CommonEnemy(pos.x, pos.y));
-    }
+    this.generateCommonEnemy(isHardMode? 10 : 6); 
+
+    //时间柱
+    this.generateTimeBonus(3); // 刷奖励物
 
     // 刷黑洞
-    for (let i = 0; i < 2; i++) {
-        let pos = generateValidEnemyPosition(300);
-        this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
-    }
-    let healPos = generateValidEnemyPosition(300);
-    this.blackHoles.push(new BlackHole(healPos.x, healPos.y, "heal"));
+    this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
+    this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
 
     // 设置倒计时
     timer = 60;
@@ -1476,33 +1516,18 @@ class Level3 extends BaseLevel {
     let minSpawnDistance = player.r * 10;
 
     // FollowEnemy
-    for (let i = 0; i < 5; i++) {
-      let followPos = generateOutsideViewPosition();
-      enemies.push(new FollowEnemy(followPos.x, followPos.y));
-    }
+    this.generateFollowEnemy(isHardMode? 8 : 5); 
 
     // CommonEnemy
-    for (let i = 0; i < 10; i++) {
-      let pos = generateOutsideViewPosition();
-      enemies.push(new CommonEnemy(pos.x, pos.y));
-    }
+    this.generateCommonEnemy(isHardMode? 20 : 10); 
 
     // 刷黑洞
-    for (let i = 0; i < 2; i++) {
-      let pos = generateValidEnemyPosition(300);
-      this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
-    }
-    let healPos = generateValidEnemyPosition(300);
-    this.blackHoles.push(new BlackHole(healPos.x, healPos.y, "heal"));
+    this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
+    
+   this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
 
     // 刷奖励物
-    for (let i = 0; i < 3; i++) {
-      timeBonuses.push(new TimeBonus(
-        random(-width, width),
-        random(-height, height),
-        15
-      ));
-    }
+    this.generateTimeBonus(3); // 刷奖励物
 
     // 设置倒计时
     timer = 90;
@@ -1592,40 +1617,21 @@ class Level4 extends BaseLevel{
       let minSpawnDistance = player.r * 10;
   
       // BulletEnemy（弹幕怪）追击玩家
-      for (let i = 0; i < 5; i++) {
-        let pos = generateValidEnemyPosition(minSpawnDistance);
-        enemies.push(new BulletEnemy(pos.x, pos.y, 35));
-      }
-  
+      this.generateBulletEnemy(isHardMode? 5 : 3); // 刷弹幕怪
   
       // FollowEnemy
-      for (let i = 0; i < 5; i++) {
-        let followPos = generateOutsideViewPosition();
-        enemies.push(new FollowEnemy(followPos.x, followPos.y));
-      }
+      this.generateFollowEnemy(isHardMode? 8 : 5);
   
       // CommonEnemy
-      for (let i = 0; i < 10; i++) {
-        let pos = generateOutsideViewPosition();
-        enemies.push(new CommonEnemy(pos.x, pos.y));
-      }
+      this.generateCommonEnemy(isHardMode? 20 : 10);
   
       // 刷黑洞
-      for (let i = 0; i < 2; i++) {
-        let pos = generateValidEnemyPosition(300);
-        this.blackHoles.push(new BlackHole(pos.x, pos.y, "danger"));
-      }
-      let healPos = generateValidEnemyPosition(300);
-      this.blackHoles.push(new BlackHole(healPos.x, healPos.y, "heal"));
+      this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
+      
+      this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
   
       // 刷奖励物
-      for (let i = 0; i < 3; i++) {
-        timeBonuses.push(new TimeBonus(
-          random(-width, width),
-          random(-height, height),
-          15
-        ));
-      }
+      this.generateTimeBonus(3); // 刷奖励物
   
       // 设置倒计时
       timer = 60;
