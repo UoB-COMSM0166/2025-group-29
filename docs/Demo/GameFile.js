@@ -2,6 +2,11 @@ import { supabase } from './js/supabase.js';
 
 const params = new URLSearchParams(window.location.search);
 const saveId = params.get('saveId');
+const MAIN_URL = 'index.html?directMain=1';
+
+function goToMainMenu() {
+  window.location.href = MAIN_URL;
+}
 
 if (!saveId) {
   alert('缺少存档 ID，无法加载存档。');
@@ -606,7 +611,7 @@ function keyPressed() {
 
     // 菜单中按 M 返回主菜单
     if (key === 'M' || key === 'm') {
-      window.location.href = 'index.html?directMain=1';
+      goToMainMenu();
     }
 
     return;
@@ -1756,7 +1761,7 @@ class Level5 extends BaseLevel{
 handleKeyPressed(key) {
   // 游戏完成后允许 M 返回主页
   if (this.finished && (key === 'M' || key === 'm')) {
-    window.location.href = 'index.html'; // ⬅️ 改为你的主菜单路径
+    goToMainMenu();
     return;
   }
 
