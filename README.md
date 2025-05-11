@@ -46,6 +46,17 @@ Add a group photo here!
 ## Project Report
 
 ### Introduction
+Art Design and Innovation
+
+Character Specialization
+
+| Image                                                           | Name        | Description                                                                           |
+|-----------------------------------------------------------------|-------------|---------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/character/normal-idle-base.gif)  | Normal mode | The normal state of the battle mecha when no skill tree branch or style is activated. |
+|![image](docs/Demo/assets/media/character/agile-idle-base.gif)   | Agile mode  | The state of the battle mecha when the agile-type skill tree branch is activated.     |
+|![image](docs/Demo/assets/media/character/power-idle-base.gif)   | Power mode  | The state of the battle mecha when the power-type skill tree branch is activated.     |
+|![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
+
 
 - 5% ~250 words 
 - Describe your game, what is based on, what makes it novel? 
