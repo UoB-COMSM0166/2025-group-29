@@ -45,13 +45,13 @@ Add a group photo here!
 
 # Project Report
 ## Table of Contents
-- [1 Introduction](#1-introduction)
+- [1 Introduction](1-introduction)
   
   
-- [2 Art Design and Innovation](#2-art-design-and-innovation)
+- [2 Art Design and Innovation](2-art-design-and-innovation)
 
-## 1 Introduction
-## 2 Art Design and Innovation
+# 1 Introduction
+# 2 Art Design and Innovation
 We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
 
 ## Character State
