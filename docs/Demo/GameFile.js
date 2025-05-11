@@ -828,9 +828,9 @@ function sendLevelToBackground(levelNumber) {
       type: 'level',
       level: levelNumber
     }, '*');
-    console.log(`🎨 背景层已收到关卡编号：BG${levelNumber}.png`);
+    console.log(`背景层已收到关卡编号：BG${levelNumber}.png`);
   } else {
-    console.warn("⚠️ 未找到背景 iframe，无法更新背景图片");
+    console.warn("未找到背景 iframe，无法更新背景图片");
   }
 }
 
@@ -845,32 +845,20 @@ class LevelManager {
     this.levels.push(level);
   }
 
-  // loadLevel(index) {
-  //   this.currentLevel = this.levels[index];
-  //   console.log(`加载 Level ${index + 1}`);
-  //   this.currentLevel.start();  // 启动关卡
 
-  //   //  每次加载新关卡后，重新创建碰撞检测器和近战攻击器
-  //   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
-  //   player.meleeAttack = new MeleeAttack(player, enemies);
-
-  // }
   //修改关卡背景zc5.9
   loadLevel(index) {
   const prevLevel = this.currentLevel; 
   this.currentLevel = this.levels[index];
   console.log(`加载 Level ${index + 1}`);
 
-  // // 如果有上一关，继承它的 totalScore
-  // if (prevLevel) {
-  //     this.currentLevel.startingScore = prevLevel.totalScore;
-  // }
+
   this.currentLevel.startingScore = prevLevel
     ? prevLevel.totalScore
     : savedCumulativeScore || 0;
   this.currentLevel.start();
 
-  // 👉 通知背景层更换背景图
+  // 通知背景层更换背景图
   sendLevelToBackground(this.currentLevel.levelNumber);
 
   // 每次加载新关卡后，重新绑定系统
@@ -918,6 +906,11 @@ class BaseLevel {
     this.blackHoles = [];
     this.finished       = false;   // 关卡是否已结束
     this.postGameStage  = 0;       // 0‑结算信息；1‑Save / Continue
+
+    this.tipCharIndex = 0;            // 当前显示到哪个字符
+    this.tipStartTime = 0;            // 动画开始时间
+    this.tipCharDelay = 40;           // 每个字符的显示间隔（毫秒）
+
   }
 
   start() {
@@ -970,7 +963,40 @@ class BaseLevel {
 
   draw() {
     // 关卡的特效、提示
+
+
+    push();
+    resetMatrix();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(28);
+
+    if (!this.tipExpireTime || millis() < this.tipExpireTime) {
+    let now = millis();
+    let elapsed = now - this.tipStartTime;
+    this.tipCharIndex = Math.floor(elapsed / this.tipCharDelay);
+
+    let displayedText = this.tip.substring(0, this.tipCharIndex);
+    text(displayedText, windowWidth / 2, 80);
   }
+
+
+    // 如果关卡完成，弹出结算界面
+    if (this.finished) {
+        this.showSummaryScreen();
+    }
+
+
+    pop();
+  }
+
+  setTipAnimated(msg, duration = 5000) {
+    this.tip = msg;
+    this.tipExpireTime = millis() + duration;
+    this.tipStartTime = millis();
+    this.tipCharIndex = 0;
+}
+
 
   // 通用结算方法
   finalizeScore() {
@@ -983,8 +1009,6 @@ class BaseLevel {
 
   onTimeUp() {
     if (!this.finished) {
-      // console.log(`${this.name} 时间到，正常结算`);
-      // this.stage = 2;  
       this.tip = "Finished！";
       this.tipExpireTime = null;
       this.finished = true;
@@ -1179,7 +1203,7 @@ class Level1 extends BaseLevel {
     // 5: 完成
     this.stage = 0;
 
-    this.tip = "Welcome to the Epilogue, Hunter";
+    this.setTipAnimated("Welcome to the Epilogue, Hunter");
     this.playerHasMoved = false;
     this.attackCount = 0;
 
@@ -1188,7 +1212,7 @@ class Level1 extends BaseLevel {
     this.remainingTime = 60;  // 1 分钟
     this.completed = false;
 
-    this.tipExpireTime = null;  // 🆕 提示语消失的时间戳（单位：毫秒）
+    this.tipExpireTime = null;  // 提示语消失的时间戳（单位：毫秒）
     this.finished = false;  // 标记关卡是否结束
 
     this.postGameStage = 0;  // 0=结算等待任意键，1=显示“Save/Continue”界面，2=存档界面
@@ -1250,26 +1274,7 @@ class Level1 extends BaseLevel {
 
 
   draw() {
-    push();
-    resetMatrix();
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(28);
-    // text(this.tip, windowWidth / 2, 80);
-
-    // 判断是否过期：只有未过期时显示
-    if (!this.tipExpireTime || millis() < this.tipExpireTime) {
-      text(this.tip, windowWidth / 2, 80);
-  }
-
-
-    // 如果关卡完成，弹出结算界面
-    if (this.finished) {
-        this.showSummaryScreen();
-    }
-
-
-    pop();
+  super.draw();
   }
 
 
@@ -1278,7 +1283,7 @@ class Level1 extends BaseLevel {
   handleKeyPressed(key) {
     if (this.stage === 0) {
       this.stage = 1;
-      this.tip = "Use the arrow keys to move";
+      this.setTipAnimated("Use the arrow keys to move");
     }else {
       // 默认的处理交给 BaseLevel
       super.handleKeyPressed(key);
@@ -1290,7 +1295,7 @@ class Level1 extends BaseLevel {
   handlePlayerMoved() {
     if (this.stage === 1) {
       this.stage = 2;
-      this.tip = "Press A for melee attack";
+      this.setTipAnimated("Press A for melee attack");
     }
   }
 
@@ -1299,8 +1304,7 @@ class Level1 extends BaseLevel {
       this.attackCount++;
       if (this.attackCount >= 8) {
         this.stage = 3;
-        this.tip = "Excellent! A large wave of enemies is coming. Survive within the time limit!";
-        this.tipExpireTime = millis() + 10000;  // 设置10秒后消失
+        this.setTipAnimated("Excellent! A large wave of enemies is coming. Survive within the time limit!",10000);
 
         // 延迟 2 秒启动敌人/奖励刷怪
         setTimeout(() => {
@@ -1370,15 +1374,9 @@ class Level2 extends BaseLevel {
 
       this.tip = "Marked for death...The ambush is coming fast-stay alert!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-      // this.finished = false;
-
-      // this.blackHoles = [];
-
-      // this.pauseTimer = millis() + 10000;  // 10秒后触发暂停提示
       this.pauseShown = false;
       this.pausedForBlackHoleTip = false;
 
-      // this.postGameStage = 0;
   }
   start() {
     super.start();
@@ -1419,11 +1417,10 @@ class Level2 extends BaseLevel {
         
       // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
-            gamePaused = true;
-            this.tip = "Seek out the black holes🌀— some heal, some hurt!";
+            // gamePaused = true;
+            this.setTipAnimated("Seek out the black holes🌀— some heal, some hurt!", 8000);
+            // this.tipExpireTime = millis() + 8000;  // 自动显示 8 秒
             this.pauseShown = true;
-            this.pausedForBlackHoleTip = true;
-            this.tipExpireTime = null;  // 让它一直显示，直到按键继续
         }
 
         // 检查完成
@@ -1445,35 +1442,12 @@ class Level2 extends BaseLevel {
 
   
 draw() {
-  push();
-  resetMatrix();
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(28);
-
-  // 判断是否过期：只有未过期时显示
-  if (!this.tipExpireTime || millis() < this.tipExpireTime) {
-      text(this.tip, windowWidth / 2, 80);
-  }
-
-  if (this.finished) {
-      this.showSummaryScreen();
-  }
-
-  pop();
+    super.draw();
 }
 
 // 外部事件监听
 handleKeyPressed(key) {
-  // 黑洞提示暂停状态，按任意键继续
-  if (this.pausedForBlackHoleTip) {
-      gamePaused = false;
-      this.tip = "";
-      this.pausedForBlackHoleTip = false;
-  } else {
-    // 其他按键转发给 BaseLevel，处理 Save / Continue 等逻辑
     super.handleKeyPressed(key);
-}
 }
 
 
@@ -1494,8 +1468,6 @@ class Level3 extends BaseLevel {
     this.tip = "Something's lurking in the dark... Run for your life!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-    // this.blackHoles = [];
-    // this.postGameStage = 0;
   }
 
   start() {
@@ -1504,8 +1476,7 @@ class Level3 extends BaseLevel {
 
 
     // 初始化提示内容 + 定时消失
-    this.tip = "Something's lurking in the dark... Run for your life!";
-    this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+    this.setTipAnimated("Something's lurking in the dark... Run for your life!",8000);
 
 /*
     // 刷敌人
@@ -1555,22 +1526,7 @@ class Level3 extends BaseLevel {
 
 
   draw() {
-    push();
-    resetMatrix();
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(28);
-
-    // 判断是否过期：只有未过期时显示
-    if (!this.tipExpireTime || millis() < this.tipExpireTime) {
-      text(this.tip, windowWidth / 2, 80);
-    }
-
-    if (this.finished) {
-      this.showSummaryScreen();
-    }
-
-    pop();
+    super.draw();
   }
 
   handleKeyPressed(key) {
@@ -1593,10 +1549,6 @@ class Level4 extends BaseLevel{
   
       this.tip = "Something wicked this way comes! Dodge their bullets!";
       this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
-      // this.finished = false;
-  
-      // this.blackHoles = [];
-      // this.postGameStage = 0;
     }
 
     start() {
@@ -1605,8 +1557,7 @@ class Level4 extends BaseLevel{
   
   
       // 初始化提示内容 + 定时消失
-      this.tip = "Something wicked this way comes! Dodge their bullets!";
-      this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+      this.setTipAnimated("Something wicked this way comes! Dodge their bullets!", 8000);
   
   
       // 刷敌人
@@ -1658,22 +1609,7 @@ update() {
 }
 
 draw() {
-  push();
-  resetMatrix();
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(28);
-
-  // 判断是否过期：只有未过期时显示
-  if (!this.tipExpireTime || millis() < this.tipExpireTime) {
-    text(this.tip, windowWidth / 2, 80);
-  }
-
-  if (this.finished) {
-    this.showSummaryScreen();
-  }
-
-  pop();
+  super.draw();
 }
 
 handleKeyPressed(key) {
@@ -1704,8 +1640,7 @@ class Level5 extends BaseLevel{
     super.start();
 
     // 初始化提示内容 + 定时消失
-    this.tip = "So you've made it this far... Final battle begins now!";
-    this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
+    this.setTipAnimated("So you've made it this far... Final battle begins now!",8000);
     //以下是测试boss内容
     const bossPos = createVector(0, -250);    // 出现在玩家正上方 250 像素
     boss = new Boss(bossPos.x, bossPos.y);    // boss 是全局 let 变量
@@ -1855,33 +1790,7 @@ handleKeyPressed(key) {
 
 
   draw() {
-    push();
-    resetMatrix();
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(28);
-    // text(this.tip, windowWidth / 2, 80);
-
-    // // 显示黑洞
-    // for (let bh of this.blackHoles) {
-    //     bh.show();
-    // }
-
-
-
-    // 判断是否过期：只有未过期时显示
-    if (!this.tipExpireTime || millis() < this.tipExpireTime) {
-      text(this.tip, windowWidth / 2, 80);
-  }
-
-
-    // 如果关卡完成，弹出结算界面
-    if (this.finished) {
-        this.showSummaryScreen();
-    }
-
-
-    pop();
+    super.draw();
   }
 
 }
@@ -2080,21 +1989,21 @@ class Player {
 
 class Enemy {
   constructor(x, y) {
-    this.pos = createVector(x, y);  // 所有敌人都需要位置
-    this.hp = new HPSystem(30);     // 血量系统（子类可覆盖）
-    this.dead = false;              // 死亡标记
+    this.pos = createVector(x, y);  // Initial position of enemies
+    this.hp = new HPSystem(30);     
+    this.dead = false;              // Death Mark
   
-    this.exploding = false; // ✅ 是否在播放死亡特效
-    this.explodeStartTime = 0; // ✅ 记录开始时间
-    this.explodeDuration = 1000; // 毫秒
+    this.exploding = false; // Whether to play death effects
+    this.explodeStartTime = 0; // Death animation start time
+    this.explodeDuration = 1000; 
 
     this.explosion = null;
 
-     // ✅ 每个敌人自己有攻击冷却时间
+     // Each enemy has its own attack cooldown time
      this.nextHitTime = 0;
-     this.hitCooldown = 500; // 500ms
+     this.hitCooldown = 500; 
 
-     this.contactDamage = 10; // ✅ 默认接触伤害
+     this.contactDamage = 10; // Default contact damage
   
   
   }
