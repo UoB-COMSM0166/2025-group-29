@@ -232,6 +232,24 @@
 
 ===== SKIPPED (binary) ./assets/media/final/final.gif =====
 
+===== SKIPPED (binary) ./assets/media/icon/icon1.PNG =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon2.PNG =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon3.PNG =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon4.PNG =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon5.PNG =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon6.PNG =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon7.png =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon8.png =====
+
+===== SKIPPED (binary) ./assets/media/icon/icon9.png =====
+
 ===== SKIPPED (binary) ./assets/media/intro/1.png =====
 
 ===== SKIPPED (binary) ./assets/media/intro/2-1.png =====
@@ -263,6 +281,8 @@
 ===== SKIPPED (binary) ./assets/media/time/time.gif =====
 
 ===== SKIPPED (binary) ./assets/media/titled-3.png =====
+
+===== SKIPPED (binary) ./assets/music/StarHuntThemeSong.mp3 =====
 
 ===== ./css/style.css =====
 @font-face {
@@ -452,7 +472,9 @@ echo "✅ Success $output"
       margin: 0; padding: 0;
       width: 100vw; height: 100vh;
       overflow: hidden;
+      background: black;
     }
+
     /* 背景 iframe */
     #bgFrame {
       position: absolute;
@@ -462,12 +484,23 @@ echo "✅ Success $output"
       z-index: 0;
       pointer-events: none;
     }
+
     /* p5.js 的画布 */
     canvas {
       position: absolute !important;
       top: 0 !important; left: 0 !important;
       z-index: 1 !important;
       background: transparent !important;
+    }
+
+    /* 暂停菜单 iframe */
+    #pauseFrame {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 10000;
+      border: none;
     }
   </style>
 
@@ -485,20 +518,44 @@ echo "✅ Success $output"
   <!-- 2. p5.js 与游戏脚本 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
   <script type="module" src="GameFile.js"></script>
-
 </head>
-<body>
 
+<body>
+  <!-- ESC 弹窗界面 -->
+  <iframe id="pauseFrame" src="pause.html"></iframe>
+
+  <!-- 背景层 -->
   <iframe id="bgFrame" src="BG.html"></iframe>
 
-  <!-- 3. 父页面键盘事件转发给背景 -->
   <script>
     const bg = document.getElementById('bgFrame');
+    const pauseFrame = document.getElementById('pauseFrame');
+
+    // 将按键事件转发给背景
     window.addEventListener('keydown', e => {
       bg.contentWindow.postMessage({ type: 'keydown', key: e.key }, '*');
+
+      if (e.key === 'Escape') {
+        pauseFrame.style.display = 'block';
+      }
     });
     window.addEventListener('keyup', e => {
       bg.contentWindow.postMessage({ type: 'keyup', key: e.key }, '*');
+    });
+
+    // ESC 页面发回来的动作处理
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'pause_action') {
+        pauseFrame.style.display = 'none';
+        const action = e.data.action;
+        if (action === 'resume') {
+          // 返回游戏
+        } else if (action === 'save') {
+          // 触发保存逻辑（待补）
+        } else if (action === 'quit') {
+          window.location.href = 'index.html';
+        }
+      }
     });
   </script>
 </body>
@@ -625,26 +682,29 @@ echo "✅ Success $output"
   <div id="canvas-container"></div>
   <script type="module" src="js/app.js"></script>
   <script src="js/intro.js"></script>
-</body>
+  <script type="module" src="js/privacy.js"></script>
 </html>
 
 ===== ./js/app.js =====
 // js/app.js
 import { initRouter } from './router.js';
 import { initBackground } from './background.js';
+import { showPrivacyConsent } from './privacy.js';
 
 function startApp() {
-  initRouter();
   initBackground(document.getElementById('canvas-container'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 立即初始化路由与背景，让它始终在 #introOverlay 下面渲染
   startApp();
-
-  // （可选）如果需要在引导结束后做些额外逻辑，再监听它：
   window.addEventListener('introFinished', () => {
-    // 这里放「引导结束后」才想做的事
+    showPrivacyConsent(agreed => {
+      if (agreed) {
+        initRouter();
+      } else {
+        window.close();
+      }
+    });
   }, { once: true });
 });
 
@@ -855,6 +915,67 @@ Hunt—until nothing is left.`,
   showSubtitleForSlide(0);
 });
 
+===== ./js/privacy.js =====
+// js/privacy.js
+export function showPrivacyConsent(callback) {
+  // 创建遮罩
+  const overlay = document.createElement('div');
+  overlay.id = 'privacyOverlay';
+  Object.assign(overlay.style, {
+    position:   'fixed',
+    top:        '0',
+    left:       '0',
+    width:      '100vw',
+    height:     '100vh',
+    background: 'rgba(0,0,0,0.85)',
+    color:      '#fff',
+    display:    'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding:    '2em',
+    zIndex:     '10000',
+    textAlign:  'center',
+    fontSize:   '1em',
+    fontFamily: 'Minecraft, Arial, sans-serif'
+  });
+
+  // 内容
+  overlay.innerHTML = `
+    <h2>Privacy & Cookies</h2>
+    <p>
+      We use cookies and process data to provide and improve our services, 
+      in accordance with EU privacy regulations (GDPR).
+      By clicking “I Agree”, you consent to our use of cookies and data processing.
+    </p>
+    <div style="margin-top:1.5em;">
+      <button id="agreeBtn" style="
+        padding:0.75em 1.5em; margin-right:1em;
+        font-size:1em; cursor:pointer;
+        border:none; border-radius:4px;
+        background:#28a745; color:#fff;
+      ">I Agree & Continue</button>
+      <button id="declineBtn" style="
+        padding:0.75em 1.5em;
+        font-size:1em; cursor:pointer;
+        border:none; border-radius:4px;
+        background:#dc3545; color:#fff;
+      ">I Do Not Agree & Exit</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById('agreeBtn').onclick = () => {
+    overlay.remove();
+    callback(true);
+  };
+  document.getElementById('declineBtn').onclick = () => {
+    // 直接关闭标签或跳回首页
+    callback(false);
+  };
+}
+
 ===== ./js/router.js =====
 // js/router.js
 import { startFlight } from './background.js';
@@ -874,16 +995,31 @@ const modules = {
 
 let currentState = null;
 
+/**
+ * I initialize the router. If the URL contains ?directMain=1,
+ * I skip intro and privacy and go straight to MAIN_MENU.
+ */
 export function initRouter() {
-  switchTo('INTRO');
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('directMain')) {
+    switchTo('MAIN_MENU');
+  } else {
+    switchTo('INTRO');
+  }
 }
 
+/**
+ * I switch from the current state to the given state module.
+ */
 export function switchTo(state) {
   if (currentState) modules[currentState].hide();
   currentState = state;
   modules[state].show();
 }
 
+/**
+ * I advance to the next state by flying the background first.
+ */
 export function advanceTo(state) {
   const handler = () => {
     window.removeEventListener('flightComplete', handler);
@@ -1474,6 +1610,38 @@ export const SummaryMenu = {
 
 
 ===== SKIPPED (binary) ./package-lock.json =====
+
+===== ./pause.html =====
+<!-- pause.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pause Menu</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      margin: 0; background: rgba(0,0,0,0.9); color: white;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: 'Minecraft', Arial, sans-serif;
+    }
+    h1 { margin-bottom: 20px; }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Game Paused</h1>
+  <button onclick="parent.postMessage({type:'pause_action', action:'resume'}, '*')">Resume</button>
+  <button onclick="parent.postMessage({type:'pause_action', action:'save'}, '*')">Save</button>
+  <button onclick="parent.postMessage({type:'pause_action', action:'quit'}, '*')">Quit</button>
+</body>
+</html>
 
 ===== ./shop.html =====
 <!DOCTYPE html>

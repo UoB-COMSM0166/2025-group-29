@@ -2,6 +2,11 @@ import { supabase } from './js/supabase.js';
 
 const params = new URLSearchParams(window.location.search);
 const saveId = params.get('saveId');
+const MAIN_URL = 'index.html?directMain=1';
+
+function goToMainMenu() {
+  window.location.href = MAIN_URL;
+}
 
 if (!saveId) {
   alert('缺少存档 ID，无法加载存档。');
@@ -155,12 +160,15 @@ function preload() {
     dataLoaded = true;
   });
 
-  skillIcons["闪现"] = null;
-  skillIcons["火球"] = null;
-  skillIcons["护盾"] = null;
-  skillIcons["治疗"] = null;
-  skillIcons["冰冻"] = null;
-  skillIcons["反弹"] = null;
+  skillIcons["Phantom Dash"] = loadImage("assets/media/icon/icon8.PNG"); 
+  skillIcons["Ghost Cutter"] = loadImage("assets/media/icon/icon5.PNG"); 
+  skillIcons["Runner’s Instinct"] = loadImage("assets/media/icon/icon4.PNG"); 
+  skillIcons["Crimson Drain"] = loadImage("assets/media/icon/icon7.PNG"); 
+  skillIcons["Wrath Unchained"] = loadImage("assets/media/icon/icon2.PNG"); 
+  skillIcons["Berserker’s Blood"] = loadImage("assets/media/icon/icon9.PNG"); 
+  skillIcons["Iron Reversal"] = loadImage("assets/media/icon/icon3.PNG"); 
+  skillIcons["Anchor Field"] = loadImage("assets/media/icon/icon1.PNG"); 
+  skillIcons["Guardian’s Will"] = loadImage("assets/media/icon/icon6.PNG"); 
   bulletEnemyImg = null;
   //loadImage("弹幕怪.gif");
   bossBulletImg = loadImage("assets/media/bullet/Boss-bullet.gif");
@@ -505,10 +513,20 @@ function drawInfo() {
   // **修正计时器在右上角**
   textAlign(RIGHT, TOP);
   text("Time: " + nf(remainingTime, 2, 1) + "s", windowWidth - 20, 20); // **改为 windowWidth**
+  
+  // print level
   if (levelManager && levelManager.currentLevel) {
   let lv = levelManager.currentLevel.levelNumber ?? "?";
   text("Level: " + lv, windowWidth - 20, 50);  // 比 time 向下20~30像素
   }
+
+  //print mode
+   // 打印难度
+  let modeText = isHardMode ? "Hard" : "Easy";
+  text("Current Mode: " + modeText, windowWidth - 20, 80);
+
+
+  //
   skillSystem.drawIcon();  // ✅ 画技能图标
   
   
@@ -593,7 +611,7 @@ function keyPressed() {
 
     // 菜单中按 M 返回主菜单
     if (key === 'M' || key === 'm') {
-      window.location.href = 'index.html?directMain=1';
+      goToMainMenu();
     }
 
     return;
@@ -649,6 +667,17 @@ function keyReleased() {
   startTime = millis();
 
   player.speed = player.baseSpeed || 4;  // 重置速度（4 是默认值）
+
+ // 🟢 清空敌人、子弹、奖励
+  enemies.length = 0;
+  bullets.length = 0;
+  timeBonuses.length = 0;
+
+   // 🟢 重置计数器
+  ambushSpawnedCount = 0;
+  stealthSpawnedCount = 0;
+  ambushTimer = 0;
+  stealthTimer = 0;
 
 
   // 获取当前关卡索引
@@ -819,7 +848,7 @@ class LevelManager {
     ? prevLevel.totalScore
     : savedCumulativeScore || 0;
   this.currentLevel.start();
-  this.currentLevel.update();
+
 
   // 通知背景层更换背景图
   sendLevelToBackground(this.currentLevel.levelNumber);
@@ -1082,7 +1111,7 @@ generateHealBlackHole(max) {
       // 第二步：保存/继续界面
       textSize(24);
       text("Save current progress(press 'S')", windowWidth / 2, windowHeight / 2);
-      text("Countinue without saving(press 'C')", windowWidth / 2, windowHeight / 2 + 40);
+      
     }
   }
 
@@ -1109,9 +1138,7 @@ generateHealBlackHole(max) {
         await this.saveProgressToSupabase();   // 存档
         levelManager.loadNextLevel();          // 下一关
       }
-      if (key === 'C' || key === 'c') {
-        levelManager.loadNextLevel();          // 直接下一关
-      }
+      
     }
   }
 
@@ -1738,7 +1765,7 @@ class Level5 extends BaseLevel{
 handleKeyPressed(key) {
   // 游戏完成后允许 M 返回主页
   if (this.finished && (key === 'M' || key === 'm')) {
-    window.location.href = 'index.html'; // ⬅️ 改为你的主菜单路径
+    goToMainMenu();
     return;
   }
 
