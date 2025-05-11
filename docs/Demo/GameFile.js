@@ -1478,7 +1478,7 @@ class Level3 extends BaseLevel {
     // 初始化提示内容 + 定时消失
     this.setTipAnimated("Something's lurking in the dark... Run for your life!",8000);
 
-/*
+
     // 刷敌人
     
     // FollowEnemy
@@ -1494,7 +1494,7 @@ class Level3 extends BaseLevel {
 
     // 刷奖励物
     this.generateTimeBonus(3); // 刷奖励物
-    */
+    
 
     // 设置倒计时
     timer = 90;
@@ -1560,8 +1560,7 @@ class Level4 extends BaseLevel{
       this.setTipAnimated("Something wicked this way comes! Dodge their bullets!", 8000);
   
   
-      // 刷敌人
-      let minSpawnDistance = player.r * 10;
+     
   
       // BulletEnemy（弹幕怪）追击玩家
       this.generateBulletEnemy(isHardMode? 5 : 3); // 刷弹幕怪
@@ -1573,7 +1572,7 @@ class Level4 extends BaseLevel{
       this.generateCommonEnemy(isHardMode? 20 : 10);
   
       // 刷黑洞
-      this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
+      this.generateDangerBlackHole(isHardMode? 4 : 2); // 刷危险黑洞
       
       this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
   
@@ -1933,45 +1932,55 @@ class Player {
   pop();
   }
     
-    this.hp.draw(this.pos.x, this.pos.y, this.r);
+    this.hp.drawHP(this.pos.x, this.pos.y, this.r);
+    this.hp.drawShield(this.pos.x, this.pos.y, this.r, this.lastDirection);
 
   }
 
-  receiveDamage(rawDamage) {
-    // 应用困难难度倍率
-    if (isHardMode) {
-    rawDamage *= 1.5;
-    }
-  
-    // 1️⃣ 技能优先判断（如限量护盾/反弹）
-    for (let skill of this.selectedSkills) {
-      if (skill.absorbDamage && skill.absorbDamage(rawDamage)) {
-        console.log("技能吸收了伤害！");
-        return; // 技能处理了这次伤害，直接跳出
-      }
-    }
-  
-    // 2️⃣ 如果玩家是无敌状态（比如其他技能导致的） → 跳过
-    if (this.isCurrentlyInvincible()) return;
-  
-    // 3️⃣ 计算最终伤害（例如减伤）
-    let damage = floor(rawDamage * this.damageMultiplier);
+
+  receiveDamage(rawDamage, source = null) {
+  if (source?.isReflected) return;
+  if (this.isInvincibleFromDash) return;
+
+  let dmg = rawDamage;
+
+  // 蓝色护盾吸收
+  if (this.hp.shieldHP > 0) {
+    const absorb = Math.min(dmg, this.hp.shieldHP);
+    this.hp.shieldHP -= absorb;
+    dmg -= absorb;
+    console.log(`🛡️主护盾吸收了 ${absorb}`);
+  }
+
+  // 金色 bonus 护盾吸收
+  if (dmg > 0 && this.hp.bonusShieldHP > 0) {
+    const absorb = Math.min(dmg, this.hp.bonusShieldHP);
+    this.hp.bonusShieldHP -= absorb;
+    dmg -= absorb;
+    console.log(`bonus 护盾吸收了 ${absorb}`);
+  }
+
+  // 更新绘图用护盾状态
+  this.hp.setShield(this.hp.shieldHP, this.hp.maxShieldHP, this.hp.bonusShieldHP, this.hp.maxBonusShieldHP);
+
+  // 剩余伤害扣血
+  if (dmg > 0) {
+    const damage = floor(dmg * this.damageMultiplier);
     this.hp.takeDamage(damage);
     console.log(`玩家受到 ${damage} 点伤害`);
-  
-    // 4️⃣ 死亡检测
-    if (!this.hp.isAlive()) {
-      gameOver = true;
-      console.log("玩家死亡！");
-    }
   }
+
+  if (!this.hp.isAlive()) {
+    gameOver = true
+    console.log("玩家死亡！");
+  }
+}
 
   isCurrentlyInvincible() {
     if (this.isInvincibleFromDash) console.log("⚡ Dash 提供无敌");
     if (this.isInvincibleFromReflect) console.log("🛡️ Reflect 提供无敌");
     return this.isInvincibleFromDash || this.isInvincibleFromReflect;
-  } 
-  
+  }   
   getDirection() {
   if (!this.prevPos) this.prevPos = this.pos.copy();
   let dir = p5.Vector.sub(this.pos, this.prevPos);
@@ -2049,7 +2058,7 @@ class Enemy {
     } else {
       fill(255, 0, 0);
       ellipse(this.pos.x, this.pos.y, this.r * 2);
-      this.hp.draw(this.pos.x, this.pos.y, this.r);
+      this.hp.drawHP(this.pos.x, this.pos.y, this.r);
     }
   }
   drawSprite(img, x, y, r, flip) {
@@ -2124,7 +2133,7 @@ class FollowEnemy extends Enemy {
     }
 
     this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
-    this.hp.draw(this.pos.x, this.pos.y, this.r);
+    this.hp.drawHP(this.pos.x, this.pos.y, this.r);
   }
 }
 
@@ -2197,7 +2206,7 @@ class AmbushEnemy extends Enemy {
     }
     
     this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
-    this.hp.draw(this.pos.x, this.pos.y, this.r);
+    this.hp.drawHP(this.pos.x, this.pos.y, this.r);
     
   }
 }
@@ -2335,7 +2344,7 @@ if (distance < this.chaseRange) {
 
       // 血条只在可见状态下绘制（并共享透明度）
       if (dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y) <= this.chaseRange) {
-        this.hp.draw(this.pos.x, this.pos.y, this.r);
+        this.hp.drawHP(this.pos.x, this.pos.y, this.r);
       }
     
       pop();
@@ -2406,8 +2415,8 @@ class BulletEnemy extends Enemy {
     
     
     this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
-
-      this.hp.draw(this.pos.x, this.pos.y, this.r);
+    this.hp.drawHP(this.pos.x, this.pos.y, this.r);
+      
     
 
 
@@ -2470,7 +2479,7 @@ class CommonEnemy extends Enemy {
     }
 
     this.drawSprite(this.spriteImg, this.pos.x, this.pos.y, this.r, this.flip);
-    this.hp.draw(this.pos.x, this.pos.y, this.r);
+    this.hp.drawHP(this.pos.x, this.pos.y, this.r);
   }
 }
 
@@ -3110,7 +3119,7 @@ if (this.dashPhase === 'explode') {
     pop();
 
     /* 血条 */
-    this.hp.draw(this.pos.x, this.pos.y, this.r);
+    this.hp.drawHP(this.pos.x, this.pos.y, this.r);
     
   
   }
@@ -3282,27 +3291,9 @@ class AttackBoostSkill extends Skill {
 }
 
 
-// class DashSkill extends Skill {
-//   constructor(player,enemies) {
-//     super("Phantom Dash", "", 8); // 冲刺技能冷却
-//     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
-//     this.isDashing = false; // 冲刺中标记
-//     this.originalSpeed = 0; // 记录冲刺前的速度
-//     this.dashedEnemies = []; // 已经撞过的敌人列表
-//     this.dashEndTime = 0; // 冲刺结束时间
-
-//     this.dashTrail = [];             // ✅ 拖影数组
-//     this.maxDashTrailLength = 20;    // ✅ 最多记录多少
-
-//     this.player = player; 
-//     this.enemies = enemies; // 保存敌人列表
-
-//     this.totalDamage = 0; // 累积冲刺造成的伤害
-//   }
-
   class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("Phantom Dash", "", 8); // 冲刺技能冷却
+    super("Phantom Dash", "", 1); // 冲刺技能冷却
     this.dashDamage = 5; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
@@ -3355,25 +3346,7 @@ class AttackBoostSkill extends Skill {
       }
     }
   }
-
-  // updateTrail() {
-  //   this.dashTrail.push(this.player.pos.copy());
-  //   if (this.dashTrail.length > this.maxDashTrailLength) {
-  //     this.dashTrail.shift();
-  //   }
-  // }
-
-  // showTrail() {
-  //   for (let i = 0; i < this.dashTrail.length; i++) {
-  //     let pos = this.dashTrail[i];
-  //     let alpha = map(i, 0, this.dashTrail.length, 50, 200);
-  //     let size = map(i, 0, this.dashTrail.length, player.r * 0.5, this.player.r);
-  //     fill(0, 255, 0, alpha);
-  //     noStroke();
-  //     ellipse(pos.x, pos.y, size * 2);
-  //   }
-  // }
-
+  // 更新冲刺拖影
     updateTrail() {
   if ((this._frameCounter++ % this.frameSkip) !== 0) return;
 
@@ -3476,86 +3449,6 @@ class DashResetSkill extends Skill {
     }
   }
 }
-
-// class ChargeStrikeSkill extends Skill {
-//   constructor(player, enemies) {
-//     super("Wrath Unchained", "", 3); // 技能名称，按键X，冷却8秒
-//     this.player = player;
-//     this.enemies = enemies;
-
-//     this.isCharging = false;
-//     this.startTime = 0;
-//     this.chargeDuration = 2000; // 1秒蓄力
-    
-//     this.chargeAttack = 40;      // 高额范围伤害
-    
-//     this.range = 100;           // 攻击范围半径
-//   }
-
-//   castSkillEffect() {
-//     console.log("⚡ 蓄力攻击启动：玩家进入蓄力状态");
-
-//     this.isCharging = true;
-//     this.startTime = millis();
-
-//     // ✅ 设置玩家状态
-//     this.player.isCharging = true;         // 禁止移动（在 player.update 中处理）
-//     this.player.damageMultiplier = 0.5;    // 减伤50%
-//     this.player.spriteMgr.request("charge", 2000, 1);
-//   }
-
-//   update() {
-//     super.update();
-
-//     if (this.isCharging && millis() - this.startTime >= this.chargeDuration) {
-//       this.releaseExplosion();             // 造成范围伤害
-//       this.isCharging = false;
-
-//       // ✅ 恢复玩家状态
-//       this.player.isCharging = false;
-//       this.player.damageMultiplier = 1;
-//       console.log("✅ 蓄力攻击完成，状态恢复");
-//     }
-//   }
-
-//   releaseExplosion() {
-//     console.log("💥 蓄力完成，释放360°范围攻击！");
-  
-//     let totalDamage = 0; // ✅ 累计总伤害
-  
-//     for (let enemy of this.enemies) {
-//       if (!enemy.hp || !enemy.hp.isAlive()) continue;
-  
-//       let d = dist(this.player.pos.x, this.player.pos.y, enemy.pos.x, enemy.pos.y);
-//       if (d <= this.range + enemy.r) {
-//         const attackInfo = {
-//           source: "charged",
-//           player: this.player,
-//           baseDamage: this.chargeAttack,
-//           target: enemy
-//         };
-  
-//         let damageDone = DamageCalculator.calculate(attackInfo);
-//         totalDamage += damageDone;
-  
-//         console.log(`命中敌人，造成 ${damageDone} 点伤害`);
-//       }
-//     }
-  
-//     if (totalDamage > 0) {
-//       console.log(`✅ 蓄力攻击总伤害: ${totalDamage}`);
-  
-//       for (let skill of this.player.selectedSkills) {
-//         if (skill instanceof LifestealSkill) {
-//           skill.onDamageDealt(totalDamage, "dash"); // 或 "melee"、"charged"
-//         }
-//       }
-      
-//     }
-
-//     // 👉 可以在这里加入爆炸粒子特效等
-//   }
-// }
 
 /* ---------- ChargeStrikeSkill ---------- */
 class ChargeStrikeSkill extends Skill {
@@ -3757,79 +3650,68 @@ class BloodFurySkill extends Skill {
   }
 }
 
+
 class ReflectSkill extends Skill {
   constructor(player) {
-    super("Iron Reversal", "", 2);     // 名称、按键占位、冷却 12 s
-    this.player   = player;
-    this.duration = 4 * 1000;  // 4 秒持续
-    this.endTime  = 0;
-    this.shieldHP = 200; // 最大可抵挡伤害
-    this.remainingShieldHP = 0; // 当前护盾剩余值
+    super("Iron Reversal", "", 2); // 名称、快捷键占位、冷却秒数
+    this.player = player;
+
+    this.duration = 4 * 1000; // 持续时间：4秒
+    this.endTime = 0;
+
+    this.baseShield = 200; // 主护盾值
   }
 
- 
-
-  /* ① 真正的效果写在这里，供父类 trigger() 调用 */
+  // 技能释放时触发
   castSkillEffect() {
-    this.player.isReflecting = true;       // 开启反弹状态
-    this.player.isInvincibleFromReflect = true;       // ✅ 设置为无敌
-    this.remainingShieldHP = this.shieldHP;     // 初始化护盾值
-    // ✅ 加上被动护盾（电击领域）
-  if (this.player.pendingBonusShield > 0) {
-    console.log(`🛡️ 叠加被动护盾 ${this.player.pendingBonusShield}`);
-    this.remainingShieldHP += this.player.pendingBonusShield;
-    this.player.pendingBonusShield = 0; // ⚠️ 重置
-  }
-    this.endTime = millis() + this.duration;
-    console.log(`🛡️ 反弹开启，护盾值 ${this.remainingShieldHP}`);
+    // 标记反弹状态
+    this.player.isReflecting = true;
+    this.player.isInvincibleFromReflect = true;
+
+    // 计算护盾值
+    const bonus = this.player.pendingBonusShield || 0;
+    const totalShield = this.baseShield + bonus;
+
+    // 更新护盾系统，用于绘图与吸收
+    this.player.hp.setShield(
+      totalShield,         // 当前总护盾（蓝+金）
+      totalShield,         // 最大总护盾
+      bonus,               // bonus 护盾（用于绘图金色条）
+      bonus                // 最大 bonus 护盾
+    );
+
+    // 清除 bonus 记录
+    this.player.pendingBonusShield = 0;
+
+    // 显示护盾特效
     this.player.spriteMgr.request("shield", this.duration, 1);
-    
-  
+
+    // 设置结束时间
+    this.endTime = millis() + this.duration;
+
+    console.log(`🛡️ Iron Reversal 启动！主护盾: ${this.baseShield}, bonus: ${bonus}`);
   }
 
-  /* ② 持续检查时间，自动关掉反弹 */
+  // 每帧检查是否超时
   update() {
-    super.update();                         // 先递减冷却
-    if ( this.player.isReflecting &&
-         millis() > this.endTime ) {
-      this.player.isReflecting = false;
-      this.player.isInvincibleFromReflect = false;    // ✅ 恢复正常
-      console.log("⚡ 反弹结束");
-    }
-  }
+    super.update(); // 冷却计时
 
-  // 提供给 player.receiveDamage 调用，尝试吸收伤害
-  absorbDamage(rawDamage) {
-    
-    if (this.player.isInvincibleFromDash) {
-      console.log("⚡ Dash无敌中，护盾不吸收伤害");
-      return false;
-    }
-
-    if (!this.player.isReflecting || !this.player.isInvincibleFromReflect) return false;
-
-    this.remainingShieldHP -= rawDamage;
-
-    console.log(`🛡️ Iron Reversal 吸收 ${rawDamage} 点伤害，剩余护盾 ${this.remainingShieldHP}`);
-
-    if (this.remainingShieldHP <= 0) {
+    if (this.player.isReflecting && millis() > this.endTime) {
       this._endShield();
-      console.log("💥 Iron Reversal 护盾破碎，技能终止");
+      console.log("⚡ Iron Reversal 结束，护盾消失");
     }
-
-    return true; // 已处理伤害
   }
 
-  // 内部逻辑：结束护盾效果
+  // 内部函数：结束技能状态
   _endShield() {
     this.player.isReflecting = false;
     this.player.isInvincibleFromReflect = false;
-    this.remainingShieldHP = 0;
+
+    // 清空护盾（也会影响绘图）
+    this.player.hp.setShield(0, 0, 0, 0);
   }
-
- 
-
 }
+
 
 
 /* ───────────────────────────────────────────────
@@ -4077,9 +3959,22 @@ class HPSystem {
     this.maxHP = maxHP;
     this.currentHP = maxHP;
     this.isDead = false;
+    
+    this.shieldHP = 0;
+    this.maxShieldHP = 0;
+
+    this.bonusShieldHP = 0;
+    this.maxBonusShieldHP = 0;
+  
+  
   }
 
-
+  setShield(shieldHP, maxShieldHP, bonusShieldHP = 0, maxBonusShieldHP = 0) {
+    this.shieldHP = shieldHP;
+    this.maxShieldHP = maxShieldHP;
+    this.bonusShieldHP = bonusShieldHP;
+    this.maxBonusShieldHP = maxBonusShieldHP;
+  }
 
   takeDamage(amount) {
     this.currentHP -= amount;
@@ -4100,7 +3995,7 @@ class HPSystem {
     return !this.isDead;
   }
 
-  draw(x, y, r, width = 50, height = 6) {
+  drawHP(x, y, r, width = 50, height = 6) {
   const barX = x - width / 2;
   const barY = y - r - 15;
   const radius = 0.5;
@@ -4119,18 +4014,7 @@ class HPSystem {
   const hpWidth = map(this.currentHP, 0, this.maxHP, 0, width);
   rect(barX, barY, hpWidth, height, radius);
 
-  // 🔵 蓝色护盾（延长部分）
-  if (ReflectSkill?.remainingShieldHP > 0) {
-    const shield = ReflectSkill.remainingShieldHP;
-    const maxShield = ReflectSkill.shieldHP || shield;
-    const shieldWidth = map(shield, 0, maxShield, 0, width); // 护盾条宽度同样基于 width 比例
-
-    fill(0, 180, 255); // 蓝色
-    rect(barX + hpWidth, barY, shieldWidth, height, radius); // 直接拼接在绿色条右侧
-    console.log("护盾条宽度:", shieldWidth);
-    console.log("护盾条位置:", barX + hpWidth, barY);
-  }
-
+   
   // 边框（白色微边框）
   stroke(255);
   strokeWeight(0.5);
@@ -4138,6 +4022,66 @@ class HPSystem {
   rect(barX, barY, width, height, radius);
   noStroke();
 }
+
+drawShield(x, y, r, facing = "right", width = 6, height = 50) {
+  const offset = 10;
+  const dir = (facing === "right") ? "left" : "right";
+  const radius = 0.5;
+  let barX = (dir === "left")
+    ? x - r - offset - width
+    : x + r + offset;
+  let barY = y - height / 2;
+
+  // 先判断是否有护盾需要绘制
+  const hasShield = (this.shieldHP > 0 && this.maxShieldHP > 0);
+  const hasBonus  = (this.bonusShieldHP > 0 && this.maxBonusShieldHP > 0);
+  if (!hasShield && !hasBonus) return; // 完全没有护盾，不绘制任何东西
+
+  let shieldHeight = 0;
+  if (hasShield) {
+    shieldHeight = map(this.shieldHP, 0, this.maxShieldHP, 0, height);
+  }
+
+  let currentY = barY + height;
+
+  // 🟦 主护盾（蓝色）
+  if (shieldHeight > 0) {
+    fill(0, 180, 255);
+    currentY -= shieldHeight;
+    rect(barX, currentY, width, shieldHeight, radius);
+  }
+  // 🧱 总体边框（仅在有护盾时绘制）
+  stroke(255);
+  strokeWeight(0.5);
+  noFill();
+  rect(barX, barY, width, height);
+  noStroke();
+
+  // 🟨 bonus护盾（金色），延长最多 1/3 主护盾长度
+  if (hasBonus && shieldHeight > 0) {
+    let rawBonusHeight = map(this.bonusShieldHP, 0, this.maxBonusShieldHP, 0, height);
+    let maxBonusHeight = shieldHeight / 3;
+    let bonusHeight = min(rawBonusHeight, maxBonusHeight);
+
+    if (bonusHeight > 0) {
+      fill(255, 215, 0);
+      currentY -= bonusHeight;
+      rect(barX, currentY, width, bonusHeight,radius);
+
+      // 描边 bonus 护盾
+      stroke(255);
+      strokeWeight(0.5);
+      noFill();
+      rect(barX, currentY, width, bonusHeight,radius);
+      noStroke();
+    }
+  }
+
+  
+}
+
+
+
 
 }
 
@@ -4198,7 +4142,7 @@ class CollisionManager {
       for (let enemy of this.enemies) {
         if (!enemy.hp || !enemy.hp.isAlive()) continue;
         if (this.checkCollision(bullet, enemy)) {
-          enemy.hp.takeDamage(15);
+          enemy.hp.takeDamage(10);
           bullet.alive = false;
           console.log("敌人被反弹击中！扣15血");
         }
@@ -4467,10 +4411,7 @@ class BlackHole {
     this.dangerRadius = dangerRadius;  // 判定为“在黑洞里”的范围
     this.sparkList = [];
 
-    // this.defaultSpeed = 4;           // 你的正常速度值（按需修改）
-    // this.inBlackHole = false;        // 是否在黑洞内
-    // this.blackHoleExitTime = null;   // 上次退出黑洞的时间
-
+    this.lastDamageTime = 0;  // 记录上次伤害时间
   }
 
   update( player ) {
@@ -4523,22 +4464,32 @@ class BlackHole {
 
   }
 
-  applyEffects(player) {
-    if (this.type == "danger") {
+    applyEffects(player) {
+  const now = millis(); // 当前时间（毫秒）
 
+  if (this.type == "danger") {
+    const damageInterval = 1000; // 每秒一次（单位：毫秒）
 
-      player.receiveDamage(0.2); // 每帧小幅掉血
-      // 用 player.isInvincible 判断冲刺状态
-      if (!player.isInvincible && player.speed > 2) {
-        player.speed = 2;
-      }
+    // 只有超过1秒才造成一次伤害
+    if (now - this.lastDamageTime >= damageInterval) {
+      player.receiveDamage(2); // ⬅️ 每秒掉2点血（你可以自定义）
+      this.lastDamageTime = now;
+    }
 
+    // 减速逻辑（仍然每帧判断）
+    if (!player.isInvincible && player.speed > 2) {
+      player.speed = 2;
+    }
 
-
-    } else if (this.type === "heal") {
-      player.hp.heal(0.2);
+  } else if (this.type === "heal") {
+    // 同理，每秒回血一次
+    const healInterval = 1000;
+    if (now - this.lastDamageTime >= healInterval) {
+      player.hp.heal(2); // ⬅️ 每秒回2点血
+      this.lastDamageTime = now;
     }
   }
+}
   
   show() {
       push();
@@ -4814,7 +4765,7 @@ class Tower extends Enemy {
         image(this.gif, this.pos.x, this.pos.y, this.r*3.5, this.r*3.5);
         pop();
       } 
-      this.hp.draw(this.pos.x, this.pos.y, this.r);
+      this.hp.drawHP(this.pos.x, this.pos.y, this.r);
     }
   }
 }
