@@ -484,7 +484,7 @@ function drawInfo() {
   //print mode
    // 打印难度
   let modeText = isHardMode ? "Hard" : "Easy";
-  text("Current Mode: " + modeText, windowWidth - 20, 80);
+  text("Mode: " + modeText, windowWidth - 20, 80);
 
 
   //
