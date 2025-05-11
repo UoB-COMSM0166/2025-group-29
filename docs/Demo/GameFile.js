@@ -111,7 +111,6 @@ let blackHoles = [];
 
 //关卡管理
 let levelManager;
-let gamePaused = false;
 
 let remainingTime; // 剩余时间（秒）
 let stealthTimer = 0;
@@ -120,8 +119,6 @@ let stealthSpawnedCount = 0; // 生成的隐形敌人数量
 let ambushSpawnedCount = 0; // 生成的伏击怪数量
 
 let isHardMode = false; // 是否开启困难模式
-
-let pauseMenuActive = false;
 
 
 const GIF_POOL = {
@@ -378,23 +375,6 @@ if (gameOver) {
   return;
 }
 
-if (gamePaused) {
-    drawPauseMenu();  // 渲染暂停界面
-    return;           // 停止后续更新与渲染
-}
-
-
-
-// 检查暂停状态
-if (typeof gamePaused !== 'undefined' && gamePaused) {
-  clear(); // 保持黑色背景
-  if (levelManager && levelManager.currentLevel) {
-    levelManager.currentLevel.draw();  // 显示关卡的提示语
-  }
-  drawInfo();  // 分数、时间、技能 HUD
-  return;  // 提前退出，避免更新其他逻辑
-}
-
 // 只有在关卡没结束时更新倒计时
 if (!levelManager.currentLevel.finished) {
   updateTimer();
@@ -434,25 +414,6 @@ if (gameOver) {
 
 
 
-}
-
-
-function drawPauseMenu() {
-  push();
-  resetMatrix();
-  fill(0, 180);
-  rect(0, 0, windowWidth, windowHeight);
-
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(36);
-  text("⏸ Paused", windowWidth / 2, windowHeight / 2 - 100);
-
-  textSize(24);
-  text("Press R or Esc to Resume", windowWidth / 2, windowHeight / 2 - 20);
-  text("Press M to Return to Main Menu", windowWidth / 2, windowHeight / 2 + 30);
-
-  pop();
 }
 
 
@@ -589,67 +550,38 @@ function showGameOverScreen() {
 
 
 function keyPressed() {
-  keys[key] = true; // 记录按下的按键
+  keys[key] = true;                    // 记录按下的按键
 
-  if ((key === 'R' || key === 'r') && gameOver ) { // 按 R 重新开始
+  /* ---------- 全局快捷 ---------- */
+  if ((key === 'R' || key === 'r') && gameOver) {   // R：重新开始
     restartGame();
+    return;
   }
-
-    // 暂停/恢复 游戏
-  if (keyCode === ESCAPE) {
-    pauseMenuActive = !pauseMenuActive;
-    gamePaused = pauseMenuActive;
-    return; // 不继续触发后续游戏逻辑
-  }
-
-  if (pauseMenuActive) {
-    // 菜单中按 R 或 Esc 继续游戏
-    if (key === 'R' || key === 'r' || keyCode === ESCAPE) {
-      pauseMenuActive = false;
-      gamePaused = false;
-    }
-
-    // 菜单中按 M 返回主菜单
-    if (key === 'M' || key === 'm') {
-      goToMainMenu();
-    }
-
+  if (key === 'M' || key === 'm') {                 // M：回主菜单
+    goToMainMenu();
     return;
   }
 
+  /* ---------- 调试跳关 ---------- */
+  if (key === '1') gamelevel = 1;
+  if (key === '2') gamelevel = 2;
 
-
-  if (key == '1'){
-    gamelevel = 1;
-  }
-  
-  if (key == '2'){
-    gamelevel = 2;
-  }
-  
+  /* ---------- 普攻 ---------- */
   if (key.toLowerCase() === 'a') {
-    if (!player.isCharging) { // ✅ 正在蓄力时不能普攻
+    if (!player.isCharging) {          // 正在蓄力时禁止普通攻击
       player.meleeAttack.trigger();
     } else {
-      console.log("⚠️ 当前为蓄力攻击状态，禁止普通攻击");
+      console.log("⚠️ 蓄力中，A 键被忽略");
     }
-
-    // 告诉 Level1 玩家攻击了
-  if (levelManager && levelManager.currentLevel instanceof Level1) {
-    levelManager.currentLevel.handlePlayerAttack();
-}
+    // 关卡 1 需要知道玩家攻击
+    if (levelManager?.currentLevel instanceof Level1) {
+      levelManager.currentLevel.handlePlayerAttack();
+    }
   }
 
-  // 让当前关卡处理按键
-  if (levelManager && levelManager.currentLevel) {
-    levelManager.currentLevel.handleKeyPressed(key);
-}
-  
-  
-
-  skillSystem.tryActivateSkill(key); // 让技能系统处理按键
-  
-  
+  /* ---------- 让当前关卡/技能系统处理 ---------- */
+  levelManager?.currentLevel?.handleKeyPressed?.(key);
+  skillSystem.tryActivateSkill(key);
 }
 
 function keyReleased() {

@@ -1583,17 +1583,28 @@ export const SummaryMenu = {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8">
   <title>Pause Menu</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    html,body{margin:0;padding:0;height:100vh;overflow:hidden;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center}
+  </style>
 </head>
 <body>
   <div class="pauseContainer">
-    <h1>Game Paused​</h1>
-    <button class="menuButton" onclick="…">Resume</button>
-    <button class="menuButton" onclick="…">Save</button>
-    <button class="menuButton" onclick="…">Quit</button>
+    <h1>Game Paused</h1>
+    <button class="menuButton" id="resumeBtn">Resume</button>
+    <button class="menuButton" id="saveBtn">Save</button>
+    <button class="menuButton" id="quitBtn">Quit</button>
   </div>
+
+  <script>
+    const send=a=>parent.postMessage({type:'pause_action',action:a},'*')
+    document.getElementById('resumeBtn').onclick=()=>send('resume')
+    document.getElementById('saveBtn').onclick  =()=>send('save')
+    document.getElementById('quitBtn').onclick  =()=>send('quit')
+    window.addEventListener('keydown',e=>{if(e.key==='Escape')send('resume')})
+  </script>
 </body>
 </html>
 
