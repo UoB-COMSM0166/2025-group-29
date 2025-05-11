@@ -48,14 +48,14 @@ Add a group photo here!
 - [1 Introduction](#1-introduction)
   - [1.1 Overview](#11-overview)
 - [2 Art Design and Innovation](#2-art-design-and-innovation)
-- [3 Art Design and Innovation](#2-art-design-and-innovation)
-- [4 Art Design and Innovation](#2-art-design-and-innovation)
-- [5 Art Design and Innovation](#2-art-design-and-innovation)
-- [6 Art Design and Innovation](#2-art-design-and-innovation)
-- [7 Art Design and Innovation](#2-art-design-and-innovation)
-- [8 Art Design and Innovation](#2-art-design-and-innovation)
-- [9 Art Design and Innovation](#2-art-design-and-innovation)
-- [10 Art Design and Innovation](#2-art-design-and-innovation)
+- [3 Requirements](#3-requirements)
+- [4 Design](#4-design)
+- [5 Implementation](#5-implementation)
+- [6 Evaluation](#6-evaluation)
+- [7 Process](#7-process)
+- [8 Conclusion](#8-conclusion)
+- [9 Contribution Statement](#9-contribution-statementn)
+- [10 Additional Marks](#10-additional-marks)
 
 # 1 Introduction
 # 2 Art Design and Innovation
@@ -178,7 +178,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 - Describe implementation of your game, in particular highlighting the three areas of challenge in developing your game.
 - 技能系统；存档系统；Boss战
 
-# 6.Evaluation
+# 6 Evaluation
 
 - 15% ~750 words
 
