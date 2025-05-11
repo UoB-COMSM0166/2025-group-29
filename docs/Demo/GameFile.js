@@ -832,9 +832,9 @@ function sendLevelToBackground(levelNumber) {
       type: 'level',
       level: levelNumber
     }, '*');
-    console.log(`🎨 背景层已收到关卡编号：BG${levelNumber}.png`);
+    console.log(`背景层已收到关卡编号：BG${levelNumber}.png`);
   } else {
-    console.warn("⚠️ 未找到背景 iframe，无法更新背景图片");
+    console.warn("未找到背景 iframe，无法更新背景图片");
   }
 }
 
@@ -849,32 +849,20 @@ class LevelManager {
     this.levels.push(level);
   }
 
-  // loadLevel(index) {
-  //   this.currentLevel = this.levels[index];
-  //   console.log(`加载 Level ${index + 1}`);
-  //   this.currentLevel.start();  // 启动关卡
 
-  //   //  每次加载新关卡后，重新创建碰撞检测器和近战攻击器
-  //   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
-  //   player.meleeAttack = new MeleeAttack(player, enemies);
-
-  // }
   //修改关卡背景zc5.9
   loadLevel(index) {
   const prevLevel = this.currentLevel; 
   this.currentLevel = this.levels[index];
   console.log(`加载 Level ${index + 1}`);
 
-  // // 如果有上一关，继承它的 totalScore
-  // if (prevLevel) {
-  //     this.currentLevel.startingScore = prevLevel.totalScore;
-  // }
+
   this.currentLevel.startingScore = prevLevel
     ? prevLevel.totalScore
     : savedCumulativeScore || 0;
   this.currentLevel.start();
 
-  // 👉 通知背景层更换背景图
+  // 通知背景层更换背景图
   sendLevelToBackground(this.currentLevel.levelNumber);
 
   // 每次加载新关卡后，重新绑定系统
