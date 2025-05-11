@@ -49,7 +49,7 @@ Add a group photo here!
 #### Art Design and Innovation
 We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
 
-#### Character state
+#### Character State
 Character design is combined with the skill tree system. Players can freely choose skills to build skill tree branches and styles, which activate different states.
 
 | Image                                                           | Name        | Description                                                                           |
@@ -59,7 +59,7 @@ Character design is combined with the skill tree system. Players can freely choo
 |![image](docs/Demo/assets/media/character/power-idle-base.gif)   | Power mode  | The state of the battle mecha when the power-type skill tree branch is activated.     |
 |![image](docs/Demo/assets/media/character/tank-idle-base.gif)    | Tank mode   |  The state of the battle mecha when the tank-type skill tree branch is activated.     |
 
-#### Skill and attack effects
+#### Skill And Attack Effects
 Skill animations and effects are combined with art to make the game more immersive and fun for players.
 
 | Image                                                             | Name           | Description                                                                                                                         |
@@ -71,7 +71,7 @@ Skill animations and effects are combined with art to make the game more immersi
 |![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
 |![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
 
-#### Monster appearances
+#### Monster Appearances
 Carefully designed monster appearances match the game’s theme and make players feel more involved.
 
 | Image                                                               | Name             | Description                                                                                                                         |
@@ -92,6 +92,18 @@ Many kinds of bullets with different targets. This makes the visuals more intere
 |![image](docs/Demo/assets/media/bullet/Monster-bullet.gif)           | Monster-bullet            | Bullets shot by Danmaku-monsters.                                                                                                   |
 |![image](docs/Demo/assets/media/bullet/Character-rebound-bullet.gif) | Character-rebound-bullet  | Bullets reflected by player skills.                                                                                                 |
 |![image](docs/Demo/assets/media/bullet/Boss-bullet.gif)              | Boss-bullet               | Special bullet patterns from the boss.                                                                                              |
+
+#### Visual Effects
+Rich visual effects make the game more fun and improve the player’s experience.
+
+| Image                                                               | Description              | Image                                                                 |        Description                                                   |
+|---------------------------------------------------------------------|--------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/Visualeffect/boost.gif)              | character-boost          | ![image](docs/Demo/assets/media/Visualeffect/charge.gif)              |             character-charge                                         |
+|![image](docs/Demo/assets/media/Visualeffect/shield.gif)             | character-shield         | ![image](docs/Demo/assets/media/Visualeffect/steal.gif)               |             character-steal                                          |
+|![image](docs/Demo/assets/media/Visualeffect/character-dash-puff.gif)| character-dash-puff      | ![image](docs/Demo/assets/media/Visualeffect/character-idle-puff.gif) |             character-idle-puff                                      |
+|![image](docs/Demo/assets/media/Visualeffect/boss-dash-explore.gif)  | boss-dash-explore        | ![image](docs/Demo/assets/media/Visualeffect/boss-blackhole.gif)      |             boss-blackhole                                           |
+|![image](docs/Demo/assets/media/Visualeffect/boss-puff.gif)          | boss-puff                | ![image](docs/Demo/assets/media/Visualeffect/boss-summon.gif)         |             boss-summon                                              | 
+|![image](docs/Demo/assets/media/Visualeffect/boss-wave.gif)          | boss-wave                | 
 
 
 
