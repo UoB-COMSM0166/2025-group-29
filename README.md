@@ -84,6 +84,16 @@ Carefully designed monster appearances match the game’s theme and make players
 |![image](docs/Demo/assets/media/boss/TOWER.gif)                      | Tower            | A device summoned by the boss.                                                                                                      |
 |![image](docs/Demo/assets/media/boss/BOSS_IDLE.gif)                  | Boss             | Has many attack moves and effects, and includes game mechanics that players need to figure out.                                     |
 
+#### Bullet Types
+Many kinds of bullets with different targets. This makes the visuals more interesting and improves the game experience.
+
+| Image                                                               | Name                      | Description                                                                                                                         |
+|---------------------------------------------------------------------|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/bullet/Monster-bullet.gif)           | Monster-bullet            | Bullets shot by Danmaku-monsters.                                                                                                   |
+|![image](docs/Demo/assets/media/bullet/Character-rebound-bullet.gif) | Character-rebound-bullet  | Bullets reflected by player skills.                                                                                                 |
+|![image](docs/Demo/assets/media/bullet/Boss-bullet.gif)              | Boss-bullet               | Special bullet patterns from the boss.                                                                                              |
+
+
 
 - 5% ~250 words 
 - Describe your game, what is based on, what makes it novel? 
