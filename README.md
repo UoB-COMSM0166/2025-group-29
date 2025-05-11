@@ -71,6 +71,19 @@ Skill animations and effects are combined with art to make the game more immersi
 |![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
 |![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
 
+#### Monster appearances
+Carefully designed monster appearances match the game’s theme and make players feel more involved.
+
+| Image                                                               | Name             | Description                                                                                                                         |
+|---------------------------------------------------------------------|------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/monster/normal-monster.gif)          | Normal-monster   | Moves around within a set area.                                                                                                     |
+|![image](docs/Demo/assets/media/monster/Follow-monster.gif)          | Follow-monster   | Follows and attacks the player.                                                                                                     |
+|![image](docs/Demo/assets/media/monster/Invisible-monster.gif)       | Invisible-monster| Becomes visible only when the player gets close, then follows and attacks.                                                          |
+|![image](docs/Demo/assets/media/monster/Ambush-monster-attack.gif)   | Ambush-monster   | Rushes to attack the player quickly when close.                                                                                     | 
+|![image](docs/Demo/assets/media/monster/Danmaku-monster.gif)         | Danmaku-monster  | Shoots bullet attacks at the player.                                                                                                |
+|![image](docs/Demo/assets/media/boss/TOWER.gif)                      | Tower            | A device summoned by the boss.                                                                                                      |
+|![image](docs/Demo/assets/media/boss/BOSS_IDLE.gif)                  | Boss             | Has many attack moves and effects, and includes game mechanics that players need to figure out.                                     |
+
 
 - 5% ~250 words 
 - Describe your game, what is based on, what makes it novel? 
