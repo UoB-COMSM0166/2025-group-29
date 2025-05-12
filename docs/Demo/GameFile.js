@@ -1439,9 +1439,9 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 50 : 30); 
+    this.generateFollowEnemy(isHardMode? 40 : 30); 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 60 : 40); 
+    this.generateCommonEnemy(isHardMode? 50 : 40); 
 
     //时间柱
     this.generateTimeBonus(3); // 刷奖励物
