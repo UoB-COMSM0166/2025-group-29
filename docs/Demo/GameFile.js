@@ -752,7 +752,7 @@ function updateStealthSpawn(max) {
     let pos = generateStealthEnemyAhead(player.pos, dir);
     enemies.push(new StealthEnemy(pos.x, pos.y));
     stealthSpawnedCount++; // ✅ 每生成一个就增加
-    console.log(`生成隐形敌人 ${stealthSpawnedCount}/${max}`, pos);
+    console.log(`生成隐形敌人 ${stealthSpawnedCount}/${max}`, pos); 
   }
 }
   
@@ -1342,8 +1342,6 @@ class Level2 extends BaseLevel {
     this.tip = "Marked for death...The ambush is coming fast - stay alert!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-    // 刷敌人（正常血量）
-    let minSpawnDistance = player.r * 10;
 
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
