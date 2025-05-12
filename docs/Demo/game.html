@@ -11,13 +11,12 @@
     #pauseFrame{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10000;border:none}
   </style>
   <script>
-    const MAIN_URL='index.html?directMain=1';
+    const MAIN_URL='index.html?directMain=1'
     function goToMainMenu(){window.location.href=MAIN_URL}
-
-    const params=new URLSearchParams(window.location.search);
-    const saveId=params.get('saveId');
+    const params=new URLSearchParams(window.location.search)
+    const saveId=params.get('saveId')
     if(!saveId){console.error('Missing saveId in URL');alert('存档 ID 缺失，无法继续')}
-    window.APP_SAVE_ID=saveId;
+    window.APP_SAVE_ID=saveId
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/addons/p5.sound.min.js"></script>
@@ -27,45 +26,40 @@
   <iframe id="pauseFrame" src="pause.html"></iframe>
   <iframe id="bgFrame" src="BG.html"></iframe>
   <script>
-    const bg = document.getElementById('bgFrame');
-    const pauseFrame = document.getElementById('pauseFrame');
-
-    // 捕获模式下先拦截 Esc，再转发所有键给 BG 画面
-    window.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        pauseFrame.style.display = 'block';
-        e.preventDefault();
+    const bg=document.getElementById('bgFrame')
+    const pauseFrame=document.getElementById('pauseFrame')
+    window.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        pauseFrame.style.display='block'
+        noLoop()
+        e.preventDefault()
+      } else {
+        bg.contentWindow.postMessage({type:'keydown',key:e.key},'*')
       }
-      bg.contentWindow.postMessage({ type:'keydown', key:e.key }, '*');
-    }, true);
-
-    window.addEventListener('keyup', e => {
-      bg.contentWindow.postMessage({ type:'keyup', key:e.key }, '*');
-    });
-
-    // 接收来自 BG.html 的“pause_menu”请求，和来自 pause.html 的“pause_action”
-    window.addEventListener('message', e => {
-      // 来自 BG.html，按 Esc 时打开暂停
-      if (e.data?.type === 'pause_menu') {
-        pauseFrame.style.display = 'block';
-        return;
+    },true)
+    window.addEventListener('keyup',e=>{
+      if(e.key!=='Escape'){
+        bg.contentWindow.postMessage({type:'keyup',key:e.key},'*')
       }
-      // 来自 pause.html，点击 Resume/Save/Quit
-      if (e.data?.type === 'pause_action') {
-        pauseFrame.style.display = 'none';
-        const action = e.data.action;
-        if (action === 'resume') {
-          // 强制把焦点切回到父页面，否则需要点击才能接着收到键盘
-          window.focus();
-        }
-        else if (action === 'save') {
-          // TODO: 加你的存档逻辑
-        }
-        else if (action === 'quit') {
-          goToMainMenu();
+    })
+    window.addEventListener('message',e=>{
+      if(e.data?.type==='pause_menu'){
+        pauseFrame.style.display='block'
+        return
+      }
+      if(e.data?.type==='pause_action'){
+        pauseFrame.style.display='none'
+        const action=e.data.action
+        if(action==='resume'){
+          loop()
+          window.focus()
+        } else if(action==='save'){
+          // your save logic here
+        } else if(action==='quit'){
+          goToMainMenu()
         }
       }
-    });
+    })
   </script>
 </body>
 </html>
