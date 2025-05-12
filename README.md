@@ -23,8 +23,9 @@
 
 
 ## Your Game
+#### **Demo video**  
 Click the image to watch the Demo video on YouTube.
-[![Watch the video](https://img.youtube.com/vi/U4nfC1jR4LA/hqdefault.jpg)](https://www.youtube.com/watch?v=U4nfC1jR4LA)
+- **Demo video** ➡️[![Watch the video](https://img.youtube.com/vi/U4nfC1jR4LA/hqdefault.jpg)](https://www.youtube.com/watch?v=U4nfC1jR4LA)
 
 [Download demo video](/docs/Demo/video.mp4)
 
