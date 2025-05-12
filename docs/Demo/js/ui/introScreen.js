@@ -3,7 +3,8 @@ import { advanceTo } from '../router.js';
 
 export const IntroScreen = {
   el: null,
-  show() {
+
+  show () {
     this.el = document.createElement('div');
     this.el.id = 'introScreen';
     this.el.innerHTML = `
@@ -12,26 +13,26 @@ export const IntroScreen = {
     `;
     document.body.appendChild(this.el);
 
-    // add listeners for keyboard and mouse input
+    const img = this.el.querySelector('#titleImage');
+    if (img) {
+      /* kill glow: stop animation, clear filter & shadow */
+      img.style.animation  = 'none';
+      img.style.filter     = 'none';
+      img.style.boxShadow  = 'none';
+    }
+
     window.addEventListener('keydown', this._onInput);
     window.addEventListener('mousedown', this._onInput);
   },
-  hide() {
-    // remove input event listeners and intro screen element
+
+  hide () {
     window.removeEventListener('keydown', this._onInput);
     window.removeEventListener('mousedown', this._onInput);
     this.el.remove();
   },
 
-  /**
-   * this method is called when user presses key or clicks
-   * if intro overlay element is still present, do nothing
-   * otherwise navigate to main menu
-   */
-  _onInput(event) {
-    if (document.getElementById('introOverlay')) {
-      return; // waiting for intro overlay to disappear
-    }
+  _onInput () {
+    if (document.getElementById('introOverlay')) return;
     advanceTo('MAIN_MENU');
   }
 };
