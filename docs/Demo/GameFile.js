@@ -3690,7 +3690,7 @@ class LifestealSkill extends Skill {
   constructor(player) {
     super("Crimson Drain", "", 5); // 技能名称、按键、冷却秒数
     this.player = player;
-    this.lifestealRatio = 0.65; // 吸血比例
+    this.lifestealRatio = 0.5; // 吸血比例
     this.duration = 5000; // 持续时间（毫秒）
     this.active = false;
     this.endTime = 0;
