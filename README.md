@@ -57,7 +57,7 @@ Add a group photo here!
 - [3 Requirements](#3-requirements)
 - [4 Design](#4-design)
 - [5 Implementation](#5-implementation)
-  - [5.1 Challenge 1 Skill Tree System and Animation Management](#51-challenge-1-skill-tree-system-and-animation-management)
+  - [5.1 Challenge 1: Skill Tree System and Animation Management](#51-challenge-1-skill-tree-system-and-animation-management)
 - [6 Evaluation](#6-evaluation)
   - [6.1 Think-Aloud Testing](#61-qualitative-evaluation)
   - [6.2 NASA-TLX Workload Study](#62-quantitative-evaluation)
@@ -307,7 +307,7 @@ We encountered a wide range of issues during development, which can be broadly c
 Within the gameplay logic domain, the challenges further divide into two key subsystems: skill system architecture and logic and enemy generation & behavior modeling. Each subsystem posed distinct technical hurdles but collectively contributed to a cohesive and dynamic gameplay experience.
 
 
-## 5.1 Challenge 1 Skill Tree System and Animation Management
+## 5.1 Challenge 1: Skill Tree System and Animation Management
 The goal of our skill tree design is to provide players with more personalized growth paths and strategic options, thereby enhancing the game’s depth and replayability. Initially, we introduced three skill slots, and through skill combinations, players can experience a faction-based active skill system, encouraging them to build unique playstyles.
 Later in development, to further differentiate these factions, we converted faction bonuses into three new passive skills that enhance corresponding active skills, reinforcing each faction's unique style and increasing immersion. At the same time, we retained the “three-color skill combination” mechanic, which means players can select one skill from each of the three factions, allowing for non-faction-based builds and greatly expanding the possibilities for creative experimentation.
 For character sprite management, we adopted a three-level nested object structure called GIF_POOL to index GIF animations based on faction, status, and skill state. The function applyFactionFromSkills() dynamically determines the current faction based on the equipped skills and triggers a corresponding visual update to reflect the faction’s aesthetic.
