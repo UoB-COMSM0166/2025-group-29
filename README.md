@@ -504,7 +504,7 @@ In conclusion, this project has provided us with solid development experience an
 | Yichen Zhang  | 1.00         |
 | Guojie Liu    | 1.00         |
 | Chen Zhang    | 1.00         |
-| Mengqiu Liu   | 1.00         |
+| Mengqiu Yan   | 1.00         |
 
 [Back to Table of Contents](#table-of-contents)
 # 11 Additional Marks
