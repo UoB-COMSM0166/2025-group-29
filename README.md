@@ -455,6 +455,8 @@ We paid attention to how our design might impact players emotionally and cogniti
 
 These choices show our commitment to accessibility, and long-term enjoyment, and reflect the kind of responsibility we believe game developers should take seriously.
 
+[Back to Table of Contents](#table-of-contents)
+
 ---
 # 8 Process 
 
