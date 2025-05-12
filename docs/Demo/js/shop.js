@@ -64,10 +64,13 @@ function updateUI () {
 
     /* column glow */
     $c.classList.remove('active', 'green', 'yellow', 'red');
-    if (col === homeCol) {
+    
+    if (level >= 2) {
+     const selectedInCol = ITEMS[col].filter(n => stored.includes(n));
+     if (selectedInCol.length === 3) {
       $c.classList.add('active', ['green', 'yellow', 'red'][col]);
-    }
-
+     }
+   }
     /* cells */
     $c.querySelectorAll('.item').forEach($it => {
       const row  = +$it.dataset.row;
