@@ -180,12 +180,12 @@ function preload() {
     dataLoaded = true;
   });
 
-  skillIcons["Phantom Dash"] = loadImage("assets/media/icon/icon8.PNG"); 
+  skillIcons["Phantom Dash"] = loadImage("assets/media/icon/icon8.png"); 
   skillIcons["Ghost Cutter"] = loadImage("assets/media/icon/icon5.PNG"); 
   skillIcons["Runner’s Instinct"] = loadImage("assets/media/icon/icon4.PNG"); 
-  skillIcons["Crimson Drain"] = loadImage("assets/media/icon/icon7.PNG"); 
+  skillIcons["Crimson Drain"] = loadImage("assets/media/icon/icon7.png"); 
   skillIcons["Wrath Unchained"] = loadImage("assets/media/icon/icon2.PNG"); 
-  skillIcons["Berserker’s Blood"] = loadImage("assets/media/icon/icon9.PNG"); 
+  skillIcons["Berserker’s Blood"] = loadImage("assets/media/icon/icon9.png"); 
   skillIcons["Iron Reversal"] = loadImage("assets/media/icon/icon3.PNG"); 
   skillIcons["Anchor Field"] = loadImage("assets/media/icon/icon1.PNG"); 
   skillIcons["Guardian’s Will"] = loadImage("assets/media/icon/icon6.PNG"); 
@@ -2523,7 +2523,7 @@ class Boss extends Enemy {
 
     /* ───── 基本属性 ───── */
     this.r  = 115;
-    this.hp = new HPSystem(28);
+    this.hp = new HPSystem(2800);
     this.contactDamage = 40;
 
     /* ───── idle / 召唤图片 ───── */
