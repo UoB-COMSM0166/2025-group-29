@@ -4864,3 +4864,14 @@ window.setup      = setup;
 window.draw       = draw;
 window.keyPressed = keyPressed;
 window.keyReleased= keyReleased;
+window.addEventListener('message', e => {
+  if (e.data?.type === 'pause_action') {
+    pauseFrame.style.display = 'none';
+    const action = e.data.action;
+    if (action === 'resume') {
+      loop();      // 恢复 p5.js draw 循环
+      window.focus();
+    }
+    // …
+  }
+});
