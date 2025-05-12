@@ -3354,7 +3354,7 @@ class AttackBoostSkill extends Skill {
   castSkillEffect() {
     SFX.play("boost");
     console.log("快速攻击发动！攻击力提升3秒");
-    this.player.buffAttack = 30; // 技能发动时，攻击力变成30
+    this.player.buffAttack = 60; // 技能发动时，攻击力变成30
     setTimeout(() => {
       this.player.buffAttack = player.baseAttack; // 3秒后恢复原来的基础攻击
       console.log("攻击加成结束，恢复基础伤害");
@@ -3536,7 +3536,7 @@ class ChargeStrikeSkill extends Skill {
     this.chargeDuration = 2000;  // ms
     this.range          = 100;   // 蓄满后的最大攻击半径
     this.minRange       = 20;    // 起始提示半径
-    this.chargeAttack = 70;      // 高额范围伤害
+    this.chargeAttack = 100;      // 高额范围伤害
 
     this.isCharging = false;
     this.startTime  = 0;
@@ -3661,7 +3661,7 @@ class LifestealSkill extends Skill {
   constructor(player) {
     super("Crimson Drain", "", 5); // 技能名称、按键、冷却秒数
     this.player = player;
-    this.lifestealRatio = 0.5; // 吸血比例
+    this.lifestealRatio = 0.65; // 吸血比例
     this.duration = 5000; // 持续时间（毫秒）
     this.active = false;
     this.endTime = 0;
@@ -3945,7 +3945,7 @@ else if (this.slowed.has(enemy)) {
 
 class SlowFieldBonusDamage extends Skill {
   constructor(player, enemies, slowField,
-              damage   = 5,
+              damage   = 20,
               innerCD  = 7000) {
 
     super("Guardian’s Will", "", 0);    
