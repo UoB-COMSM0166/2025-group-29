@@ -268,6 +268,9 @@ Game Structure
 - SkillSystem: Controls all skill activations, cooldowns, HUD displays, and more. Manages different skill subclasses, such as Dash skill, Blood fury skill, and so on.
 - loadSaveData: Controls the archive system, used to read archives from Supabase and load them into the game environment.
 - Other key classes: CollisionManager (detects player collisions with enemies, black holes, bullets, etc.) Bullet (manages all flying bullets for enemies and bosses to share) MeleeAttack class (manages interactions between enemies and players)
+
+To see the details please save the following image! 
+
 ### Class Diagram
 ![Class Diagram](docs/Datas/Class%20Diagram.png)
 
