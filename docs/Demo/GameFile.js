@@ -1420,9 +1420,9 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 25 : 18); 
+    this.generateFollowEnemy(isHardMode? 20 : 16); 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 33 : 24); 
+    this.generateCommonEnemy(isHardMode? 25 : 18); 
 
     //时间柱
     this.generateTimeBonus(3); // 刷奖励物
@@ -1441,7 +1441,7 @@ class Level2 extends BaseLevel {
   update() {
     super.update();
     if (this.stage === 1) {
-      updateAmbushSpawn (isHardMode ? 10 : 5); // ✅ 每帧尝试生成伏击怪
+      updateAmbushSpawn (isHardMode ? 7 : 3); // ✅ 每帧尝试生成伏击怪
         
       // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
@@ -1510,10 +1510,10 @@ class Level3 extends BaseLevel {
     // 刷敌人
     
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 36 : 24); 
+    this.generateFollowEnemy(isHardMode? 12 : 8); 
 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 40: 30); 
+    this.generateCommonEnemy(isHardMode? 17: 12); 
 
     // 刷黑洞
     this.generateDangerBlackHole(isHardMode? 5 : 3); // 刷危险黑洞
@@ -1535,8 +1535,8 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(isHardMode ? 30 : 20); // ✅ 每帧尝试生成隐身怪
-        updateAmbushSpawn(isHardMode ? 13 : 8); // ✅ 每帧尝试生成伏击怪
+        updateStealthSpawn(isHardMode ? 22 : 15); // ✅ 每帧尝试生成隐身怪
+        updateAmbushSpawn(isHardMode ? 13 : 6); // ✅ 每帧尝试生成伏击怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -2059,7 +2059,7 @@ class Enemy {
 
      // Each enemy has its own attack cooldown time
      this.nextHitTime = 0;
-     this.hitCooldown = 600;
+     this.hitCooldown = 500;
 
      this.contactDamage = 10; // Default contact damage
   
