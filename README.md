@@ -208,7 +208,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 
 - 15% ~750 words 
 - System architecture. Class diagrams, behavioural diagrams. 
-[Back to Table of Contents](#table-of-contents)
+
 
 ---
 类图
@@ -279,6 +279,8 @@ When the player passes the current level, LevelManager loads the next level (Lev
 In Level 5, the player will enter a specially designed Boss Battle, where the Boss will unleash a special skill and the player will need to fight against it with the help of the skills equipped in the previous levels. If the boss is defeated, the final checkout page will be displayed and the game will end successfully!
 
 At the end of each level,  the player enters the shop screen, which displays upgrade options, rewards, recovery items, etc. The player can choose to upgrade their skills or exit the game.
+
+[Back to Table of Contents](#table-of-contents)
 
 # 5 Implementation
 
