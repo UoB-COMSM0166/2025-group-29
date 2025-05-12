@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission Summary</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    html,body{
+      margin:0;padding:0;height:100vh;overflow:hidden;background:#000;
+      color:#fff;font-family:'Minecraft',Arial,sans-serif;
+      display:flex;align-items:center;justify-content:center
+    }
+    .summaryContainer{
+      background:rgba(0,0,0,.85);
+      border:2px solid #fff;border-radius:8px;
+      padding:32px 48px;text-align:center;
+      max-width:420px;width:90%;opacity:0;
+      transition:opacity .8s ease
+    }
+    .summaryContainer.show{opacity:1}
+    .summaryContainer h2{margin:0 0 12px;font-size:32px;letter-spacing:1px}
+    .summaryContent p{margin:8px 0;font-size:20px}
+    .grade{display:inline-block;padding:4px 14px;border-radius:4px;font-size:28px}
+    .grade-S{background:gold;color:#000}
+    .grade-A{background:#2c9}
+    .grade-B{background:#66c}
+    .grade-C{background:#888}
+    .summaryActions{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+    .summaryActions .menuButton{
+      padding:10px 18px;border:2px solid #fff;border-radius:4px;
+      background:rgba(255,255,255,.12);color:#fff;font-size:18px;
+      cursor:pointer;transition:background .25s,transform .1s
+    }
+    .summaryActions .menuButton:hover{
+      background:rgba(255,255,255,.25);transform:scale(1.04)
+    }
+    #introMask{
+      position:fixed;inset:0;z-index:9999;
+      background:#000 url('assets/media/final/final.gif') center/contain no-repeat;
+      animation:fadeMask 5s forwards
+    }
+    @keyframes fadeMask{
+      0%,80%{opacity:1}
+      100%{opacity:0;visibility:hidden}
+    }
+  </style>
+</head>
+<body>
+  <div id="introMask"></div>
+  <audio id="victoryBgm" src="assets/music/Victory.wav"></audio>
+  <div id="summary" class="summaryContainer"></div>
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+    const bgm=document.getElementById('victoryBgm');bgm.volume=.2;bgm.play().catch(()=>{});
+    setTimeout(()=>document.getElementById('summary').classList.add('show'),5000);
+    const params=new URLSearchParams(location.search);const saveId=params.get('saveId');
+    if(!saveId){alert('缺少 saveId');history.back()}
+    let totalScore=0;
+    try{
+      const{data,error}=await supabase.from('saves').select('cumulative_score').eq('id',saveId).single();
+      if(error)throw error;totalScore=data.cumulative_score??0
+    }catch(err){console.error(err);alert('读取分数失败：'+err.message)}
+    let grade='C';if(totalScore>=2000)grade='S';else if(totalScore>=1500)grade='A';else if(totalScore>=1000)grade='B';
+    const $summary=document.getElementById('summary');
+    $summary.innerHTML=`
+      <h2>MISSION&nbsp;COMPLETE!</h2>
+      <div class="summaryContent">
+        <p><strong>Score：</strong>${totalScore}</p>
+        <p><strong>Grade：</strong><span class="grade grade-${grade}">${grade}</span></p>
+      </div>
+      <div class="summaryActions">
+        <button id="retryBtn" class="menuButton">Retry&nbsp;Boss</button>
+        <button id="menuBtn"  class="menuButton">Main&nbsp;Menu</button>
+        <button id="newBtn"   class="menuButton">New&nbsp;Game</button>
+      </div>`
+    document.getElementById('retryBtn').onclick=()=>location.href=`game.html?saveId=${saveId}`;
+    document.getElementById('menuBtn').onclick =()=>location.href='index.html?directMain=1';
+    document.getElementById('newBtn').onclick  =()=>location.href='index.html';
+  </script>
+</body>
+</html>
