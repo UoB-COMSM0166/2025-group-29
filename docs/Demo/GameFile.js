@@ -2153,7 +2153,7 @@ class FollowEnemy extends Enemy {
   constructor(x, y) {
     super(x, y);
     this.r = 35;
-    this.speed = 4; // 速度稍慢于玩家 
+    this.speed = 3.8; // 速度稍慢于玩家 
     this.hp = new HPSystem(100); 
     this.contactDamage = 15; // 接触伤害
     this.scaleFactor = 2;//大小
@@ -2528,7 +2528,7 @@ class CommonEnemy extends Enemy {
     super(x, y);
     this.r = 20;             // 比精英怪小
     this.hp = new HPSystem(60); // 较低血量
-    this.speed = 4;        // 稍快的移动速度
+    this.speed = 3.8;        // 稍快的移动速度
     this.scaleFactor = 1.8;//大小
     this.spriteImg = common_gif;  // 比如 bulletEnemyImg
     this.flip = false;  // 初始是否翻转，可以动态更新
