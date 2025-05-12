@@ -262,14 +262,16 @@ function preload() {
   SFX.attack     = loadSound("assets/media/audio/attack.mp3");
   SFX.dash       = loadSound("assets/media/audio/dash.mp3");
   SFX.charge     = loadSound("assets/media/audio/charge.mp3");
-  // SFX.lifesteal  = loadSound("assets/media/audio/lifesteal.mp3");
-  // SFX.reflect    = loadSound("assets/media/audio/reflect.mp3");
+  SFX.lifesteal  = loadSound("assets/media/audio/lifesteal.mp3");
+  SFX.reflect    = loadSound("assets/media/audio/reflect.mp3");
+  SFX.boost    = loadSound("assets/media/audio/boost.mp3");
 
   SFX.attack.setVolume(0.1);
   SFX.dash.setVolume(0.1);
   SFX.charge.setVolume(0.1);
-  // SFX.lifesteal.setVolume(0.1);
-  // SFX.reflect.setVolume(0.1);
+  SFX.lifesteal.setVolume(0.1);
+  SFX.reflect.setVolume(0.1);
+  SFX.boost.setVolume(0.1);
 }
 
 function playLevelBGM(levelNumber) {
@@ -3350,6 +3352,7 @@ class AttackBoostSkill extends Skill {
   }
 
   castSkillEffect() {
+    SFX.play("boost");
     console.log("快速攻击发动！攻击力提升3秒");
     this.player.buffAttack = 30; // 技能发动时，攻击力变成30
     setTimeout(() => {
@@ -3665,6 +3668,7 @@ class LifestealSkill extends Skill {
   }
 
   castSkillEffect() {
+    SFX.play("lifesteal");  // ✅ 启动吸血音效
     console.log("🩸 吸血技能启动！未来5秒内造成的伤害可吸血");
     this.active = true;
     this.endTime = millis() + this.duration;
@@ -3738,6 +3742,7 @@ class ReflectSkill extends Skill {
 
   // 技能释放时触发
   castSkillEffect() {
+    SFX.play("reflect");
     // 标记反弹状态
     this.player.isReflecting = true;
     this.player.isInvincibleFromReflect = true;
