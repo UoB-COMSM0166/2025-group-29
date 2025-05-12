@@ -1420,9 +1420,9 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 20 : 16); 
+    this.generateFollowEnemy(isHardMode? 50 : 30); 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 25 : 18); 
+    this.generateCommonEnemy(isHardMode? 60 : 40); 
 
     //时间柱
     this.generateTimeBonus(3); // 刷奖励物
@@ -1441,7 +1441,7 @@ class Level2 extends BaseLevel {
   update() {
     super.update();
     if (this.stage === 1) {
-      updateAmbushSpawn (isHardMode ? 7 : 3); // ✅ 每帧尝试生成伏击怪
+      updateAmbushSpawn (isHardMode ? 9 : 5); // ✅ 每帧尝试生成伏击怪
         
       // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
@@ -3536,7 +3536,7 @@ class ChargeStrikeSkill extends Skill {
     this.chargeDuration = 2000;  // ms
     this.range          = 100;   // 蓄满后的最大攻击半径
     this.minRange       = 20;    // 起始提示半径
-    this.chargeAttack = 65;      // 高额范围伤害
+    this.chargeAttack = 70;      // 高额范围伤害
 
     this.isCharging = false;
     this.startTime  = 0;
@@ -3550,7 +3550,7 @@ class ChargeStrikeSkill extends Skill {
     this.startTime       = millis();
 
     this.player.isCharging        = true;   // 禁止位移
-    this.player.damageMultiplier  = 0.5;    // 蓄力期间减伤
+    this.player.damageMultiplier  = 0.2;    // 蓄力期间减伤
     this.player.spriteMgr.request("charge", this.chargeDuration, 1);
   }
 
