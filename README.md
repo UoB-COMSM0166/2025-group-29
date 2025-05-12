@@ -61,6 +61,7 @@ Add a group photo here!
   - [4.1 Class Diagram](#41-class-diagram)
   - [4.2 Use Case Diagram](#42-use-case-diagram)
   - [4.3 Behavioral Diagram](#43-behavioral-diagram)
+  - [4.4 System Architecture](#44-system-architecture)
 - [5 Implementation](#5-implementation)
   - [5.1 Challenge 1: Skill Tree System and Animation Management](#51-challenge-1-skill-tree-system-and-animation-management)
   - [5.2 Challenge 2: Managing Concurrent Skill Effects](#52-Challenge-2-Managing-Concurrent-Skill-Effects)
