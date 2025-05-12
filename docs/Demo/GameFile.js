@@ -255,7 +255,7 @@ function preload() {
 
 
   bgmNormal = loadSound("assets/media/audio/stage.mp3");     // 用于第1-4关
-  bgmBoss   = loadSound("assets/media/audio/finalboss.wav"); // 用于第5关
+  bgmBoss   = loadSound("assets/media/audio/finalboss.mp3"); // 用于第5关
   bgmNormal.setVolume(0.1);
   bgmBoss.setVolume(0.1);
 
@@ -265,6 +265,7 @@ function preload() {
   SFX.lifesteal  = loadSound("assets/media/audio/lifesteal.mp3");
   SFX.reflect    = loadSound("assets/media/audio/reflect.mp3");
   SFX.boost    = loadSound("assets/media/audio/boost.mp3");
+  SFX.slow    = loadSound("assets/media/audio/slow.mp3");
 
   SFX.attack.setVolume(0.1);
   SFX.dash.setVolume(0.1);
@@ -272,6 +273,7 @@ function preload() {
   SFX.lifesteal.setVolume(0.1);
   SFX.reflect.setVolume(0.1);
   SFX.boost.setVolume(0.1);
+  SFX.slow.setVolume(0.1);
 }
 
 function playLevelBGM(levelNumber) {
@@ -3818,6 +3820,7 @@ class SlowFieldSkill extends Skill {
 
   /* 主动触发 */
   castSkillEffect() {
+    SFX.play("slow");
     this.active  = true;
     this.endTime = millis() + this.duration;
     console.log("🌀 减速领域开启");
@@ -4869,3 +4872,14 @@ window.setup      = setup;
 window.draw       = draw;
 window.keyPressed = keyPressed;
 window.keyReleased= keyReleased;
+window.addEventListener('message', e => {
+  if (e.data?.type === 'pause_action') {
+    pauseFrame.style.display = 'none';
+    const action = e.data.action;
+    if (action === 'resume') {
+      loop();      // 恢复 p5.js draw 循环
+      window.focus();
+    }
+    // …
+  }
+});
