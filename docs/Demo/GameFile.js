@@ -1766,18 +1766,9 @@ class Level5 extends BaseLevel{
 
   textSize(24);
   text(comment, windowWidth / 2, windowHeight / 2 + 50);
-
-  textSize(20);
-  text(`Press M to return to main menu`, windowWidth / 2, windowHeight / 2 + 110);
 }
 
 handleKeyPressed(key) {
-  // 游戏完成后允许 M 返回主页
-  if (this.finished && (key === 'M' || key === 'm')) {
-    goToMainMenu();
-    return;
-  }
-
   // 其他按键交给父类处理（保存、继续等）
   super.handleKeyPressed(key);
 }
