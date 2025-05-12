@@ -90,6 +90,10 @@ Skill animations and effects are combined with art to make the game more immersi
 |![image](docs/Demo/assets/media/character/normal-idle-steal.gif)   | Crimson Drain  | A lifesteal skill. Attacks restore some health.                                                                                     | 
 |![image](docs/Demo/assets/media/character/normal-idle-dash.gif)    | Phantom Dash   | A dash skill. The character dashes forward and deals area damage along the path.                                                    |
 |![image](docs/Demo/assets/media/character/normal-attack-charge.gif)| Wrath Unchained| A charge-up skill. After charging, it deals heavy damage to enemies in a 360-degree area and reduces damage taken while charging.   |
+|![image](docs/Demo/assets/media/icon/icon1.PNG)                    | Anchor Field     | Summons a slow-down field in a 360-degree area. Enemies that come close will be slowed down.                                        |
+|![image](docs/Demo/assets/media/icon/icon4.PNG)                    | Runner’s Instinct| Passive skill after activating the agility skill tree style: if you kill an enemy, your Phantom Dash skill will be refreshed.       |
+|![image](docs/Demo/assets/media/icon/icon6.PNG)                    | Guardian’s Will  | Passive skill after activating the tank skill tree style: enemies take damage while inside the Anchor Field skill, and the damage dealt will be added to the value of the next Iron Reversal skill.   |
+|![image](docs/Demo/assets/media/icon/icon9.png)                    | Berserker’s Blood| Passive skill after activating the power skill tree style: when the player's health is below a certain percentage, their attack power is greatly increased.  |
 
 ## 2.3 Monster And Time Item Appearances
 Carefully designed monster appearances match the game’s theme and make players feel more involved.
