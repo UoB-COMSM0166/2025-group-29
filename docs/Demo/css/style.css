@@ -3,22 +3,24 @@
     src: url('../assets/font/Minecraft.ttf') format('truetype');
 }
 
-/* Force all elements to use Minecraft font */
+/* Define Minecraft font for use */
 * {
     font-family: 'Minecraft', Arial, sans-serif !important;
 }
 
+/* Reset body layout and set default font */
 body {
     margin: 0;
     overflow: hidden;
     font-family: 'Minecraft', Arial, sans-serif;
 }
 
+/* Make canvas display as block to fill its container */
 canvas {
     display: block;
 }
 
-/* Intro Screen */
+/* Intro screen title image styling */
 #introScreen #titleImage {
     position: absolute;
     top: 10%;
@@ -26,32 +28,33 @@ canvas {
     transform: translateX(-50%) scale(1.25);
     max-width: 400px;
     mix-blend-mode: lighten;
-}
-    /* 其余样式保持不变 */
     animation: glow 2s ease-in-out infinite alternate;
-  
-  @keyframes glow {
+}
+
+/* Glow effect keyframes for intro title */
+@keyframes glow {
     from {
-      filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
+        filter: drop-shadow(0 0 5px rgba(255,255,255,0.6));
     }
     to {
-      filter: drop-shadow(0 0 20px rgba(255,255,255,0.9));
+        filter: drop-shadow(0 0 20px rgba(255,255,255,0.9));
     }
-
 }
 
+/* Continue text positioning and pulsing animation */
 #introScreen #continueText {
     position: absolute;
-    bottom: 10%;             /* 下移到离底部 10% */
+    bottom: 10%;
     left: 50%;
     transform: translateX(-50%);
     font-size: 28px;
     font-weight: normal;
     color: white;
     text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-    animation: pulse 1.5s ease-in-out infinite; /* 添加放大缩小动画 */
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* Define pulsing keyframes for continue text */
 @keyframes pulse {
     0%, 100% {
         transform: translateX(-50%) scale(1);
@@ -61,7 +64,7 @@ canvas {
     }
 }
 
-/* Common Menu Styles */
+/* Common menu container styling */
 .menuContainer {
     position: absolute;
     top: 50%;
@@ -76,6 +79,7 @@ canvas {
     border-radius: 8px;
 }
 
+/* Menu button base style */
 .menuButton {
     width: 100%;
     margin: 10px 0;
@@ -89,12 +93,13 @@ canvas {
     transition: background 0.3s, transform 0.1s;
 }
 
+/* Button hover effect */
 .menuButton:hover {
     background: rgba(255,255,255,0.2);
     transform: scale(1.02);
 }
 
-/* Load / Save Lists */
+/* Load/save list styling */
 .menuList {
     list-style: none;
     padding: 0;
@@ -103,6 +108,7 @@ canvas {
     overflow-y: auto;
 }
 
+/* List item hover underline effect */
 .menuList li {
     margin: 5px 0;
     font-size: 18px;
@@ -113,31 +119,32 @@ canvas {
     text-decoration: underline;
 }
 
-/* Load container full-width and scrollable */
+/* Load container full-width scrollable */
 .loadContainer {
     position: absolute;
-    top: 5%;               /* title nearer to top */
+    top: 5%;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;            /* nearly full width */
-    max-height: 90vh;      /* vertical scroll area */
+    width: 90%;
+    max-height: 90vh;
     background: rgba(0, 0, 0, 0.8);
     padding: 20px;
     border-radius: 8px;
-    overflow-y: auto;      /* vertical scroll */
+    overflow-y: auto;
 }
 
-/* Table wrapper */
+/* Wrapper for scrollable table */
 .tableContainer {
     width: 100%;
     overflow-y: auto;
 }
 
-/* Load Game Table Styles */
+/* Table styling for load game list */
 .loadTable {
     width: 100%;
     border-collapse: collapse;
 }
+
 .loadTable th,
 .loadTable td {
     border: 1px solid #fff;
@@ -145,13 +152,13 @@ canvas {
     text-align: center;
     color: #fff;
 }
+
 .loadTable th {
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Pause Menu Styles */
+/* Pause menu container styling (reuses menuContainer) */
 .pauseContainer {
-    /* 与 .menuContainer 保持一致 */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -165,6 +172,7 @@ canvas {
     border-radius: 8px;
 }
 
+/* Pause menu title styling */
 .pauseContainer h1 {
     margin: 0 0 16px;
     font-size: 28px;
@@ -172,4 +180,4 @@ canvas {
     letter-spacing: 1px;
 }
 
-/* 按钮依然使用 .menuButton，已含 hover 和 transform 效果 */
+/* Pause menu buttons reuse .menuButton styles */

@@ -5,10 +5,11 @@ import { switchTo } from '../router.js';
 export const LoadMenu = {
   el: null,
   show: async function() {
+    // create div for load container
     this.el = document.createElement('div');
     this.el.className = 'loadContainer';
 
-    // 从数据库读取存档，并多取 skills 和 cumulative_score 列
+    // get save records from supabase including skills and cumulative score
     let { data: saves, error } = await supabase
       .from('saves')
       .select(`
@@ -26,13 +27,12 @@ export const LoadMenu = {
       saves = [];
     }
 
-    // 构造表格行
+    // build table rows for each save
     const rows = saves.length
       ? saves.map(s => {
-          const created   = new Date(s.creation_time).toLocaleString();
+          const created = new Date(s.creation_time).toLocaleString();
           const skillsStr = (s.skills || []).join(', ');
-          const cumScore  = s.cumulative_score ?? 0;
-
+          const cumScore = s.cumulative_score ?? 0;
           return `
             <tr data-id="${s.id}">
               <td>${created}</td>
@@ -51,7 +51,7 @@ export const LoadMenu = {
         }).join('')
       : `<tr><td colspan="7">(no saves found)</td></tr>`;
 
-    // 渲染整个界面
+    // set html to show table and back button
     this.el.innerHTML = `
       <h2>Load Game</h2>
       <div class="tableContainer">
@@ -74,7 +74,7 @@ export const LoadMenu = {
     `;
     document.body.appendChild(this.el);
 
-    // 点击行加载存档
+    // attach click on each row to load that save
     this.el.querySelectorAll('tbody tr[data-id]').forEach(tr => {
       tr.addEventListener('click', () => {
         const id = tr.getAttribute('data-id');
@@ -82,7 +82,7 @@ export const LoadMenu = {
       });
     });
 
-    // 删除按钮逻辑
+    // attach delete logic to delete button
     this.el.querySelectorAll('.deleteBtn').forEach(btn => {
       btn.addEventListener('click', async e => {
         e.stopPropagation();
@@ -101,10 +101,11 @@ export const LoadMenu = {
       });
     });
 
-    // 返回主菜单
+    // back button goes main menu
     document.getElementById('backFromLoad').onclick = () => switchTo('MAIN_MENU');
   },
   hide() {
+    // remove element if exists
     if (this.el) this.el.remove();
   }
 };

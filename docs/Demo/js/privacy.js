@@ -1,6 +1,6 @@
 // js/privacy.js
 export function showPrivacyConsent(callback) {
-  // 创建遮罩
+  // create a full-screen overlay for privacy consent
   const overlay = document.createElement('div');
   overlay.id = 'privacyOverlay';
   Object.assign(overlay.style, {
@@ -22,7 +22,7 @@ export function showPrivacyConsent(callback) {
     fontFamily: 'Minecraft, Arial, sans-serif'
   });
 
-  // 内容
+  // set the HTML content with message and action buttons
   overlay.innerHTML = `
     <h2>Privacy & Cookies</h2>
     <p>
@@ -48,12 +48,14 @@ export function showPrivacyConsent(callback) {
 
   document.body.appendChild(overlay);
 
+  // when user agrees, remove overlay and call callback with true
   document.getElementById('agreeBtn').onclick = () => {
     overlay.remove();
     callback(true);
   };
+
+  // when user declines, call callback with false
   document.getElementById('declineBtn').onclick = () => {
-    // 直接关闭标签或跳回首页
     callback(false);
   };
 }

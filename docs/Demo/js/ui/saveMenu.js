@@ -5,6 +5,7 @@ import { switchTo } from '../router.js';
 export const SaveMenu = {
   el: null,
   show() {
+    // create container for save menu
     this.el = document.createElement('div');
     this.el.className = 'menuContainer';
     this.el.innerHTML = `
@@ -28,25 +29,33 @@ export const SaveMenu = {
     `;
     document.body.appendChild(this.el);
 
-    // 插入新存档，初始化 skills 为空数组
+    // insert new save record, initialize skills as empty array
     document.getElementById('confirmSave').onclick = async () => {
       const name = document.getElementById('saveNameInput').value.trim();
-      if (!name) return alert('Please enter a save name.');
+      if (!name) {
+        alert('Please enter a save name.');
+        return;
+      }
       const mode = document.querySelector('input[name="mode"]:checked').value;
       const { data, error } = await supabase
         .from('saves')
-        .insert([{ name, current_level: 1, mode, skills: [],cumulative_score: 0}])
+        .insert([{ name, current_level: 1, mode, skills: [], cumulative_score: 0 }])
         .select();
-      if (error) return alert('Save failed: ' + error.message);
+      if (error) {
+        alert('Save failed: ' + error.message);
+        return;
+      }
       const saveId = data[0].id;
+      // go to game page with new save
       window.location.href = `game.html?saveId=${saveId}`;
     };
 
-    // 返回主菜单
+    // back button returns to main menu
     document.getElementById('backFromSave').onclick = () => switchTo('MAIN_MENU');
   },
 
   hide() {
+    // remove save menu element if it exists
     if (this.el) this.el.remove();
   }
 };

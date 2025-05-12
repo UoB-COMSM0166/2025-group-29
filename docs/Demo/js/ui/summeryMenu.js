@@ -2,21 +2,17 @@
 import { supabase } from '../supabase.js';
 import { switchTo } from '../router.js';
 
-/**
- * SummaryMenu: 显示结算页面，根据分数评定等级 (C, B, A, S)
- * 用法: SummaryMenu.show(totalScore);
- */
 export const SummaryMenu = {
   el: null,
   show(totalScore) {
-    // 计算等级
+    // determine grade from total score
     let grade;
-    if (totalScore >= 2000)       grade = 'S';
-    else if (totalScore >= 1500)  grade = 'A';
-    else if (totalScore >= 1000)  grade = 'B';
-    else                           grade = 'C';
+    if (totalScore >= 2000) grade = 'S';
+    else if (totalScore >= 1500) grade = 'A';
+    else if (totalScore >= 1000) grade = 'B';
+    else grade = 'C';
 
-    // 创建容器
+    // create container element for summary
     this.el = document.createElement('div');
     this.el.className = 'summaryContainer';
     this.el.innerHTML = `
@@ -33,27 +29,30 @@ export const SummaryMenu = {
     `;
     document.body.appendChild(this.el);
 
-    // 绑定事件
+    // go to next level on click
     document.getElementById('nextLevelBtn').onclick = () => {
       switchTo('GAME');
     };
+    // retry same level on click
     document.getElementById('retryBtn').onclick = () => {
       switchTo('GAME', { retry: true });
     };
+    // exit to main menu on click
     document.getElementById('exitBtn').onclick = () => switchTo('MAIN_MENU');
   },
   hide() {
+    // remove summary element if exists
     if (this.el) this.el.remove();
   }
 };
 
-// CSS (建议加入全局样式表或内联样式)
+// CSS to include in global stylesheet or inline styles:
 /*
 .summaryContainer {
   position: fixed;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   color: #fff;
   padding: 2em;
   border-radius: 8px;

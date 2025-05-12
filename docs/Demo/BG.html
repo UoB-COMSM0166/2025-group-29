@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>随机旋转平铺背景 + 箭头键控制</title>
+  <title>Random Rotating Tiled Background + Arrow Key Control</title>
   <style>
     html, body {
       margin: 0; padding: 0;
@@ -24,19 +24,19 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx    = canvas.getContext('2d');
 
-    // parse initial level from ?level=X
-    const params  = new URLSearchParams(location.search);
-    let level      = parseInt(params.get('level')) || 1;
+    // get initial level from URL or default to 1
+    const params = new URLSearchParams(location.search);
+    let level = parseInt(params.get('level')) || 1;
 
-    // when parent sends a level update
+    // listen for level update from parent
     window.addEventListener('message', e => {
       if (e.data?.type === 'level' && typeof e.data.level === 'number') {
         level = e.data.level;
-        loadLevelImage();  // reload new tile
+        loadLevelImage();
       }
     });
 
-    // handle resizing
+    // resize canvas to fill window
     function resizeCanvas() {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -44,43 +44,43 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // load the correct tile image for this level
+    // load the tile image for current level
     let img = new Image();
     function loadLevelImage() {
       img.src = `assets/media/BG${level}.png`;
     }
     loadLevelImage();
 
-    // random-but-stable rotation per tile
+    // calculate stable rotation angle for tile at [i, j]
     function getRotationAngle(i, j) {
       const seed = (i * 374761393 + j * 668265263) & 3;
       return [0, 90, 180, 270][seed] * Math.PI / 180;
     }
 
-    // draw the infinite tiled bg
+    // draw infinite tiled background with random rotations
     function drawBackground(offsetX, offsetY) {
       const tw = img.width, th = img.height;
       if (!tw || !th) return;
-      const cols = Math.ceil(canvas.width/tw) + 2;
-      const rows = Math.ceil(canvas.height/th) + 2;
-      const startCol = Math.floor(offsetX/tw);
-      const startRow = Math.floor(offsetY/th);
+      const cols = Math.ceil(canvas.width / tw) + 2;
+      const rows = Math.ceil(canvas.height / th) + 2;
+      const startCol = Math.floor(offsetX / tw);
+      const startRow = Math.floor(offsetY / th);
 
-      for (let i = startCol; i < startCol+cols; i++) {
-        for (let j = startRow; j < startRow+rows; j++) {
-          const x = i*tw - offsetX;
-          const y = j*th - offsetY;
+      for (let i = startCol; i < startCol + cols; i++) {
+        for (let j = startRow; j < startRow + rows; j++) {
+          const x = i * tw - offsetX;
+          const y = j * th - offsetY;
           const angle = getRotationAngle(i, j);
           ctx.save();
-          ctx.translate(x+tw/2, y+th/2);
+          ctx.translate(x + tw / 2, y + th / 2);
           ctx.rotate(angle);
-          ctx.drawImage(img, -tw/2, -th/2);
+          ctx.drawImage(img, -tw / 2, -th / 2);
           ctx.restore();
         }
       }
     }
 
-    // keyboard movement via postMessage
+    // track arrow key states from parent messages
     const keys = {};
     window.addEventListener('message', e => {
       if (e.data?.type === 'keydown') keys[e.data.key] = true;
@@ -91,8 +91,9 @@
     const SPEED = 200;
     let lastTime = 0;
 
+    // animation loop to update offsets and redraw
     function loop(timestamp) {
-      const dt = (timestamp - lastTime)/1000;
+      const dt = (timestamp - lastTime) / 1000;
       lastTime = timestamp;
 
       if (keys['ArrowUp'])    offsetY -= SPEED * dt;
@@ -100,11 +101,12 @@
       if (keys['ArrowLeft'])  offsetX -= SPEED * dt;
       if (keys['ArrowRight']) offsetX += SPEED * dt;
 
-      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (img.complete) drawBackground(offsetX, offsetY);
       requestAnimationFrame(loop);
     }
 
+    // start loop after image loads
     img.onload = () => {
       requestAnimationFrame(time => {
         lastTime = time;
@@ -112,17 +114,15 @@
       });
     };
   </script>
+
+  <script>
+    // listen for Escape key to pause game
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        parent.postMessage({ type: 'pause_menu' }, '*');
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
-
-<script>
-  // 监听真正的键盘事件
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      // 通知父页面打开暂停菜单
-      parent.postMessage({ type: 'pause_menu' }, '*');
-      // 阻止事件继续冒泡到 p5.js 里
-      e.preventDefault();
-    }
-  });
-</script>

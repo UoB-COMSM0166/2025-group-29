@@ -12,24 +12,25 @@ export const IntroScreen = {
     `;
     document.body.appendChild(this.el);
 
-    // 绑定键盘和鼠标事件
+    // add listeners for keyboard and mouse input
     window.addEventListener('keydown', this._onInput);
     window.addEventListener('mousedown', this._onInput);
   },
   hide() {
-    // 清除监听
+    // remove input event listeners and intro screen element
     window.removeEventListener('keydown', this._onInput);
     window.removeEventListener('mousedown', this._onInput);
     this.el.remove();
   },
 
   /**
-   * 当用户按键或点击时触发。
-   * 如果 #introOverlay 还存在，则忽略；否则进入主菜单。
+   * this method is called when user presses key or clicks
+   * if intro overlay element is still present, do nothing
+   * otherwise navigate to main menu
    */
   _onInput(event) {
     if (document.getElementById('introOverlay')) {
-      return; // 仍在播放引导，先等它消失
+      return; // waiting for intro overlay to disappear
     }
     advanceTo('MAIN_MENU');
   }
