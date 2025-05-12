@@ -206,7 +206,34 @@ Game Structure
 ### Class Diagram
 ![Class Diagram](docs/Datas/Class%20Diagram.png)
 
+---
+Behavioral Diagram
 
+类图告诉我们系统中有什么，时序图告诉我们它们如何工作。我们通过绘制时序图来模拟游戏的真实运行流程（从游戏启动到关卡推进、BOSS战再到通关和结束的流程）。
+
+在游戏启动阶段（Game Launch）加载当前关卡（如 Level1），初始化玩家属性（位置、技能槽、HP 等），初始化技能系统，绑定快捷键并注册技能，生成第一关的敌人。
+
+当玩家通过当前关卡后，LevelManager加载下一关（Level2 至 Level5），重新生成敌人与黑洞，SkillSystem保留玩家技能，更新被动/冷却状态。
+
+在第 5 关中，玩家将进入特别设计的 Boss 战。Boss将会释放特殊技能，玩家需要在前几关装备的技能辅助下与其进行对抗。如果 Boss 被击败，则进入最终结算页面，游戏顺利结束！
+
+在通关时，玩家进入 shop界面，展示升级选项、奖励、恢复道具等，玩家可选择技能升级或退出游戏。
+
+Class diagrams tell us what's in the system, sequence diagrams tell us how they work. We simulate the real flow of the game (from Game Launch to Level Advancement, Boss Battles to Pass & Finish) by drawing a timing diagram.
+
+### Sequence Diagram
+![Sequence Diagram](docs/Datas/Sequence%20Diagram.png)
+
+In the Game Launch phase, the current level (e.g. Level1) is loaded, player attributes are initialised (position, skill slots, HP, etc.), the skill system is initialised, shortcuts are bound, skills are registered, and enemies are generated for the first level.  
+
+Then we enter the main game loop, InputHandler is responsible for detecting player's keystrokes (move, attack, release skills),
+each module executes update() method in turn. Player class moves, attacks and calls skills. SkillSystem is responsible for skill cooldowns, sustained effects, skill state refresh. Enemy is responsible for enemy behavior. CollisionManager detects all the collision events and passes the result to HPSystem to execute the logic of deducting HP, restoring HP, shield adding, etc. This phase is a continuous loop until the level completion condition is triggered (e.g. defeating all enemies or reaching the scoring goal).
+
+When the player passes the current level, LevelManager loads the next level (Level 2 to Level 5), regenerates the enemies and black holes. SkillSystem retains the player's skills and updates the passive/cooldown status.
+
+In Level 5, the player will enter a specially designed Boss Battle, where the Boss will unleash a special skill and the player will need to fight against it with the help of the skills equipped in the previous levels. If the boss is defeated, the final checkout page will be displayed and the game will end successfully!
+
+At the end of each level,  the player enters the shop screen, which displays upgrade options, rewards, recovery items, etc. The player can choose to upgrade their skills or exit the game.
 
 # 5 Implementation
 
