@@ -8,6 +8,10 @@ function goToMainMenu() {
   window.location.href = MAIN_URL;
 }
 
+async function goToSummary() {
+  window.location.href = `summary.html?saveId=${saveId}`;
+}
+
 if (!saveId) {
   alert('缺少存档 ID，无法加载存档。');
   throw new Error('saveId required');
@@ -1168,7 +1172,11 @@ generateHealBlackHole(max) {
     }
     console.log('✅ 进度已保存到 Supabase, 累计分数更新为', newCumulative);
     savedCumulativeScore = newCumulative;
-    goToShop(); 
+      if (this.levelNumber === 5) {
+         goToSummary();
+      } else {
+        goToShop();
+}
   }
 
   isCompleted() {
