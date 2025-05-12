@@ -51,8 +51,9 @@ Add a group photo here!
   - [2.1 Character State](#21-character-state)
   - [2.2 Skill And Attack Effects](#22-skill-and-attack-effects)
   - [2.3 Monster And Time Item Appearances](#23-monster-and-time-item-appearances)
-  - [2.4 Bullet Types](#24-bullet-types)
-  - [2.5 Visual Effects](#25-visual-effects)
+  - 
+  - [2.5 Bullet Types](#25-bullet-types)
+  - [2.6 Visual Effects](#26-visual-effects)
 - [3 Requirements](#3-requirements)
 - [4 Design](#4-design)
 - [5 Implementation](#5-implementation)
@@ -112,8 +113,20 @@ Carefully designed monster appearances match the game’s theme and make players
 |![image](docs/Demo/assets/media/boss/BOSS_IDLE.gif)                  | Boss             | Has many attack moves and effects, and includes game mechanics that players need to figure out.                                     |
 |![image](docs/Demo/assets/media/time/time.gif)                       | Time             | Players can touch it to get extra time and earn more points.                                                                        |
 
+## 2.4 Boss skill animation showcase.
+Carefully designed monster appearances match the game’s theme and make players feel more involved.
 
-## 2.4 Bullet Types
+| Image                                                               |  Description                                                                                                                         |
+|---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+|![image](docs/Demo/assets/media/boss/BOSS_BLACKHOLE_SKILL.gif)       |                                                                                                     |
+|![image](docs/Demo/assets/media/boss/BOSS_DASH.gif)                  |                                                                                                     |
+|![image](docs/Demo/assets/media/boss/BOSS_SUMMON.gif)                |                                                           |
+|![image](docs/Demo/assets/media/boss/BOSS_TOWER_SKILL.gif)           |                                                                                     | 
+|![image](docs/Demo/assets/media/boss/BOSS_WAVE_BOSS.gif)             |                                                                                               |
+
+
+
+## 2.5 Bullet Types
 Many kinds of bullets with different targets. This makes the visuals more interesting and improves the game experience.
 
 | Image                                                               | Name                      | Description                                                                                                                         |
@@ -122,7 +135,7 @@ Many kinds of bullets with different targets. This makes the visuals more intere
 |![image](docs/Demo/assets/media/bullet/Character-rebound-bullet.gif) | Character-rebound-bullet  | Bullets reflected by player skills.                                                                                                 |
 |![image](docs/Demo/assets/media/bullet/Boss-bullet.gif)              | Boss-bullet               | Special bullet patterns from the boss.                                                                                              |
 
-## 2.5 Visual Effects
+## 2.6 Visual Effects
 Rich visual effects make the game more fun and improve the player’s experience.
 
 | Image                                                               | Description              | Image                                                                 |        Description                                                   |
