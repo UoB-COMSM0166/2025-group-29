@@ -55,7 +55,7 @@ Add a group photo here!
   - [2.5 Bullet Types](#25-bullet-types)
   - [2.6 Visual Effects](#26-visual-effects)
 - [3 Requirements](#3-requirements)
-  - [3.1 Ideation & Inspiration](#31-ideation-inspiration)
+  - [3.1 Ideation & Inspiration](#31-ideation--inspiration)
   - [3.2 Stakeholder Analysis](#32-stakeholder-analysis)
   - [3.3 User Stories](#33-user-stories)
 - [4 Design](#4-design)
