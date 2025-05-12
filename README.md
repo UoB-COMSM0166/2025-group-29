@@ -308,6 +308,13 @@ In Level 5, the player will enter a specially designed Boss Battle, where the Bo
 
 At the end of each level,  the player enters the shop screen, which displays upgrade options, rewards, recovery items, etc. The player can choose to upgrade their skills or exit the game.
 
+---
+## 4.4 System Architecture
+
+![System Architecture](docs/Datas/System%20Architecture.png)
+
+This System Architecture Diagram acts as a high-level component map that lays out the overall structure of the game. It works alongside other UML diagrams to provide a well-rounded development guide that covers the system’s structure, functionality, and behavior.
+
 [Back to Table of Contents](#table-of-contents)
 
 # 5 Implementation
