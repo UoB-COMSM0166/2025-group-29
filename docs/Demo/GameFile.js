@@ -255,7 +255,7 @@ function preload() {
 
 
   bgmNormal = loadSound("assets/media/audio/stage.mp3");     // 用于第1-4关
-  bgmBoss   = loadSound("assets/media/audio/finalboss.wav"); // 用于第5关
+  bgmBoss   = loadSound("assets/media/audio/finalboss.mp3"); // 用于第5关
   bgmNormal.setVolume(0.1);
   bgmBoss.setVolume(0.1);
 
