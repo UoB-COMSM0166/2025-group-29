@@ -121,6 +121,7 @@ let stealthTimer = 0;
 let ambushTimer = 0;
 let stealthSpawnedCount = 0; // 生成的隐形敌人数量
 let ambushSpawnedCount = 0; // 生成的伏击怪数量
+let ambushForceDashTriggered = false;
 
 let isHardMode = false; // 是否开启困难模式
 
@@ -479,6 +480,18 @@ if (gameOver) {
 function updateTimer() {
   let elapsedTime = (millis() - startTime) / 1000;
   remainingTime = max(0, timer - elapsedTime);
+  // ✅ 倒计时到 20 秒，强制所有伏击怪冲刺（只触发一次）
+  if (!ambushForceDashTriggered && remainingTime <= 20) {
+    ambushForceDashTriggered = true;
+    for (let enemy of enemies) {
+      if (enemy instanceof AmbushEnemy && !enemy.isDashing) {
+        enemy.startDash(); // 调用伏击怪的冲刺函数（你已有这个函数）
+      }
+    }
+    console.log("⚡ 所有伏击怪已强制进入冲刺状态");
+  }
+  
+
   if (remainingTime <= 0) {
     // 不再直接 Game Over，而是通知关卡
     if (levelManager && levelManager.currentLevel && typeof levelManager.currentLevel.onTimeUp === 'function') {
@@ -751,34 +764,50 @@ function generateStealthEnemyAhead(playerPos, playerDir, distance = 600, spread 
 function generateAmbushOutsideViewPosition(playerPos, playerDir, baseDistance = 800, angleRange = PI / 4, maxAttempts = 20) {
   const normDir = playerDir.copy().normalize();
 
+  // 地图边界范围
+  const mapLeft = -width;
+  const mapRight = width;
+  const mapTop = -height;
+  const mapBottom = height;
+
   let attempt = 0;
   while (attempt < maxAttempts) {
-    // ✅ 在 ±angleRange 范围内随机角度
     const angleOffset = random(-angleRange, angleRange);
     const spawnAngle = normDir.heading() + angleOffset;
 
-    // ✅ 用角度和距离生成偏移向量
     const spawnVector = p5.Vector.fromAngle(spawnAngle).mult(baseDistance + random(-100, 100));
-
     const candidate = p5.Vector.add(playerPos, spawnVector);
 
-    // ✅ 判断是否在视野外（绕玩家构造窗口）
     const viewLeft   = playerPos.x - windowWidth * 0.75;
     const viewRight  = playerPos.x + windowWidth * 0.75;
     const viewTop    = playerPos.y - windowHeight * 0.75;
     const viewBottom = playerPos.y + windowHeight * 0.75;
 
-    if (candidate.x < viewLeft || candidate.x > viewRight ||
-        candidate.y < viewTop  || candidate.y > viewBottom) {
+    const inView = (
+      candidate.x >= viewLeft && candidate.x <= viewRight &&
+      candidate.y >= viewTop  && candidate.y <= viewBottom
+    );
+
+    const inMap = (
+      candidate.x >= mapLeft && candidate.x <= mapRight &&
+      candidate.y >= mapTop  && candidate.y <= mapBottom
+    );
+
+    // ✅ 满足：视野外 且 地图内
+    if (!inView && inMap) {
       return candidate;
     }
 
     attempt++;
   }
 
-  // fallback：直接生成远方向
-  return p5.Vector.add(playerPos, p5.Vector.mult(normDir, 1000));
+  // fallback：向前方生成并限制在地图边界内
+  const fallback = p5.Vector.add(playerPos, p5.Vector.mult(normDir, 1000));
+  fallback.x = constrain(fallback.x, mapLeft, mapRight);
+  fallback.y = constrain(fallback.y, mapTop, mapBottom);
+  return fallback;
 }
+
 
 
 
@@ -1391,9 +1420,9 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 10 : 5); 
+    this.generateFollowEnemy(isHardMode? 8 : 6); 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 10 : 6); 
+    this.generateCommonEnemy(isHardMode? 11 : 8); 
 
     //时间柱
     this.generateTimeBonus(3); // 刷奖励物
@@ -1481,10 +1510,10 @@ class Level3 extends BaseLevel {
     // 刷敌人
     
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 8 : 5); 
+    this.generateFollowEnemy(isHardMode? 12 : 9); 
 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 20 : 10); 
+    this.generateCommonEnemy(isHardMode? 15 : 12); 
 
     // 刷黑洞
     this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
@@ -1496,7 +1525,7 @@ class Level3 extends BaseLevel {
     
 
     // 设置倒计时
-    timer = 90;
+    timer = 30;
     startTime = millis();
 
     this.stage = 1;  // 切换到正式战斗阶段
@@ -1506,8 +1535,8 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(isHardMode ? 6 : 4); // ✅ 每帧尝试生成隐身怪
-        updateAmbushSpawn(isHardMode ? 6 : 8); // ✅ 每帧尝试生成伏击怪
+        updateStealthSpawn(isHardMode ? 10 : 6); // ✅ 每帧尝试生成隐身怪
+        updateAmbushSpawn(isHardMode ? 8 : 5); // ✅ 每帧尝试生成伏击怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -1560,15 +1589,15 @@ class Level4 extends BaseLevel{
   
   
      
-  /*
-      // BulletEnemy（弹幕怪）追击玩家
+  
+      // BulletEnemy（弹幕怪）
       this.generateBulletEnemy(isHardMode? 5 : 3); // 刷弹幕怪
   
       // FollowEnemy
-      this.generateFollowEnemy(isHardMode? 8 : 5);
+      this.generateFollowEnemy(isHardMode? 12 : 8);
   
       // CommonEnemy
-      this.generateCommonEnemy(isHardMode? 20 : 10);
+      this.generateCommonEnemy(isHardMode? 17 : 13);
   
       // 刷黑洞
       this.generateDangerBlackHole(isHardMode? 4 : 2); // 刷危险黑洞
@@ -1577,7 +1606,7 @@ class Level4 extends BaseLevel{
   
       // 刷奖励物
       this.generateTimeBonus(3); // 刷奖励物
-      */
+      
   
       // 设置倒计时
       timer = 60;
@@ -2228,6 +2257,18 @@ class AmbushEnemy extends Enemy {
     this.hp.drawHP(this.pos.x, this.pos.y, this.r);
     
   }
+
+  startDash() {
+  // 如果已经冲刺或正在休息，不重复激活
+  if (!this.isDashing && !this.isResting) {
+    this.isChasing = true;
+    this.isDashing = true;
+    this.dashStartTime = millis();
+    this.dashDir = p5.Vector.sub(player.pos, this.pos).normalize();
+    this.spriteImg = this.dashGif;
+  }
+}
+
 }
 
 class StealthEnemy extends Enemy {
