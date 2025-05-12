@@ -1439,9 +1439,9 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 40 : 30); 
+    this.generateFollowEnemy(isHardMode? 40 : 20); 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 50 : 40); 
+    this.generateCommonEnemy(isHardMode? 50 : 30); 
 
     //时间柱
     this.generateTimeBonus(3); // 刷奖励物
@@ -2153,7 +2153,7 @@ class FollowEnemy extends Enemy {
   constructor(x, y) {
     super(x, y);
     this.r = 35;
-    this.speed = 3.7; // 速度稍慢于玩家 
+    this.speed = 3.6; // 速度稍慢于玩家 
     this.hp = new HPSystem(100); 
     this.contactDamage = 15; // 接触伤害
     this.scaleFactor = 2;//大小
@@ -2528,7 +2528,7 @@ class CommonEnemy extends Enemy {
     super(x, y);
     this.r = 20;             // 比精英怪小
     this.hp = new HPSystem(60); // 较低血量
-    this.speed = 3.7;        // 稍快的移动速度
+    this.speed = 3.6;        // 稍快的移动速度
     this.scaleFactor = 1.8;//大小
     this.spriteImg = common_gif;  // 比如 bulletEnemyImg
     this.flip = false;  // 初始是否翻转，可以动态更新
@@ -3393,8 +3393,8 @@ class AttackBoostSkill extends Skill {
 
   class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("Phantom Dash", "", 5); // 冲刺技能冷却
-    this.dashDamage = 20; // 冲刺时撞敌造成5伤害
+    super("Phantom Dash", "", 3); // 冲刺技能冷却
+    this.dashDamage = 40; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
     this.dashedEnemies = []; // 已经撞过的敌人列表
@@ -3514,7 +3514,11 @@ class AttackBoostSkill extends Skill {
       console.log("冲刺结束，恢复速度");
       this.isDashing = false;
       this.player.speed = this.originalSpeed;
-      this.player.isInvincibleFromDash = false;
+       // ✅ 延迟 1 秒后取消无敌
+      setTimeout(() => {
+        this.player.isInvincibleFromDash = false;
+        console.log("冲刺后的无敌时间结束");
+      }, 1500);
       
       if (this.totalDamage > 0) {
         for (let skill of this.player.selectedSkills) {
