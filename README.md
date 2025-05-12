@@ -118,8 +118,8 @@ The boss has carefully designed skill animations and challenge mechanics. These 
 
 | Image                                                               |  Description                                                                                                                         |
 |---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-|![image](docs/Demo/assets/media/boss/BOSS_BLACKHOLE_SKILL.gif)       |                                                                                                     |
-|![image](docs/Demo/assets/media/boss/BOSS_DASH.gif)                  |                                                                                                     |
+|![image](docs/Demo/assets/media/boss/BOSS_BLACKHOLE_SKILL.gif)       |    The boss summons a black hole to limit the player’s movement area.              |
+|![image](docs/Demo/assets/media/boss/BOSS_DASH.gif)                  |    The boss dashes forward to attack the player, leaving a trail that deals damage.                                                  |
 |![image](docs/Demo/assets/media/boss/BOSS_SUMMON.gif)                |                                                           |
 |![image](docs/Demo/assets/media/boss/BOSS_TOWER_SKILL.gif)           |                                                                                     | 
 |![image](docs/Demo/assets/media/boss/BOSS_WAVE_BOSS.gif)             |                                                                                               |
