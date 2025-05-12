@@ -57,6 +57,9 @@ Add a group photo here!
 - [4 Design](#4-design)
 - [5 Implementation](#5-implementation)
 - [6 Evaluation](#6-evaluation)
+  - [6.1 Think-Aloud Testing](#61-think-aloud-testing)
+  - [6.2 NASA-TLX Workload Study](#62-nasa-tlx-workload-study)
+  - [6.3 Testing Methodology](#63-testing-methodology)
 - [7 Process](#7-process)
 - [8 Conclusion](#8-conclusion)
 - [9 Contribution Statement](#9-contribution-statement)
@@ -294,7 +297,7 @@ These real-time voice comments exposed pain-points in **navigation, clarity, pac
 
 Simply comparing two difficulty levels might not be that exciting. Long-lasting games often maintain a well-tuned balance between different characters or playstyles. This balance helps prevent any one style from feeling disproportionately demanding and avoids the dreaded “class fatigue” that arises when an option feels like too much work.
 
-To evaluate the subjective workload associated with different playstyles, we recruited eight participants to experience all three gameplay archetypes. To mitigate potential order effects—which we noticed during our first round of testing—we adopted a Latin-Square design that systematically varied the sequence in which each participant played the archetypes. This within-subjects setup ensures that each playstyle appears equally often in each position, helping us make fairer comparisons.
+To evaluate the subjective workload associated with different playstyles, we recruited eight participants to experience all three gameplay archetypes. To mitigate potential order effects—which we noticed during our first round of testing—we adopted a Latin-Square design that systematically varied the sequence in which each participant played the archetypes. This within-subjects setup ensures that each playstyle appears equally often in each position, helping us make fairer comparisons.(YES! We are such good students who learn new methods on our own)
 
 ### Workload Trend  
 
@@ -320,13 +323,15 @@ We iterated on Build&nbsp;B’s rebound mechanic—enhancing its in-game effects
 
 ## 6.3 Testing Methodology  
 
-* **Unit & Integration Tests** – Core modules (collision detection, skill cooldowns, save/load API) covered by Jest scripts executed in GitHub Actions CI.  
-* **Play-Session Logging** – Instrumented sessions record FPS, collision counts, and error stacks for regression analysis.  
-* **Cross-Browser Matrix** – Manual runs on Chrome, Edge, Firefox, and Mobile&nbsp;Safari verify rendering and input consistency.  
-* **Load & Latency Tests** – Supabase endpoints stressed with 1&nbsp;000 concurrent requests to validate rate-limit handling and data integrity.  
-* **Bug-Tracking Sprints** – Issues flagged during daily builds are triaged on the Kanban board; critical defects are patched within 24&nbsp;hours.
+We followed a **black-box, feature-oriented** strategy. Each core module—Skill System, Enemy AI, Save/Load API, and Level Timer—was treated as an independent unit. For every unit we listed its outward-facing features, then wrote concise test cases that stress **boundary conditions** (e.g., last frame of invincibility, timer hitting 0 s, max concurrent bullets, empty Supabase response).  
 
-This multilayered strategy ensures functional correctness, performance stability, and a polished player experience.
+This uncovered edge bugs such as:  
+
+* the player clipping into the boss gate at exactly `x = 0`,  
+* bullet hit-boxes shrinking to zero when speed > 14 px / frame,  
+* save files failing when a UID string reached 36 chars.  
+
+After adjusting collision radii, bullet speed caps, and database field lengths, all cases passed a second run of the same black-box suite, giving us confidence in gameplay stability across levels and devices.  
 
 [Back to Table of Contents](#table-of-contents)
 
