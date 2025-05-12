@@ -217,7 +217,7 @@ Although all key functionalities are already represented in the class diagram, w
 The diagram shows how the player uses the InputHandler to control movement, interacts with the SkillSystem to activate skills, and engages with the LevelManager to enter levels or challenge bosses, providing a comprehensive view of how these systems work together.
 
 ### Use Case Diagram
-![Use Case Diagram](docs/Datas/Case%20Diagram.png)
+![Case Diagram](docs/Datas/Case%20Diagram.png)
 
 
 ---
