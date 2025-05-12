@@ -279,7 +279,7 @@ We conducted a Think-Aloud usability test with six participants (N = 6), who pla
 | **“It’s starting to feel a bit repetitive—just run, fight, run.”**<br>**“现在有点重复了，一直逃、打、逃。”** | Introduced new non-combat segments and mechanics in Level 3 to vary the experience.<br>第3关加入非战斗互动机制，打破重复循环。 |
 
 ---
-![alt text](image-1.png)
+![alt text](docs/Datas/WordCloud.png)
 
 ## 🧩 Insights & Impact  
 These real-time voice comments enabled us to uncover pain points in *navigation, clarity, pacing,* and *player motivation*. Iterative adjustments based on these Think-Aloud observations significantly improved early-game experience and onboarding effectiveness.  
