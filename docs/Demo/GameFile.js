@@ -1420,16 +1420,16 @@ class Level2 extends BaseLevel {
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 8 : 6); 
+    this.generateFollowEnemy(isHardMode? 25 : 18); 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 11 : 8); 
+    this.generateCommonEnemy(isHardMode? 33 : 24); 
 
     //时间柱
     this.generateTimeBonus(3); // 刷奖励物
 
     // 刷黑洞
-    this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
-    this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
+    this.generateDangerBlackHole(isHardMode? 7 : 5); // 刷危险黑洞
+    this.generateHealBlackHole(isHardMode? 0 : 2); // 刷治疗黑洞
 
     // 设置倒计时
     timer = 60;
@@ -1441,7 +1441,7 @@ class Level2 extends BaseLevel {
   update() {
     super.update();
     if (this.stage === 1) {
-      updateAmbushSpawn (isHardMode ? 6 : 4); // ✅ 每帧尝试生成伏击怪
+      updateAmbushSpawn (isHardMode ? 10 : 5); // ✅ 每帧尝试生成伏击怪
         
       // 检查黑洞提示是否触发
         if (!this.pauseShown && millis() > this.pauseTimer) {
@@ -1510,15 +1510,15 @@ class Level3 extends BaseLevel {
     // 刷敌人
     
     // FollowEnemy
-    this.generateFollowEnemy(isHardMode? 12 : 9); 
+    this.generateFollowEnemy(isHardMode? 36 : 24); 
 
     // CommonEnemy
-    this.generateCommonEnemy(isHardMode? 15 : 12); 
+    this.generateCommonEnemy(isHardMode? 40: 30); 
 
     // 刷黑洞
-    this.generateDangerBlackHole(isHardMode? 3 : 2); // 刷危险黑洞
+    this.generateDangerBlackHole(isHardMode? 5 : 3); // 刷危险黑洞
     
-   this.generateHealBlackHole(isHardMode? 0 : 1); // 刷治疗黑洞
+   this.generateHealBlackHole(isHardMode? 0 : 2); // 刷治疗黑洞
 
     // 刷奖励物
     this.generateTimeBonus(3); // 刷奖励物
@@ -1535,8 +1535,8 @@ class Level3 extends BaseLevel {
     super.update();
     if (this.stage === 1) {
 
-        updateStealthSpawn(isHardMode ? 10 : 6); // ✅ 每帧尝试生成隐身怪
-        updateAmbushSpawn(isHardMode ? 8 : 5); // ✅ 每帧尝试生成伏击怪
+        updateStealthSpawn(isHardMode ? 30 : 20); // ✅ 每帧尝试生成隐身怪
+        updateAmbushSpawn(isHardMode ? 13 : 8); // ✅ 每帧尝试生成伏击怪
       // 检查完成
       if (!this.finished && remainingTime <= 0) {
         this.stage = 2;
@@ -1594,10 +1594,10 @@ class Level4 extends BaseLevel{
       this.generateBulletEnemy(isHardMode? 5 : 3); // 刷弹幕怪
   
       // FollowEnemy
-      this.generateFollowEnemy(isHardMode? 12 : 8);
+      this.generateFollowEnemy(isHardMode? 15 : 10);
   
       // CommonEnemy
-      this.generateCommonEnemy(isHardMode? 17 : 13);
+      this.generateCommonEnemy(isHardMode? 20 : 15);
   
       // 刷黑洞
       this.generateDangerBlackHole(isHardMode? 4 : 2); // 刷危险黑洞
@@ -1617,8 +1617,8 @@ class Level4 extends BaseLevel{
 update() {
   super.update();
   if (this.stage === 1) {
-    updateStealthSpawn(10);
-    updateAmbushSpawn (0); // ✅ 每帧尝试生成伏击怪
+     updateStealthSpawn(isHardMode ? 35 : 25); // ✅ 每帧尝试生成隐身怪
+        updateAmbushSpawn(isHardMode ? 15 : 9); // ✅ 每帧尝试生成伏击怪
     // 检查完成
     if (!this.finished && remainingTime <= 0) {
       this.stage = 2;
@@ -2048,7 +2048,7 @@ vel: createVector(random(-1, 1), random(-2, -1)), // ← 更强的上飘速度
 class Enemy {
   constructor(x, y) {
     this.pos = createVector(x, y);  // Initial position of enemies
-    this.hp = new HPSystem(100);     
+    this.hp = new HPSystem(60);     
     this.dead = false;              // Death Mark
   
     this.exploding = false; // Whether to play death effects
@@ -2059,7 +2059,7 @@ class Enemy {
 
      // Each enemy has its own attack cooldown time
      this.nextHitTime = 0;
-     this.hitCooldown = 1000;
+     this.hitCooldown = 600;
 
      this.contactDamage = 10; // Default contact damage
   
@@ -2128,8 +2128,8 @@ class FollowEnemy extends Enemy {
   constructor(x, y) {
     super(x, y);
     this.r = 35;
-    this.speed = 3; // 速度稍慢于玩家 
-
+    this.speed = 4; // 速度稍慢于玩家 
+    this.hp = new HPSystem(80); 
     this.contactDamage = 15; // 接触伤害
     this.scaleFactor = 2;//大小
     this.spriteImg = follow_gif;  // 比如 bulletEnemyImg
@@ -2503,7 +2503,7 @@ class CommonEnemy extends Enemy {
     super(x, y);
     this.r = 20;             // 比精英怪小
     this.hp = new HPSystem(60); // 较低血量
-    this.speed = 3;        // 稍快的移动速度
+    this.speed = 4;        // 稍快的移动速度
     this.scaleFactor = 1.8;//大小
     this.spriteImg = common_gif;  // 比如 bulletEnemyImg
     this.flip = false;  // 初始是否翻转，可以动态更新
@@ -3347,7 +3347,7 @@ class SkillSystem {
 
 class AttackBoostSkill extends Skill {
   constructor(player) {
-    super("Ghost Cutter", "", 10); // 名称、按键（暂时空）、冷却时间
+    super("Ghost Cutter", "", 6); // 名称、按键（暂时空）、冷却时间
     this.player = player; // 保存玩家对象
   }
 
@@ -3368,7 +3368,7 @@ class AttackBoostSkill extends Skill {
 
   class DashSkill extends Skill {
   constructor(player,enemies) {
-    super("Phantom Dash", "", 1); // 冲刺技能冷却
+    super("Phantom Dash", "", 5); // 冲刺技能冷却
     this.dashDamage = 20; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
@@ -3529,14 +3529,14 @@ class DashResetSkill extends Skill {
 /* ---------- ChargeStrikeSkill ---------- */
 class ChargeStrikeSkill extends Skill {
   constructor(player, enemies) {
-    super("Wrath Unchained", "", 3);
+    super("Wrath Unchained", "", 7);
     this.player        = player;
     this.enemies       = enemies;
 
     this.chargeDuration = 2000;  // ms
     this.range          = 100;   // 蓄满后的最大攻击半径
     this.minRange       = 20;    // 起始提示半径
-    this.chargeAttack = 40;      // 高额范围伤害
+    this.chargeAttack = 65;      // 高额范围伤害
 
     this.isCharging = false;
     this.startTime  = 0;
@@ -3659,7 +3659,7 @@ class ChargeStrikeSkill extends Skill {
 
 class LifestealSkill extends Skill {
   constructor(player) {
-    super("Crimson Drain", "", 6); // 技能名称、按键、冷却秒数
+    super("Crimson Drain", "", 5); // 技能名称、按键、冷却秒数
     this.player = player;
     this.lifestealRatio = 0.5; // 吸血比例
     this.duration = 5000; // 持续时间（毫秒）
@@ -3731,7 +3731,7 @@ class BloodFurySkill extends Skill {
 
 class ReflectSkill extends Skill {
   constructor(player) {
-    super("Iron Reversal", "", 2); // 名称、快捷键占位、冷却秒数
+    super("Iron Reversal", "", 6); // 名称、快捷键占位、冷却秒数
     this.player = player;
 
     this.duration = 4 * 1000; // 持续时间：4秒
