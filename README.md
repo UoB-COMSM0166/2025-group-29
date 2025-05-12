@@ -51,8 +51,9 @@ Add a group photo here!
   - [2.1 Character State](#21-character-state)
   - [2.2 Skill And Attack Effects](#22-skill-and-attack-effects)
   - [2.3 Monster And Time Item Appearances](#23-monster-and-time-item-appearances)
-  - [2.4 Bullet Types](#24-bullet-types)
-  - [2.5 Visual Effects](#25-visual-effects)
+  - 
+  - [2.5 Bullet Types](#25-bullet-types)
+  - [2.6 Visual Effects](#26-visual-effects)
 - [3 Requirements](#3-requirements)
 - [4 Design](#4-design)
 - [5 Implementation](#5-implementation)
