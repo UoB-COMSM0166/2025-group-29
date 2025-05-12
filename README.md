@@ -55,7 +55,13 @@ Add a group photo here!
   - [2.5 Bullet Types](#25-bullet-types)
   - [2.6 Visual Effects](#26-visual-effects)
 - [3 Requirements](#3-requirements)
+  - [3.1 Ideation & Inspiration](#31-ideation--inspiration)
+  - [3.2 Stakeholder Analysis](#32-stakeholder-analysis)
+  - [3.3 User Stories](#33-user-stories)
 - [4 Design](#4-design)
+  - [4.1 Class Diagram](#41-class-diagram)
+  - [4.2 Use Case Diagram](#42-use-case-diagram)
+  - [4.3 Behavioral Diagram](#43-behavioral-diagram)
 - [5 Implementation](#5-implementation)
   - [5.1 Challenge 1: Skill Tree System and Animation Management](#51-challenge-1-skill-tree-system-and-animation-management)
   - [5.2 Challenge 2: Managing Concurrent Skill Effects](#52-Challenge-2-Managing-Concurrent-Skill-Effects)
@@ -71,15 +77,17 @@ Add a group photo here!
 - [10 Additional Marks](#10-additional-marks)
 
 # 1 Introduction
-- 5% ~250 words 
-- Describe your game, what is based on, what makes it novel?
 This document outlines our software engineering practices in developing a brand-new game from scratch.
 
 Space Hunt is a side-scrolling combat game set in the forbidden depths of the universe, a realm where death and violence reign supreme. Players take on the role of a space hunter   burdened by a dark past, awakening from a long cryosleep to pursue the only mission he knows: the hunt—until all returns to nothingness.
 
 The game features two difficulty levels. While the core gameplay mechanics remain consistent across both, the higher difficulty introduces faster-paced combat, more frequent and powerful enemy spawns, and fewer healing items.
 
+![gif1](docs/Datas/1st.gif)
+
 The game is structured around five meticulously designed levels, integrated with a robust skill progression system. Players can switch gear and skills between levels based on combat needs, facing off against a variety of mutated enemies such as tracking beasts, stealth monsters, and bullet-hell creatures. Within a limited time, players strive to earn higher scores and gradually evolve into the ultimate hunter. Space Hunt aims to deliver a fluid, exhilarating combat experience combined with a cyberpunk/cosmic horror aesthetic and a deeply immersive narrative, offering players a thrilling journey of cosmic hunting filled with both action and atmosphere.
+
+![gif2](docs/Datas/2nd.gif)
 
 The initial inspiration for this project came from classic .io games, especially Agar.io. We wanted to pay homage to these simple yet strategic experiences. Our early concept envisioned a survival game set in space, where players must navigate vast cosmic environments and outwit other entities to escape—a vision born from our shared passion for space horror themes.
 
@@ -167,9 +175,8 @@ Rich visual effects make the game more fun and improve the player’s experience
 
 
 # 3 Requirements 
-
-## Ideation & Inspiration
-
+## 3.1 Ideation & Inspiration
+Early on, our team brainstormed different types of games and talked about how we might adapt certain ideas. Our shared experience with games gave us a great starting point to create something of our own, and the flexibility to shift gears when our vision started to change. To make the combat feel both exciting and strategic, we took inspiration from the core mechanics and art styles of some of our favorite classic games and movies.
 ### Inspiration Overview
 
 | Source Work                       | Key Elements Adopted                                      | Application in *Space Hunt*                                         |
@@ -184,7 +191,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 | **Resident Evil(Mercenaries Mode)** | Countdown mechanics, score-based gameplay, checkpoint saves | Combat-time-score loop, level scoring and saving system             |
 
 
-## Stakeholder Analysis
+## 3.2 Stakeholder Analysis
 We used the Onion Model to identify and discuss the different groups involved in building, using, and evaluating our game:
 - **Core Layer – Developers:**
     
@@ -206,7 +213,7 @@ We used the Onion Model to identify and discuss the different groups involved in
     
     In some cases, the university itself might be indirectly affected—for example, if the game caused distractions or impacted the school’s reputation, it would be seen as a negative stakeholder.
 
-## User Stories
+## 3.3 User Stories
 
 - **As a player**
     
@@ -249,24 +256,8 @@ We used the Onion Model to identify and discuss the different groups involved in
     >
 [Back to Table of Contents](#table-of-contents)
 # 4 Design
-
-- 15% ~750 words 
-- System architecture. Class diagrams, behavioural diagrams. 
-
-
 ---
-类图
-
-在游戏开发的初期，类图能够帮助我们把握游戏结构，明确核心类、模块及其对应的职责。这有助于我们能够在原代码中规划良好的面向对象设计（OOD），例如合理拆分功能，降低开发人员之间的重复沟通成本。我们采用的GitHub+VS Code集成开发方法可据此划定feature分支（如feature/player, feature/BlackHole）。团队成员可以基于类图对类实现进行审查，让多人同时开发不同模块变得可控。
-
-游戏结构
-
-- LevelManager：关卡控制器。管理BaseLevel及其子类（如Level1, Level2…）每个关卡的具体实现。每个Level中又可能包含敌人生成逻辑，黑洞生成逻辑等等。
-- Player: 玩家实体，包含位置、移动、生命值、技能引用等。管理/使用技能系统，检测与敌人/时间柱/子弹的交互效果。
-- Enemy: 控制敌人行为逻辑。管理各个不同种类的敌人的子类，如`AmbushEnemy`, `StealthEnemy`, `BulletEnemy`, `Boss`等。
-- SkillSystem: 控制所有技能的激活、冷却、HUD 显示等。管理不同的技能子类，如Dash skill, Blood fury skill等等。
-- loadSaveData: 控制存档系统，用于从Supabase读取存档并加载到游戏环境中。
-- 其他关键类：CollisionManager（检测玩家与敌人、黑洞、子弹等碰撞）Bullet（管理所有飞行子弹，供敌人和boss共用）MeleeAttack类（管理敌人和玩家之间的交互）
+## 4.1 Class Diagram
 
 At the early stage of game development, class diagrams can help us grasp the structure of the game and clarify the core classes, modules and their corresponding responsibilities. This helps us to plan a good Object Oriented Design (OOD) in the original code, for example, to reasonably split the functions and reduce the cost of repeated communication between developers. The GitHub+VS Code integrated development methodology we adopted allows us to delineate feature branches (e.g. feature/player, feature/BlackHole) accordingly. Team members can review class implementations based on class diagrams, making simultaneous development of different modules by multiple people manageable.
 
@@ -282,10 +273,7 @@ Game Structure
 ![Class Diagram](docs/Datas/Class%20Diagram.png)
 
 ---
-Use Case Diagram
-虽然我们在类图中已经表现了所有关键功能的结构支持，但为了更清晰地呈现玩家与系统各个模块之间的交互行为，我们还绘制了一张 Use Case Diagram，将类图中不易直观看出的玩家视角行为路径具体化，例如各类技能之间（主动技能和被动技能）的前后关系。
-
-该图展示了玩家如何通过 InputHandler 控制移动、如何与 SkillSystem 交互释放技能、如何与 LevelManager 进入关卡/挑战 Boss 等系统协同运作的整体流程。
+## 4.2 Use Case Diagram
 
 Although all key functionalities are already represented in the class diagram, we have also created a Use Case Diagram to more clearly illustrate the interactions between the player and various system modules. This diagram helps visualize the behavior paths from the player's perspective that are not easily inferred from the class diagram, such as the sequential relationships between different types of skills (active and passive).
 
@@ -296,17 +284,7 @@ The diagram shows how the player uses the InputHandler to control movement, inte
 
 
 ---
-Behavioral Diagram
-
-类图告诉我们系统中有什么，use case diagram描述的是玩家能做什么，时序图则告诉我们系统如何一步一步实现这种行为。我们通过绘制时序图来模拟游戏的真实运行流程（从游戏启动到关卡推进、BOSS战再到通关和结束的流程）。
-
-在游戏启动阶段（Game Launch）加载当前关卡（如 Level1），初始化玩家属性（位置、技能槽、HP 等），初始化技能系统，绑定快捷键并注册技能，生成第一关的敌人。
-
-当玩家通过当前关卡后，LevelManager加载下一关（Level2 至 Level5），重新生成敌人与黑洞，SkillSystem保留玩家技能，更新被动/冷却状态。
-
-在第 5 关中，玩家将进入特别设计的 Boss 战。Boss将会释放特殊技能，玩家需要在前几关装备的技能辅助下与其进行对抗。如果 Boss 被击败，则进入最终结算页面，游戏顺利结束！
-
-在通关时，玩家进入 shop界面，展示升级选项、奖励、恢复道具等，玩家可选择技能升级或退出游戏。
+## 4.3 Behavioral Diagram
 
 The class diagram tells us what exists in the system, the use case diagram describes what the player can do, and the sequence diagram illustrates how the system carries out these actions step by step. By creating a sequence diagram, we simulate the actual gameplay process—from game launch, level progression, and boss battles to level completion and game end.
 
@@ -462,10 +440,6 @@ Ultimately, this project provided valuable, hands-on experience with Agile princ
 
 [Back to Table of Contents](#table-of-contents)
 # 8 Conclusion
-
-- 10% ~500 words
-
-- Reflect on project as a whole. Lessons learned. Reflect on challenges. Future work.
 
 Looking back on the entire project, what we implemented in this game, we learnt how team members can collaborate with each other to achieve a game's output, and we also learnt solid system design through the game's design process. From the early stages of the project, we set a clear goal: to create a modular, extensible framework that could support multiple levels with different mechanics - sneak, ambush, pop-ups, boss battles, etc. - while at the same time sharing features such as player movement collision detection, skill management and remote archiving. To realise this vision, we recognised the importance of pre-planning the architectural design. We defined clear abstract classes, such as BaseLevel, Enemy, Skill, CollisionManager, etc., so that new features could be integrated smoothly and with less coupling. Through the design of SpriteManager and Skill Stacking Queue, we learned to decouple the rendering logic from the game logic, resulting in smoother character animations. The remote archiving feature uses Supabase to further understand the details of asynchronous data loading, such as how to ensure that the main game loop is not started until loadSaveData() completes, and how to provide friendly error feedback in the event of network exceptions.
 
