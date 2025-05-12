@@ -448,13 +448,12 @@ We wanted the code to stay usable and flexible even as the project grows or chan
 These practices help prevent messy or outdated code, and make it easier for others (or even us in the future) to keep working on the game.
 
 ## 7.3 Individual
-Games affect real people, so we paid attention to how our design might impact players emotionally and cognitively. Here’s what we did:
+We paid attention to how our design might impact players emotionally and cognitively. Here’s what we did:
 
-- **Inclusive design**: We avoided things like color-only indicators so colorblind players wouldn’t be left out. We also didn’t include flashing visuals or high-frequency effects to reduce health risks.
 - **Gentle learning curve**: The early levels are simple and include helpful hints so that younger or less experienced players can ease into the game without frustration.
 - **Easy restart**: If you die, you can restart instantly—and skip the tutorial if you’ve already seen it. This gives players more control over how they experience the game.
 
-These choices show our commitment to player comfort, fairness, accessibility, and long-term enjoyment, and reflect the kind of responsibility we believe game developers should take seriously.
+These choices show our commitment to accessibility, and long-term enjoyment, and reflect the kind of responsibility we believe game developers should take seriously.
 
 ---
 # 8 Process 
