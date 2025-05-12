@@ -169,7 +169,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 # 3 Requirements 
 
 ## Ideation & Inspiration
-
+Early on, our team brainstormed different types of games and talked about how we might adapt certain ideas. Our shared experience with games gave us a great starting point to create something of our own, and the flexibility to shift gears when our vision started to change. To make the combat feel both exciting and strategic, we took inspiration from the core mechanics and art styles of some of our favorite classic games and movies.
 ### Inspiration Overview
 
 | Source Work                       | Key Elements Adopted                                      | Application in *Space Hunt*                                         |
