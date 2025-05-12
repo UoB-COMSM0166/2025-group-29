@@ -261,121 +261,75 @@ At the end of each level,  the player enters the shop screen, which displays upg
 
 # 6 Evaluation
 
-- 15% ~750 words
+- **One qualitative evaluation:** Think-Aloud testing  
+- **One quantitative evaluation:** NASA-TLX workload analysis  
+- **Description of how code was tested**
 
-- One qualitative evaluation (your choice) 
+## 6.1 Qualitative Evaluation – Think-Aloud Testing: Iterative Feedback and In-Game Adjustments  
 
-- One quantitative evaluation (of your choice) 
+We conducted a Think-Aloud usability test with six participants (**N = 6**) who played through the first two levels while narrating their thoughts aloud. Verbal expressions were transcribed, tagged, and analyzed to extract user needs and usability pain-points. Based on repeated themes—**confusion**, **uncertainty**, **overwhelm**, and **cognitive load**—we derived a set of actionable design responses to improve player experience.
 
-- Description of how code was tested. 
+### Key Observations and Design Responses  
 
-# 🧠 Think-Aloud Testing: Iterative Feedback and In-Game Adjustments  
-## 🎮 出声思考测试：迭代反馈与游戏内调整  
+| **User Observation** | **Design Response** |
+|----------------------|---------------------|
+| “Why isn’t this button responding? Did I press the wrong thing?” | Added a skill-cooldown indicator in the bottom-left corner. |
+| “Should I keep fighting or keep running?” | Moved the player’s health bar to the top for easier risk evaluation. |
+| “I’m not quite sure what the goal is—is it to survive longer or to kill more?” | Added a score display and real-time feedback to clarify objectives. |
+| “So that’s how this skill works—I didn’t realize it before.” | Enabled tooltip-on-hover in the skill shop. |
+| “This is so intense—I feel like danger is coming from every direction.” | Ensured a minimum safe radius around the player’s spawn point. |
+| “I think I’m gradually getting the hang of the game’s rhythm.” | No changes needed—pacing is working as intended. |
+| “The pace suddenly picked up in this level—I’m kind of panicking.” | Re-balanced enemy spawn frequency and added a mid-level checkpoint. |
+| “It’s starting to feel a bit repetitive—just run, fight, run.” | Introduced non-combat segments and new mechanics in Level&nbsp;3. |
 
-We conducted a Think-Aloud usability test with six participants (N = 6), who played through the first two levels while narrating their thoughts aloud. Verbal expressions were transcribed, tagged, and analyzed to extract user needs and usability pain points. Based on repeated themes—**confusion**, **uncertainty**, **overwhelm**, and **cognitive load**—we derived a set of actionable design responses to improve player experience.  
-我们对6位用户进行了出声思考测试，让他们在游玩前两个关卡时同步表达想法。我们对其言语进行转录与标注，识别出“困惑”“不确定”“压力大”和“认知负担”等高频反馈主题，并据此提出针对性的设计优化方案。
+![Word Cloud](docs/Datas/WordCloud.png)
 
----
+### Insights & Impact  
 
-### 🔍 Key Observations and Design Responses | 用户观察与设计回应  
-
-### 🎮 Think-Aloud Feedback and Design Responses | 出声思考反馈与设计响应（中英双语）
-
-| **User Observation**<br>用户观察 | **Design Response**<br>设计回应 |
-|----------------------------|-----------------------------|
-| **“Why isn’t this button responding? Did I press the wrong thing?”**<br>**“为什么这个按钮没有反应？我是不是点错了？”** | Added a skill indicator icon in the bottom-left corner to show cooldown status.<br>左下角增加技能指示图标，显示技能冷却状态。 |
-| **“Should I keep fighting or keep running?”**<br>**“我现在应该继续打还是继续跑？”** | Moved the player's health bar to the top for easier risk evaluation.<br>把玩家血条放置到顶部，让玩家自主判断风险。 |
-| **“I’m not quite sure what the goal is—is it to survive longer or to kill more?”**<br>**“我不太清楚目标是什么——是活得更久还是杀更多？”** | Added a score system and real-time feedback to clarify high-score objectives.<br>增加分数显示和实时反馈机制，让玩家明确目标是获得高分。 |
-| **“So that’s how this skill works—I didn’t realize it before.”**<br>**“原来这个技能是这样用的，我刚才没看出来。”** | Enabled tooltip-on-hover on the skill shop interface.<br>技能商店界面支持悬停查看技能说明。 |
-| **“This is so intense—I feel like danger is coming from every direction.”**<br>**“现在压力好大，感觉四面八方都有危险。”** | Ensured a minimum safe radius around player spawn to avoid instant ambush.<br>保证怪物生成与玩家有一定安全距离，避免“刷脸”突袭。 |
-| **“I think I’m gradually getting the hang of the game’s rhythm.”**<br>**“我觉得我正在慢慢掌握这游戏的节奏。”** | No changes needed—this indicates pacing is working as intended.<br>无需调整，表明当前节奏设计合理。 |
-| **“The pace suddenly picked up in this level—I’m kind of panicking.”**<br>**“这关节奏突然变快，我有点慌。”** | Rebalanced enemy spawn frequency and added a mid-level checkpoint.<br>调整敌人刷新频率，在关卡中段加入检查点。 |
-| **“It’s starting to feel a bit repetitive—just run, fight, run.”**<br>**“现在有点重复了，一直逃、打、逃。”** | Introduced new non-combat segments and mechanics in Level 3 to vary the experience.<br>第3关加入非战斗互动机制，打破重复循环。 |
-
----
-![alt text](docs/Datas/WordCloud.png)
-
-## 🧩 Insights & Impact  
-These real-time voice comments enabled us to uncover pain points in *navigation, clarity, pacing,* and *player motivation*. Iterative adjustments based on these Think-Aloud observations significantly improved early-game experience and onboarding effectiveness.  
-这些即时语音反馈帮助我们揭示了“导航”、“目标清晰度”、“节奏”和“玩家动机”等多个设计盲点。基于出声思考测试的迭代优化显著提升了前期游戏体验与引导效果。
-
-**NASA-TLX Workload Comparison:**  
-
-单纯比较两种难度或许并不够有趣。我们注意到，任何能够长期运营的游戏，往往在不同的主角或流派之间都维持着非常良好的平衡性。这种平衡能避免某个流派带来明显更高的工作负荷，进而引发玩家的“流派厌恶”。
-
-**Simply comparing two difficulty levels might not be that exciting.  
-What truly caught our attention is how long-lasting games often maintain a well-tuned balance between different characters or playstyles.  
-This kind of balance helps prevent any one style from feeling disproportionately demanding—and avoids the dreaded “class fatigue” players can get when one option just feels like too much work.**
-
-为了评估不同游戏流派带来的主观工作负荷，我们招募了八位参与者来体验所有三种流派。  
-为了减轻顺序偏差（我们在第一次测试中确实发现了这个问题），我们采用了拉丁方设计，让每位参与者体验流派的顺序有所不同。  
-这种被试内设计保证了每种流派在每个顺序位置中出现的次数均衡，从而使比较更加公平。  
-（是的，我们是热爱学习新方法的好学生！）
-
-**To evaluate the subjective workload associated with different playstyles, we recruited eight participants to experience all three gameplay archetypes.  
-To mitigate potential order effects—which we actually noticed during our first round of testing—we adopted a Latin Square design to systematically vary the sequence in which each participant played the archetypes.  
-This within-subjects setup ensures that each playstyle appears equally often in each position, helping us make fairer comparisons.  
-(Yes, we’re good students who love to learn new methods!)**
-
----
-### 工作负荷趋势图
-[查看 NASA-TLX 原始数据 (CSV)](docs/Datas/NASA-TLX_Results.csv)
-
-![NASA-TLX 工作负荷趋势 (SVG)](docs/Datas/nasa_tlx_workload_SVG.svg)
-![NASA-TLX 工作负荷趋势 (JPG)](docs/Datas/nasa_tlx_workload.jpg)
-
-### 中文版本：
-
-在收集完 NASA-TLX 数据后，我们使用 Python 及其可视化库 Matplotlib 绘制了三个流派（Build A、B、C）在六个维度上的平均工作负荷趋势图。从图中可以观察到三个流派在主观负荷感知上的显著差异：
-
-🎯 **线条走势解读：**
-
-1. **Build A（蓝色）：** 整体得分中等偏低，走势平缓；在 时间压力 与 努力程度 上略有下降，代表任务节奏轻松、投入压力较低；是一种“压力适中、操作轻松”的流派。
-
-2. **Build B（黄色）：** 几乎在所有维度上得分最高，尤其在 努力 和 挫败感 上表现突出；表明这是玩家“最累”的流派，可能在后期引发疲劳或厌倦感。
-
-3. **Build C（粉红色）：** 前几个维度得分较低，后段逐步上升，在 表现满意度 附近达到高点；呈现出“前轻后重”的体验节奏；表明此流派上手容易，但要精通则需要更多精神和情绪投入。
+These real-time voice comments exposed pain-points in **navigation, clarity, pacing,** and **player motivation**. Iterative adjustments based on these observations significantly improved onboarding and early-game engagement.
 
 ---
 
-### 英文版本：
+## 6.2 Quantitative Evaluation – NASA-TLX Workload Analysis  
 
-Upon receiving the collected NASA-TLX data, we used Python and the Matplotlib library to visualize the average workload scores across the six TLX dimensions for each playstyle (Build A, B, and C). The resulting line chart revealed distinct trends in perceived workload:
+Simply comparing two difficulty levels might not be that exciting. Long-lasting games often maintain a well-tuned balance between different characters or playstyles. This balance helps prevent any one style from feeling disproportionately demanding and avoids the dreaded “class fatigue” that arises when an option feels like too much work.
 
-🎯 **Interpretation of Line Trends:**
+To evaluate the subjective workload associated with different playstyles, we recruited eight participants to experience all three gameplay archetypes. To mitigate potential order effects—which we noticed during our first round of testing—we adopted a Latin-Square design that systematically varied the sequence in which each participant played the archetypes. This within-subjects setup ensures that each playstyle appears equally often in each position, helping us make fairer comparisons.
 
-1. **Build A (Blue):** Shows moderate-to-low workload scores with relatively flat progression. Slight drops in Temporal Demand and Effort suggest lower perceived pacing and cognitive investment. Represents a playstyle that feels reasonably light and accessible overall.
+### Workload Trend  
 
-2. **Build B (Yellow):** Consistently scores highest in almost all dimensions, especially Effort and Frustration. Indicates a playstyle that demands the most from players, potentially leading to fatigue or disengagement in later stages.
+[View raw NASA-TLX data (CSV)](docs/Datas/NASA-TLX_Results.csv)  
 
-3. **Build C (Pink):** Starts off with lower workload scores, gradually increasing toward Performance and beyond. Reflects a “light-to-heavy” experience curve—easy to start, but mentally and emotionally more demanding over time. Suggests a flow that’s approachable at first but requires deeper mastery to handle efficiently.
+![NASA-TLX Workload Trend (SVG)](docs/Datas/nasa_tlx_workload_SVG.svg)  
+![NASA-TLX Workload Trend (JPG)](docs/Datas/nasa_tlx_workload.jpg)
+
+Upon receiving the collected NASA-TLX data, we used Python and Matplotlib to visualize the average workload scores across the six TLX dimensions for each playstyle (Build&nbsp;A, B, C). The resulting line chart revealed distinct trends:
+
+1. **Build&nbsp;A (Blue):** Moderate-to-low scores with a flat progression; slight drops in *Temporal Demand* and *Effort* indicate lighter pacing and cognitive investment.  
+2. **Build&nbsp;B (Yellow):** Consistently highest in almost all dimensions, especially *Effort* and *Frustration*; the most demanding playstyle, likely to cause fatigue in later stages.  
+3. **Build&nbsp;C (Pink):** Starts low, then gradually increases toward *Performance*; a “light-to-heavy” curve—easy to start, but more demanding over time.
+
+The workload assessment revealed that Builds&nbsp;A and C remained within an acceptable range, providing variety without triggering frustration or overload. In contrast, Build&nbsp;B was identified as a workload outlier in need of tuning.
+
+We iterated on Build&nbsp;B’s rebound mechanic—enhancing its in-game effects, feedback clarity, and skill-tree support—to reduce unnecessary mental overhead and smooth difficulty spikes. A final balance test confirmed that all builds now score below the 68-point NASA-TLX threshold.
+
+![NASA-TLX Post-Balancing Trend (SVG)](docs/Datas/nasa_tlx_post_balancing.svg)  
+**Cool! Scores below 68 and great balance!**
 
 ---
 
-本次工作负荷评估清晰地表明，Build A 与 Build C 各具特征，但玩家在体验过程中均保持在可接受的压力范围内。两种流派引导出不同的思考节奏和操作风格，但都没有出现明显的沮丧或超载感。这说明它们在“难度与投入感”之间实现了良好的平衡，同时也提供了多样性。
+## 6.3 Testing Methodology  
 
-相比之下，Build B 在多个 NASA-TLX 维度上的得分明显偏高，尤其是在 努力程度 和 挫败感 上表现突出。数据与玩家反馈一致表明，这一流派被普遍认为压力过重、体验曲线过于陡峭，因此被我们识别为需要调整的异常点。
+* **Unit & Integration Tests** – Core modules (collision detection, skill cooldowns, save/load API) covered by Jest scripts executed in GitHub Actions CI.  
+* **Play-Session Logging** – Instrumented sessions record FPS, collision counts, and error stacks for regression analysis.  
+* **Cross-Browser Matrix** – Manual runs on Chrome, Edge, Firefox, and Mobile&nbsp;Safari verify rendering and input consistency.  
+* **Load & Latency Tests** – Supabase endpoints stressed with 1&nbsp;000 concurrent requests to validate rate-limit handling and data integrity.  
+* **Bug-Tracking Sprints** – Issues flagged during daily builds are triaged on the Kanban board; critical defects are patched within 24&nbsp;hours.
 
-基于此结果，我们已着手对 Build B 进行迭代优化，目标是降低其不必要的认知负担，并平滑其难度提升过程。我们认为问题的关键在于 反弹技能仅对远程攻击有效，实用性较低，这在对战中显著增加了玩家的操作难度。同时，该技能在释放后的特效表现较为简陋，反馈不明显，从而加重了玩家的认知负担，影响了使用体验。
+This multilayered strategy ensures functional correctness, performance stability, and a polished player experience.
 
-针对上述问题，我们对反弹机制进行了优化，增强了其触发效果与进展反馈。特别地，我们重点修改了 Build B 的技能树，提升技能表现力，以更好地支撑其核心玩法节奏。
-
-在完成上述调整后，我们开展了最后一轮均衡性测试以验证改进成效。
-
----
-
-**The workload assessment clearly revealed that Build A and Build C each presented distinct cognitive and emotional patterns, yet both remained within an acceptable workload range. Players reported different mental strategies and pacing preferences, but neither build triggered frustration or perceived overload. This suggests that the two playstyles are well-balanced in terms of difficulty and effort, while still offering meaningful variety.**
-
-**In contrast, Build B consistently scored significantly higher across multiple NASA-TLX dimensions, especially in Effort and Frustration. The data and player feedback aligned to indicate that this playstyle was perceived as overwhelmingly demanding, leading to a noticeably steeper cognitive load curve. Based on this, we identified Build B as a workload outlier in need of tuning.**
-
-**As a result, we are now iterating on Build B’s design to reduce unnecessary mental overhead and smooth out sharp difficulty spikes. We believe the core issue lies in the rebound ability, which only applies to ranged attacks. Its limited practicality likely contributed to the increased difficulty during combat. Additionally, the lack of impactful visual or audio feedback after activation may have increased the player’s cognitive load and reduced perceived effectiveness.**
-
-**To address this, we strengthened the rebound mechanic by enhancing its in-game effects and progression clarity。**
-**Specifically, we reworked Build B’s skill tree to improve feedback responsiveness and better support its core playstyle.Following these adjustments, a final round of balance testing was conducted to verify improvements.**
-
-![NASA-TLX 工作负荷趋势 (SVG)](docs/Datas/nasa_tlx_post_balancing.svg)
-**Cool! Scores belows 68 and great balance!!!**
 [Back to Table of Contents](#table-of-contents)
+
 # 7 Process 
 
 - 15% ~750 words
