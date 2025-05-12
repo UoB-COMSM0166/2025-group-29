@@ -51,7 +51,7 @@ Add a group photo here!
   - [2.1 Character State](#21-character-state)
   - [2.2 Skill And Attack Effects](#22-skill-and-attack-effects)
   - [2.3 Monster And Time Item Appearances](#23-monster-and-time-item-appearances)
-  - 
+  - [2.4 Boss Skill Animation Showcase](#24-boss-skill-animation-showcase)
   - [2.5 Bullet Types](#25-bullet-types)
   - [2.6 Visual Effects](#26-visual-effects)
 - [3 Requirements](#3-requirements)
@@ -124,7 +124,7 @@ Carefully designed monster appearances match the game’s theme and make players
 |![image](docs/Demo/assets/media/boss/BOSS_IDLE.gif)                  | Boss             | Has many attack moves and effects, and includes game mechanics that players need to figure out.                                     |
 |![image](docs/Demo/assets/media/time/time.gif)                       | Time             | Players can touch it to get extra time and earn more points.                                                                        |
 
-## 2.4 Boss skill animation showcase.
+## 2.4 Boss Skill Animation Showcase.
 The boss has carefully designed skill animations and challenge mechanics. These increase the game’s difficulty and require players to use their chosen skill tree skills wisely in battle, making the game more exciting and fun.
 
 | Image                                                               |  Description                                                                                                                         |
