@@ -1525,7 +1525,7 @@ class Level3 extends BaseLevel {
     
 
     // 设置倒计时
-    timer = 30;
+    timer = 60;
     startTime = millis();
 
     this.stage = 1;  // 切换到正式战斗阶段
