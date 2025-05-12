@@ -2036,7 +2036,13 @@ vel: createVector(random(-1, 1), random(-2, -1)), // ← 更强的上飘速度
 
   // 剩余伤害扣血
   if (dmg > 0) {
-    const damage = floor(dmg * this.damageMultiplier);
+     let modeDamage = dmg;
+    
+     if (isHardMode){
+       modeDamage = 1.5 * dmg;
+       console.log("伤害变为", modeDamage);
+    }
+    const damage = floor(modeDamage * this.damageMultiplier);
     this.hp.takeDamage(damage);
     console.log(`玩家受到 ${damage} 点伤害`);
   }
@@ -2148,7 +2154,7 @@ class FollowEnemy extends Enemy {
     super(x, y);
     this.r = 35;
     this.speed = 4; // 速度稍慢于玩家 
-    this.hp = new HPSystem(80); 
+    this.hp = new HPSystem(100); 
     this.contactDamage = 15; // 接触伤害
     this.scaleFactor = 2;//大小
     this.spriteImg = follow_gif;  // 比如 bulletEnemyImg
