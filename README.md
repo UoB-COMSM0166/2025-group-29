@@ -46,7 +46,6 @@ Add a group photo here!
 # Project Report
 ## Table of Contents
 - [1 Introduction](#1-introduction)
-  - [1.1 Overview](#11-overview)
 - [2 Art Design and Innovation](#2-art-design-and-innovation)
   - [2.1 Character State](#21-character-state)
   - [2.2 Skill And Attack Effects](#22-skill-and-attack-effects)
