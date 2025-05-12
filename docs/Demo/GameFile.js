@@ -1073,20 +1073,39 @@ class BaseLevel {
   }
 
   generateCommonEnemy(max) {
-  for (let i = 0; i < max; i++) {
+  let count = 0;
+  let interval = 1000; // 0.5 秒
+
+  let spawnTimer = setInterval(() => {
+    if (count >= max) {
+      clearInterval(spawnTimer);
+      return;
+    }
+
     let pos = generateOutsideViewPosition();  
     enemies.push(new CommonEnemy(pos.x, pos.y));
-  }
+    count++;
+  }, interval);
 
-  console.log("生成普通小怪,数量:", max);
+  console.log("开始生成普通小怪（逐个生成）:", max);
 }
 
   generateFollowEnemy(max) {
-  for (let i = 0; i < max; i++) {
+  let count = 0;
+  let interval = 1000;
+
+  let spawnTimer = setInterval(() => {
+    if (count >= max) {
+      clearInterval(spawnTimer);
+      return;
+    }
+
     let pos = generateOutsideViewPosition();  
     enemies.push(new FollowEnemy(pos.x, pos.y));
-  }
-  console.log("生成跟随怪,数量:", max);
+    count++;
+  }, interval);
+
+  console.log("开始生成跟随怪（逐个生成）:", max);
 }
 
   generateBulletEnemy(max) {
