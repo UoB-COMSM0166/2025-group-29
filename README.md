@@ -172,12 +172,12 @@ Rich visual effects make the game more fun and improve the player’s experience
 |----------------------------------|------------------------------------------------------------|----------------------------------------------------------------------|
 | **Agar.io**                      | Entity collision and devouring mechanics, minimalism       | Early prototype concept and core survival confrontation loop        |
 | **Touhou Project**               | Dense bullet patterns, varied trajectories and styles      | Enemy projectile (barrage) design                                   |
-| **Overwatch**                    | Hero skill system, cooldown-based abilities                | Player active skill system and swap mechanics                       |
+| **Overwatch**                    | Hero skill system, cooldown-based abilities                | Player skill system and swap mechanics                              |
 | **Hades**                        | Fast-paced combat, combo chaining                          | Responsive combat feel and skill impact                             |
 | **Dead Cells**                   | Satisfying movement and combat rhythm                      | Smooth mobility and attack pacing                                   |
 | **Pacific Rim (film)**           | Giant mech aesthetics, alien combat, apocalyptic tone      | Visual setting, cyborg-human style, alien monster design            |
 | **Warframe**                     | Fluid melee combat, sci-fi art style                       | Art style reference and modular combat system                       |
-| **Resident Evil: Mercenaries Mode** | Countdown mechanics, score-based gameplay, checkpoint saves | Combat-time-score loop, level scoring and saving system             |
+| **Resident Evil(Mercenaries Mode)** | Countdown mechanics, score-based gameplay, checkpoint saves | Combat-time-score loop, level scoring and saving system             |
 
 
 
