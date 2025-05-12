@@ -70,10 +70,10 @@ Add a group photo here!
   - [6.1 Think-Aloud Testing](#61-qualitative-evaluation)
   - [6.2 NASA-TLX Workload Study](#62-quantitative-evaluation)
   - [6.3 Testing Methodology](#63-testing-methodology)
-- [8 Process](#7-process)
-- [9 Conclusion](#8-conclusion)
-- [10 Contribution Statement](#9-contribution-statement)
-- [11 Additional Marks](#10-additional-marks)
+- [8 Process](#8-process)
+- [9 Conclusion](#9-conclusion)
+- [10 Contribution Statement](#10-contribution-statement)
+- [11 Additional Marks](#11-additional-marks)
 
 # 1 Introduction
 This document outlines our software engineering practices in developing a brand-new game from scratch.
