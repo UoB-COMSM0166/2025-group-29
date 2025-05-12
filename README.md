@@ -169,7 +169,7 @@ Rich visual effects make the game more fun and improve the player’s experience
 
 
 # 3 Requirements 
-## Ideation & Inspiration
+## 3.1 Ideation & Inspiration
 Early on, our team brainstormed different types of games and talked about how we might adapt certain ideas. Our shared experience with games gave us a great starting point to create something of our own, and the flexibility to shift gears when our vision started to change. To make the combat feel both exciting and strategic, we took inspiration from the core mechanics and art styles of some of our favorite classic games and movies.
 ### Inspiration Overview
 
@@ -185,7 +185,7 @@ Early on, our team brainstormed different types of games and talked about how we
 | **Resident Evil(Mercenaries Mode)** | Countdown mechanics, score-based gameplay, checkpoint saves | Combat-time-score loop, level scoring and saving system             |
 
 
-## Stakeholder Analysis
+## 3.2 Stakeholder Analysis
 We used the Onion Model to identify and discuss the different groups involved in building, using, and evaluating our game:
 - **Core Layer – Developers:**
     
@@ -207,7 +207,7 @@ We used the Onion Model to identify and discuss the different groups involved in
     
     In some cases, the university itself might be indirectly affected—for example, if the game caused distractions or impacted the school’s reputation, it would be seen as a negative stakeholder.
 
-## User Stories
+## 3.3 User Stories
 
 - **As a player**
     
@@ -251,7 +251,7 @@ We used the Onion Model to identify and discuss the different groups involved in
 [Back to Table of Contents](#table-of-contents)
 # 4 Design
 ---
-## Class Diagram
+## 4.1 Class Diagram
 
 At the early stage of game development, class diagrams can help us grasp the structure of the game and clarify the core classes, modules and their corresponding responsibilities. This helps us to plan a good Object Oriented Design (OOD) in the original code, for example, to reasonably split the functions and reduce the cost of repeated communication between developers. The GitHub+VS Code integrated development methodology we adopted allows us to delineate feature branches (e.g. feature/player, feature/BlackHole) accordingly. Team members can review class implementations based on class diagrams, making simultaneous development of different modules by multiple people manageable.
 
@@ -267,7 +267,7 @@ Game Structure
 ![Class Diagram](docs/Datas/Class%20Diagram.png)
 
 ---
-## Use Case Diagram
+## 4.2 Use Case Diagram
 
 Although all key functionalities are already represented in the class diagram, we have also created a Use Case Diagram to more clearly illustrate the interactions between the player and various system modules. This diagram helps visualize the behavior paths from the player's perspective that are not easily inferred from the class diagram, such as the sequential relationships between different types of skills (active and passive).
 
@@ -278,7 +278,7 @@ The diagram shows how the player uses the InputHandler to control movement, inte
 
 
 ---
-## Behavioral Diagram
+## 4.3 Behavioral Diagram
 
 The class diagram tells us what exists in the system, the use case diagram describes what the player can do, and the sequence diagram illustrates how the system carries out these actions step by step. By creating a sequence diagram, we simulate the actual gameplay process—from game launch, level progression, and boss battles to level completion and game end.
 
