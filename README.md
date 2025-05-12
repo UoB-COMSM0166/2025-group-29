@@ -223,7 +223,7 @@ The diagram shows how the player uses the InputHandler to control movement, inte
 ---
 Behavioral Diagram
 
-类图告诉我们系统中有什么，时序图告诉我们它们如何工作。我们通过绘制时序图来模拟游戏的真实运行流程（从游戏启动到关卡推进、BOSS战再到通关和结束的流程）。
+类图告诉我们系统中有什么，use case diagram描述的是玩家能做什么，时序图则告诉我们系统如何一步一步实现这种行为。我们通过绘制时序图来模拟游戏的真实运行流程（从游戏启动到关卡推进、BOSS战再到通关和结束的流程）。
 
 在游戏启动阶段（Game Launch）加载当前关卡（如 Level1），初始化玩家属性（位置、技能槽、HP 等），初始化技能系统，绑定快捷键并注册技能，生成第一关的敌人。
 
@@ -233,7 +233,7 @@ Behavioral Diagram
 
 在通关时，玩家进入 shop界面，展示升级选项、奖励、恢复道具等，玩家可选择技能升级或退出游戏。
 
-Class diagrams tell us what's in the system, sequence diagrams tell us how they work. We simulate the real flow of the game (from Game Launch to Level Advancement, Boss Battles to Pass & Finish) by drawing a timing diagram.
+The class diagram tells us what exists in the system, the use case diagram describes what the player can do, and the sequence diagram illustrates how the system carries out these actions step by step. By creating a sequence diagram, we simulate the actual gameplay process—from game launch, level progression, and boss battles to level completion and game end.
 
 ### Sequence Diagram
 ![Sequence Diagram](docs/Datas/Sequence%20Diagram.png)
