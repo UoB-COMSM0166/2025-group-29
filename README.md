@@ -70,10 +70,10 @@ Add a group photo here!
   - [6.1 Think-Aloud Testing](#61-qualitative-evaluation)
   - [6.2 NASA-TLX Workload Study](#62-quantitative-evaluation)
   - [6.3 Testing Methodology](#63-testing-methodology)
-- [7 Process](#7-process)
-- [8 Conclusion](#8-conclusion)
-- [9 Contribution Statement](#9-contribution-statement)
-- [10 Additional Marks](#10-additional-marks)
+- [8 Process](#7-process)
+- [9 Conclusion](#8-conclusion)
+- [10 Contribution Statement](#9-contribution-statement)
+- [11 Additional Marks](#10-additional-marks)
 
 # 1 Introduction
 This document outlines our software engineering practices in developing a brand-new game from scratch.
@@ -419,7 +419,7 @@ After adjusting collision radii, bullet speed caps, and database field lengths, 
 
 [Back to Table of Contents](#table-of-contents)
 
-# 7 Process 
+# 8 Process 
 
 
 Throughout the development of our real-time combat survival game, our team collaborated efficiently by embracing an Agile-inspired methodology. From the outset, we prioritized flexibility and iterative progress. To manage tasks effectively, we created a digital Kanban board with four clear columns: “Not Start,” “In Progress,” “Parked,” and “Done.” This visual approach allowed us to track precisely which tasks had yet to begin, which were actively being worked on, which tasks had temporarily stalled, and which were completed. The Kanban structure helped us break the development into manageable segments, clearly linking short-term tasks with broader project milestones.
@@ -441,7 +441,7 @@ Ultimately, this project provided valuable, hands-on experience with Agile princ
 ![image](https://github.com/user-attachments/assets/2e1dd967-2b86-4867-b88f-5fa2026f46b4)
 
 [Back to Table of Contents](#table-of-contents)
-# 8 Conclusion
+# 9 Conclusion
 
 Looking back on the entire project, what we implemented in this game, we learnt how team members can collaborate with each other to achieve a game's output, and we also learnt solid system design through the game's design process. From the early stages of the project, we set a clear goal: to create a modular, extensible framework that could support multiple levels with different mechanics - sneak, ambush, pop-ups, boss battles, etc. - while at the same time sharing features such as player movement collision detection, skill management and remote archiving. To realise this vision, we recognised the importance of pre-planning the architectural design. We defined clear abstract classes, such as BaseLevel, Enemy, Skill, CollisionManager, etc., so that new features could be integrated smoothly and with less coupling. Through the design of SpriteManager and Skill Stacking Queue, we learned to decouple the rendering logic from the game logic, resulting in smoother character animations. The remote archiving feature uses Supabase to further understand the details of asynchronous data loading, such as how to ensure that the main game loop is not started until loadSaveData() completes, and how to provide friendly error feedback in the event of network exceptions.
 
@@ -456,7 +456,7 @@ In addition, there are also a lot of places that can be optimised at the code le
 In conclusion, this project has provided us with solid development experience and architectural design foundation, and in the future, we can further optimise and enrich the game content from these basic directions above, and continue to improve the player experience.
 
 [Back to Table of Contents](#table-of-contents)
-# 9 Contribution Statement
+# 10 Contribution Statement
 
 | Contributor   | Contribution |
 |---------------|--------------|
@@ -468,7 +468,7 @@ In conclusion, this project has provided us with solid development experience an
 | Mengqiu Liu   | 1.00         |
 
 [Back to Table of Contents](#table-of-contents)
-# 10 Additional Marks
+# 11 Additional Marks
 
 You can delete this section in your own repo, it's just here for information. in addition to the marks above, we will be marking you on the following two points:
 
