@@ -23,6 +23,7 @@
 
 
 ## Your Game
+[Download demo video](/docs/Demo/video.mp4)
 
 Link to your game [PLAY HERE](https://uob-comsm0166.github.io/2025-group-29/)
 
