@@ -149,6 +149,9 @@ let bossBulletImg;
 let enemyBulletImg;
 let gifImg;
 
+let bgmNormal, bgmBoss;
+let currentBGM = null;
+
 function preload() {
 
   minecraftFont = loadFont('assets/font/Minecraft.ttf');
@@ -234,9 +237,29 @@ function preload() {
   enemyBulletImg = loadImage("assets/media/bullet/Monster-bullet.gif");
   gifImg = loadImage("assets/media/time/time.gif");
 
+
+  bgmNormal = loadSound("assets/media/audio/stage.mp3");     // 用于第1-4关
+  bgmBoss   = loadSound("assets/media/audio/finalboss.wav"); // 用于第5关
+  bgmNormal.setVolume(0.1);
+  bgmBoss.setVolume(0.1);
 }
 
+function playLevelBGM(levelNumber) {
+  if (currentBGM && currentBGM.isPlaying()) {
+    currentBGM.stop();
+  }
 
+  if (levelNumber === 5) {
+    currentBGM = bgmBoss;
+  } else {
+    currentBGM = bgmNormal;
+  }
+
+  if (currentBGM) {
+    currentBGM.setVolume(0.4);
+    currentBGM.loop();
+  }
+}
 
 function applyFactionFromSkills() {
   const sel = skillSystem.selectedSkills;
@@ -784,7 +807,8 @@ class LevelManager {
 
   // 通知背景层更换背景图
   sendLevelToBackground(this.currentLevel.levelNumber);
-
+  // 播放对应的背景音乐
+  playLevelBGM(this.currentLevel.levelNumber);
   // 每次加载新关卡后，重新绑定系统
   collisionManager = new CollisionManager(player, enemies, bullets, timeBonuses);
   player.meleeAttack = new MeleeAttack(player, enemies);
