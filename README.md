@@ -23,6 +23,7 @@
 
 
 ## Your Game
+[![Watch the video](https://img.youtube.com/vi/U4nfC1jR4LA/0.jpg)](https://www.youtube.com/watch?v=U4nfC1jR4LA)
 [Download demo video](/docs/Demo/video.mp4)
 
 Link to your game [PLAY HERE](https://uob-comsm0166.github.io/2025-group-29/)
