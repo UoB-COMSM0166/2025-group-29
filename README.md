@@ -114,7 +114,7 @@ Carefully designed monster appearances match the game’s theme and make players
 |![image](docs/Demo/assets/media/time/time.gif)                       | Time             | Players can touch it to get extra time and earn more points.                                                                        |
 
 ## 2.4 Boss skill animation showcase.
-Carefully designed monster appearances match the game’s theme and make players feel more involved.
+The boss has carefully designed skill animations and challenge mechanics. These increase the game’s difficulty and require players to use their chosen skill tree skills wisely in battle, making the game more exciting and fun.
 
 | Image                                                               |  Description                                                                                                                         |
 |---------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
