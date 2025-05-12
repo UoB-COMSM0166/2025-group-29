@@ -207,6 +207,20 @@ Game Structure
 ![Class Diagram](docs/Datas/Class%20Diagram.png)
 
 ---
+Use Case Diagram
+虽然我们在类图中已经表现了所有关键功能的结构支持，但为了更清晰地呈现玩家与系统各个模块之间的交互行为，我们还绘制了一张 Use Case Diagram，将类图中不易直观看出的玩家视角行为路径具体化，例如各类技能之间（主动技能和被动技能）的前后关系。
+
+该图展示了玩家如何通过 InputHandler 控制移动、如何与 SkillSystem 交互释放技能、如何与 LevelManager 进入关卡/挑战 Boss 等系统协同运作的整体流程。
+
+Although all key functionalities are already represented in the class diagram, we have also created a Use Case Diagram to more clearly illustrate the interactions between the player and various system modules. This diagram helps visualize the behavior paths from the player's perspective that are not easily inferred from the class diagram, such as the sequential relationships between different types of skills (active and passive).
+
+The diagram shows how the player uses the InputHandler to control movement, interacts with the SkillSystem to activate skills, and engages with the LevelManager to enter levels or challenge bosses, providing a comprehensive view of how these systems work together.
+
+### Use Case Diagram
+![Use Case Diagram](docs/Datas/Case%20Diagram.png)
+
+
+---
 Behavioral Diagram
 
 类图告诉我们系统中有什么，时序图告诉我们它们如何工作。我们通过绘制时序图来模拟游戏的真实运行流程（从游戏启动到关卡推进、BOSS战再到通关和结束的流程）。
