@@ -456,7 +456,15 @@ In conclusion, this project has provided us with solid development experience an
 [Back to Table of Contents](#table-of-contents)
 # 9 Contribution Statement
 
-- Provide a table of everyone's contribution, which may be used to weight individual grades. We expect that the contribution will be split evenly across team-members in most cases. Let us know as soon as possible if there are any issues with teamwork as soon as they are apparent. 
+| Contributor   | Contribution |
+|---------------|--------------|
+| Weihao Zeng   | 1.00         |
+| Lepeng Zhou   | 1.00         |
+| Yichen Zhang  | 1.00         |
+| Guojie Liu    | 1.00         |
+| Chen Zhang    | 1.00         |
+| Mengqiu Liu   | 1.00         |
+
 [Back to Table of Contents](#table-of-contents)
 # 10 Additional Marks
 
