@@ -265,6 +265,7 @@ function preload() {
   SFX.lifesteal  = loadSound("assets/media/audio/lifesteal.mp3");
   SFX.reflect    = loadSound("assets/media/audio/reflect.mp3");
   SFX.boost    = loadSound("assets/media/audio/boost.mp3");
+  SFX.slow    = loadSound("assets/media/audio/boost.mp3");
 
   SFX.attack.setVolume(0.1);
   SFX.dash.setVolume(0.1);
@@ -272,6 +273,7 @@ function preload() {
   SFX.lifesteal.setVolume(0.1);
   SFX.reflect.setVolume(0.1);
   SFX.boost.setVolume(0.1);
+  SFX.slow.setVolume(0.1);
 }
 
 function playLevelBGM(levelNumber) {
@@ -3818,6 +3820,7 @@ class SlowFieldSkill extends Skill {
 
   /* 主动触发 */
   castSkillEffect() {
+    SFX.play("slow");
     this.active  = true;
     this.endTime = millis() + this.duration;
     console.log("🌀 减速领域开启");
