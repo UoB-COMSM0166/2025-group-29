@@ -121,7 +121,7 @@ The boss has carefully designed skill animations and challenge mechanics. These 
 |![image](docs/Demo/assets/media/boss/BOSS_BLACKHOLE_SKILL.gif)       |    The boss summons a black hole to limit the player’s movement area.              |
 |![image](docs/Demo/assets/media/boss/BOSS_DASH.gif)                  |    The boss dashes forward to attack the player, leaving a trail that deals damage.                                                  |
 |![image](docs/Demo/assets/media/boss/BOSS_SUMMON.gif)                |    The boss summons ambush enemies that chase and attack the player.                                                        |
-|![image](docs/Demo/assets/media/boss/BOSS_TOWER_SKILL.gif)           |                                                                                     | 
+|![image](docs/Demo/assets/media/boss/BOSS_TOWER_SKILL.gif)           |    The boss summons bullet attacks, and the player must dodge them while completing certain mechanics, or they will be punished.            | 
 |![image](docs/Demo/assets/media/boss/BOSS_WAVE_BOSS.gif)             |                                                                                               |
 
 
