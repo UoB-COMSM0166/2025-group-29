@@ -1,4 +1,3 @@
-// js/intro.js
 document.addEventListener('DOMContentLoaded', () => {
   const images = [
     'assets/media/intro/1.png',
@@ -9,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'assets/media/intro/5-1.png',
     'assets/media/intro/5-2.png'
   ];
-
   const subtitles = [
     `At the edge of the universe lies a forbidden realm—the
 Graveyard of the Cosmos.
@@ -34,18 +32,14 @@ vaguely hear a voice:
 Hunt—until nothing is left.`,
     ''
   ];
-
   let idx       = 0;
   const overlay = document.getElementById('introOverlay');
   const imgEl   = document.getElementById('introImage');
   const storyEl = document.getElementById('storyText');
   const clickEl = document.getElementById('clickText');
   const skipBtn = document.getElementById('skipButton');
-
   let typingTimer = null;
   let charIndex   = 0;
-
-  // 文字打字机效果
   function startTyping(text) {
     clearInterval(typingTimer);
     storyEl.textContent = '';
@@ -58,7 +52,6 @@ Hunt—until nothing is left.`,
       }
     }, 30);
   }
-
   function showSubtitleForSlide(i) {
     const text = subtitles[i] || '';
     clearInterval(typingTimer);
@@ -70,15 +63,11 @@ Hunt—until nothing is left.`,
       storyEl.style.opacity = '0';
     }
   }
-
-  // “Click to continue” 的省略号动画
   let dotCount = 0;
   const ellipsisTimer = setInterval(() => {
     dotCount = (dotCount + 1) % 4;
     clickEl.textContent = 'Click to continue' + '.'.repeat(dotCount);
   }, 600);
-
-  // 收尾：淡出并触发 introFinished
   function endIntro() {
     clearInterval(ellipsisTimer);
     overlay.classList.add('hidden');
@@ -87,7 +76,6 @@ Hunt—until nothing is left.`,
       window.dispatchEvent(new Event('introFinished'));
     }, { once: true });
   }
-
   imgEl.addEventListener('click', () => {
     if (idx < images.length - 1) {
       idx++;
@@ -102,9 +90,6 @@ Hunt—until nothing is left.`,
       endIntro();
     }
   });
-
   skipBtn.addEventListener('click', endIntro);
-
-  // 初始加载第一张和文字
   showSubtitleForSlide(0);
 });
