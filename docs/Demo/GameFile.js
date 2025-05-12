@@ -265,7 +265,7 @@ function preload() {
   SFX.lifesteal  = loadSound("assets/media/audio/lifesteal.mp3");
   SFX.reflect    = loadSound("assets/media/audio/reflect.mp3");
   SFX.boost    = loadSound("assets/media/audio/boost.mp3");
-  SFX.slow    = loadSound("assets/media/audio/boost.mp3");
+  SFX.slow    = loadSound("assets/media/audio/slow.mp3");
 
   SFX.attack.setVolume(0.1);
   SFX.dash.setVolume(0.1);
