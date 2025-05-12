@@ -1,199 +1,164 @@
+/* docs/js/shop.js */
 /* eslint-env browser, es2021 */
-// ──────────────────────────────────────────────────────────────
-// Shop page main logic — js/shop.js
-// (place this file alongside supabase.js in your js/ folder)
-// ──────────────────────────────────────────────────────────────
 import { supabase } from './supabase.js';
 
-/* ─────────── Constants & Helpers ─────────── */
+/* ---------- Constants ---------- */
 const ITEMS = [
-  ['Phantom Dash',  'Ghost Cutter',      'Runner’s Instinct'],   // col-0 - Agile
-  ['Iron Reversal', 'Anchor Field',      'Guardian’s Will'   ],  // col-1 - Tank
-  ['Crimson Drain', 'Wrath Unchained',   'Berserker’s Blood']    // col-2 - Power
+  ['Phantom Dash', 'Ghost Cutter',    'Runner’s Instinct'],
+  ['Iron Reversal','Anchor Field',    'Guardian’s Will'  ],
+  ['Crimson Drain','Wrath Unchained', 'Berserker’s Blood']
 ];
-// Level-1 entry: only top‐row of each column
-const ENTRY_SET = new Set([
-  'Phantom Dash',
-  'Iron Reversal',
-  'Crimson Drain'
-]);
-// Find column & row for a skill name
+const ENTRY_SET = new Set(['Phantom Dash','Iron Reversal','Crimson Drain']);
+const DESC = {
+  'Phantom Dash':'Dash forward dealing damage along the path.',
+  'Ghost Cutter':'Temporarily boosts attack power.',
+  'Runner’s Instinct':'Passive: kill refreshes Phantom Dash cooldown.',
+  'Iron Reversal':'Creates a reflecting shield.',
+  'Anchor Field':'Slows enemies in an area.',
+  'Guardian’s Will':'Passive: damage in Anchor Field buffs next shield.',
+  'Crimson Drain':'Attacks restore some HP.',
+  'Wrath Unchained':'Charge-up 360° heavy strike.',
+  'Berserker’s Blood':'Passive: low HP greatly increases attack.'
+};
+
+/* ---------- Helpers ---------- */
 const findPos = name => {
   for (let c = 0; c < 3; c++) {
     const r = ITEMS[c].indexOf(name);
-    if (r !== -1) return { col: c, row: r };
+    if (r !== -1) return { col:c,row:r };
   }
   return null;
 };
 
-/* ─────────── DOM References ─────────── */
-const params     = new URLSearchParams(location.search);
-const saveId     = params.get('saveId');
-if (!saveId) {
-  alert('缺少存档 ID');
-  throw new Error('saveId required');
-}
-const lvlDisplay = document.getElementById('levelDisplay');
-const resetBtn   = document.getElementById('resetBtn');
-const shop       = document.getElementById('shop');
-const storedList = document.getElementById('storedList');
-const backBtn    = document.getElementById('backToGame');
+/* ---------- DOM ---------- */
+const $shop   = document.getElementById('shop');
+const $stored = document.getElementById('storedList');
+const $lvl    = document.getElementById('levelDisplay');
+const $reset  = document.getElementById('resetBtn');
+const $undo   = document.getElementById('undoBtn');
+const $back   = document.getElementById('backToGame');
+const $tip    = document.getElementById('tooltip');
 
-/* ─────────── State ─────────── */
-let level   = 1;    // overwritten by loadSave()
-let stored  = [];   // chosen skill names
-let homeCol = null; // column chosen in stage 1
+const params  = new URLSearchParams(location.search);
+const saveId  = params.get('saveId');
+if (!saveId) { alert('saveId missing'); throw new Error('saveId'); }
 
-/* ─────────── UI Rendering ─────────── */
+/* ---------- State ---------- */
+let level   = 1;
+let stored  = [];
+let homeCol = null;
+let history = [];          // ← 用于 Undo
+
+/* ---------- UI ---------- */
 function renderStored() {
-  storedList.innerHTML = stored.length
-    ? stored.map(n => `<li>${n}</li>`).join('')
-    : '<li>None</li>';
+  $stored.innerHTML = stored.length ? stored.map(n=>`<li>${n}</li>`).join('') : '<li>None</li>';
 }
-
 function updateUI() {
-  lvlDisplay.textContent = `Level: ${level}`;
-
-  document.querySelectorAll('.column').forEach($col => {
-    const col = +$col.dataset.col;
-    $col.classList.toggle('active', col === homeCol);
-
-    $col.querySelectorAll('.item').forEach($it => {
+  $lvl.textContent = `Level: ${level}`;
+  document.querySelectorAll('.column').forEach($c=>{
+    const col = +$c.dataset.col;
+    $c.classList.toggle('active', col===homeCol);
+    $c.querySelectorAll('.item').forEach($it=>{
       const row  = +$it.dataset.row;
-      const name = $it.textContent.trim();
-      let disabled = true;
-
-      if (level === 1) {
-        // Level 1: pick exactly one from the top row
-        disabled = !ENTRY_SET.has(name) || stored.length >= 1;
-      }
-      else if (level === 2) {
-        if (stored.length === 1) {
-          // specialization: same-column row 1
-          if (col === homeCol && row === 1) disabled = false;
-          // cross-column first pick: other columns, row 0 or 1
-          if (col !== homeCol && (row === 0 || row === 1)) disabled = false;
-        }
-        else if (stored.length === 2) {
-          // cross-column second pick: only the remaining column, row 0 or 1
-          const usedCols = new Set(stored.map(n => findPos(n).col));
-          if (!usedCols.has(col) && (row === 0 || row === 1)) {
-            disabled = false;
-          }
+      const name = $it.querySelector('.name').textContent;
+      let dis = true;
+      if (level===1) {
+        dis = !ENTRY_SET.has(name) || stored.length>=1;
+      } else if (level===2) {
+        if (stored.length===1) {
+          if (col===homeCol && row===1) dis=false;
+          if (col!==homeCol && (row===0||row===1)) dis=false;
+        } else if (stored.length===2) {
+          const used = new Set(stored.map(n=>findPos(n).col));
+          if (!used.has(col) && (row===0||row===1)) dis=false;
         }
       }
-      // Level ≥3: all disabled (preview only)
-      
-      // never allow re-clicking an owned skill or any passive (row 2)
-      if (stored.includes(name) || row === 2) disabled = true;
-
-      $it.classList.toggle('disabled', disabled);
+      if (stored.includes(name) || row===2) dis=true;
+      $it.classList.toggle('disabled', dis);
     });
   });
-
+  $undo.disabled = history.length===0;
   renderStored();
 }
 
-/* ─────────── Supabase Load / Save ─────────── */
+/* ---------- Supabase ---------- */
 async function loadSave() {
-  const { data, error } = await supabase
-    .from('saves')
-    .select('current_level, skills')
-    .eq('id', saveId)
-    .single();
-  if (error) {
-    alert('加载失败: ' + error.message);
-    return;
-  }
-
-  level  = data.current_level || 1;
-  stored = data.skills        || [];
-
-  if (stored.length) {
-    const p = findPos(stored[0]);
-    homeCol = p ? p.col : null;
-  }
-
+  const {data,error} = await supabase.from('saves')
+    .select('current_level,skills').eq('id',saveId).single();
+  if (error){console.error(error);return;}
+  level  = data.current_level||1;
+  stored = data.skills||[];
+  if (stored.length){const p=findPos(stored[0]);homeCol=p?p.col:null;}
   updateUI();
 }
-
-function saveState() {
-  return supabase
-    .from('saves')
-    .update({ current_level: level, skills: stored })
-    .eq('id', saveId);
+function save() {
+  return supabase.from('saves')
+    .update({current_level:level,skills:stored}).eq('id',saveId);
 }
 
-/* ─────────── Shop Click Logic ─────────── */
-shop.addEventListener('click', async e => {
-  const $it = e.target.closest('.item');
-  if (!$it || $it.classList.contains('disabled')) return;
+/* ---------- Tooltip ---------- */
+$shop.addEventListener('pointerover',e=>{
+  const $it=e.target.closest('.item'); if(!$it) return;
+  const name=$it.querySelector('.name').textContent;
+  $tip.textContent=DESC[name]||name;
+  $tip.style.opacity='1';
+});
+$shop.addEventListener('pointermove',e=>{
+  $tip.style.left=`${e.clientX+12}px`;
+  $tip.style.top =`${e.clientY+12}px`;
+});
+$shop.addEventListener('pointerout',()=>{$tip.style.opacity='0';});
 
-  const col  = +$it.parentElement.dataset.col;
-  const row  = +$it.dataset.row;
-  const name = $it.textContent.trim();
+/* ---------- Click Logic ---------- */
+$shop.addEventListener('click', async e=>{
+  const $it=e.target.closest('.item'); if(!$it||$it.classList.contains('disabled')) return;
+  const col=+$it.parentElement.dataset.col;
+  const row=+$it.dataset.row;
+  const name=$it.querySelector('.name').textContent;
 
-  if (level === 1) {
-    // Stage 1 pick
-    stored.push(name);
-    homeCol = col;
-  }
-  else if (level === 2) {
-    if (stored.length === 1) {
-      // first pick in Level 2
-      if (col === homeCol && row === 1) {
-        // specialize: same-column second row + auto-unlock passive
-        stored.push(name);
-        stored.push(ITEMS[col][2]);
-      }
-      else if (col !== homeCol && (row === 0 || row === 1)) {
-        // cross-column first pick
-        stored.push(name);
-      }
+  // ----- push snapshot for undo -----
+  history.push({level,stored:[...stored],homeCol});
+
+  if(level===1){
+    stored.push(name);homeCol=col;
+  }else if(level===2){
+    if(stored.length===1){
+      if(col===homeCol&&row===1){stored.push(name);stored.push(ITEMS[col][2]);}
+      else if(col!==homeCol&&(row===0||row===1)){stored.push(name);}
+    }else if(stored.length===2){
+      const used=new Set(stored.map(n=>findPos(n).col));
+      if(!used.has(col)&&(row===0||row===1)){stored.push(name);}
     }
-    else if (stored.length === 2) {
-      // cross-column second pick
-      const usedCols = new Set(stored.map(n => findPos(n).col));
-      if (!usedCols.has(col) && (row === 0 || row === 1)) {
-        stored.push(name);
-      }
-    }
   }
-
-  await saveState();
-  updateUI();
+  await save(); updateUI();
 });
 
-/* ─────────── Reset / Continue ─────────── */
-resetBtn.addEventListener('click', async () => {
-  level   = 1;
-  stored  = [];
-  homeCol = null;
-  await saveState();
-  updateUI();
+/* ---------- Undo ---------- */
+$undo.addEventListener('click', async ()=>{
+  if(!history.length)return;
+  const prev=history.pop();
+  level=prev.level;stored=prev.stored;homeCol=prev.homeCol;
+  await save();updateUI();
 });
 
-backBtn.addEventListener('click', async () => {
-  // advance stage on Continue
-  if (level === 1 && stored.length === 1) {
-    level = 2;
-  } else if (level === 2 && stored.length >= 2) {
-    level = 3;
-  } else if (level === 3) {
-    level = 4;
-  } else if (level === 4) {
-    level = 5;
-  }
-
-  // notify BG frame to switch tileset
-  document
-    .getElementById('bgFrame')
-    .contentWindow
-    .postMessage({ type: 'level', level }, '*');
-
-  await saveState();
-  location.href = `game.html?saveId=${saveId}`;
+/* ---------- Reset ---------- */
+$reset.addEventListener('click', async ()=>{
+  history.push({level,stored:[...stored],homeCol});
+  level=1;stored=[];homeCol=null;
+  await save();updateUI();
 });
 
-/* ─────────── Init ─────────── */
+/* ---------- Continue ---------- */
+$back.addEventListener('click',async ()=>{
+  if(level===1&&stored.length===1) level=2;
+  else if(level===2&&stored.length>=2) level=3;
+  else if(level===3) level=4;
+  else if(level===4) level=5;
+  document.getElementById('bgFrame').contentWindow
+    .postMessage({type:'level',level},'*');
+  await save();
+  location.href=`game.html?saveId=${saveId}`;
+});
+
+/* ---------- Init ---------- */
 loadSave();
