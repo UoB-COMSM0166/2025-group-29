@@ -184,7 +184,29 @@ Rich visual effects make the game more fun and improve the player’s experience
 | **Resident Evil(Mercenaries Mode)** | Countdown mechanics, score-based gameplay, checkpoint saves | Combat-time-score loop, level scoring and saving system             |
 
 
+## Stakeholder Analysis
+We used the Onion Model to identify and discuss the different groups involved in building, using, and evaluating our game:
+- **Core Layer – Developers:**
+    
+    As the development team, we were at the heart of the process, handling everything from design and coding to testing the game.
+    
+- **Inner Layer – Markers/Lecturers:**
+    
+    Acting like clients, they guided our development process and were in charge of evaluating the quality of the final product.
+    
+- **Middle Layer – Players:**
+    
+    These are the users who tested the game during development and gave us helpful feedback on gameplay, functionality, and user experience.
+    
+- **Outer Layer – Customers:**
+    
+    If the game were ever made available outside the university, these would be our general audience or potential buyers.
+    
+- **Outer Layer – University as a Negative Stakeholder:**
+    
+    In some cases, the university itself might be indirectly affected—for example, if the game caused distractions or impacted the school’s reputation, it would be seen as a negative stakeholder.
 
+## User Stories
 
 - **As a player**
     
