@@ -3280,7 +3280,7 @@ class SkillSystem {
     let startX = windowWidth - totalWidth - 20;
     let y = windowHeight - size - 20;
 
-    const keyMapping = ['Z', 'X', 'C'];
+    const keyMapping = ['Q', 'W', 'E'];
 
     for (let i = 0; i < this.selectedSkills.length; i++) {
       let skill = this.selectedSkills[i];
@@ -3297,7 +3297,7 @@ class SkillSystem {
   }
 
   tryActivateSkill(keyPressed) {
-    const keyMapping = ['Z', 'X', 'C'];
+    const keyMapping = ['Q', 'W', 'E'];
 
     for (let i = 0; i < this.selectedSkills.length; i++) {
       let skill = this.selectedSkills[i];
@@ -3771,7 +3771,7 @@ class SlowFieldSkill extends Skill {
               slowMul  = 0.1,
               duration = 5000) {
 
-    super("Anchor Field", "Z", 8);     // 名称 / 触发键 / 冷却秒数
+    super("Anchor Field", "", 8);     // 名称 / 触发键 / 冷却秒数
     this.player   = player;
     this.enemies  = enemies;
 
