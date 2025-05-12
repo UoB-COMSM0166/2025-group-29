@@ -114,3 +114,15 @@
   </script>
 </body>
 </html>
+
+<script>
+  // 监听真正的键盘事件
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      // 通知父页面打开暂停菜单
+      parent.postMessage({ type: 'pause_menu' }, '*');
+      // 阻止事件继续冒泡到 p5.js 里
+      e.preventDefault();
+    }
+  });
+</script>
