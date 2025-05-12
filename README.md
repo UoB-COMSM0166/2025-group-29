@@ -26,7 +26,7 @@
 
 Link to your game [PLAY HERE](https://uob-comsm0166.github.io/2025-group-29/)
 
-Your game lives in the [/docs/Demo](/docs/Demo) folder(source Code ,all development files and assets), and is published using Github pages to the link above.
+Your game lives in the [/docs/Demo](/docs/Demo) folder(source code ,all development files and assets), and is published using Github pages to the link above.
 
 Include a demo video of your game here (you don't have to wait until the end, you can insert a work in progress video)
 
