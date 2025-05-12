@@ -2722,7 +2722,7 @@ class Boss extends Enemy {
   
     const d = dist(this.pos.x, this.pos.y, player.pos.x, player.pos.y);
     if (d >= innerR && d <= outerR) {
-      player.receiveDamage(100);
+      player.receiveDamage(140);
       this.ringHitOnce.add(ringIdx);
       console.log(`⚡ Wave hit! ring ${ringIdx}`);
     }
@@ -2949,7 +2949,7 @@ cleanupTower() {
   if (alive.length) {
     // 有没被拆的塔：把它们都爆掉并伤害玩家
     alive.forEach(t => t.hp.takeDamage(t.hp.currentHP));
-    player.receiveDamage(100);
+    player.receiveDamage(120);
   } else {
     // 全部都被玩家拆了：Boss 受伤
     this.hp.takeDamage(500);

@@ -70,6 +70,10 @@ Add a group photo here!
   - [6.1 Think-Aloud Testing](#61-qualitative-evaluation)
   - [6.2 NASA-TLX Workload Study](#62-quantitative-evaluation)
   - [6.3 Testing Methodology](#63-testing-methodology)
+- [7 Sustainability, ethics and accessibility](#7-sustainability-ethics-and-accessibility)
+  - [7.1 Environmental](#71-environmental)
+  - [7.2 Technical](#72-technical)
+  - [7.3 Individual](#73-individual)
 - [8 Process](#8-process)
 - [9 Conclusion](#9-conclusion)
 - [10 Contribution Statement](#10-contribution-statement)
@@ -419,6 +423,41 @@ After adjusting collision radii, bullet speed caps, and database field lengths, 
 
 [Back to Table of Contents](#table-of-contents)
 
+---
+# 7 Sustainability, ethics and accessibility
+
+From the very start of our game project, we made a conscious effort to think about sustainability in the way we designed and built things. Inspired by the Karlskrona Manifesto—which talks about how design can change the world—we tried to keep in mind that software developers aren’t just responsible for making things work, but also for thinking about the broader impact of their tech. That includes potential side effects like increased energy use from over-optimization or systems that unintentionally waste resources. For example, we avoided constantly calling cloud services and instead added low-power loops and partial screen refreshes to reduce the computing load.
+
+We also used the Sustainability Awareness Framework (SusAF) to guide us, focusing on three main areas: environmental impact, technical sustainability, and user well-being. Early on, we asked questions like: Will this design use unnecessary energy? Is it easy to understand and use? Will it work well for all types of players? These helped shape our development choices in a more responsible and thoughtful way.
+
+## 7.1 Environmental
+Even though software doesn’t use raw materials like hardware does, it still leaves a footprint through the electricity used when it runs or stores and sends data. So we tried to keep that in check:
+
+- **Modular design**: We built the game with separate parts—like Player, SkillSystem, and BlackHole — so it’s easier to maintain and upgrade later, instead of throwing things away and starting over when they break.
+- **Efficient saving**: We used Supabase to save game data, but kept things light. We only read from the cloud once at the start, and only write when the player finishes a level or saves manually. We also stored just the essentials—things like save ID, level, score, and a list of skill IDs—instead of large, bloated data structures.
+- **Small assets**: We went with low-res pixel art and compressed our assets to make the game load faster and use less data.
+
+All of this helps lower the game’s environmental impact and supports global sustainability goals like responsible tech use and climate action.
+
+## 7.2 Technical
+We wanted the code to stay usable and flexible even as the project grows or changes over time. So we focused on:
+
+- **Clean architecture**: Core systems like LevelManager, Enemy, and SaveSystem all do one job and don’t overlap too much. That makes testing and updating way easier.
+- **Branch-based workflow**: Every new feature—like the boss or black hole—was built and tested in its own GitHub branch. This made it easier to track changes, review code, and fix bugs without breaking other parts of the game.
+
+These practices help prevent messy or outdated code, and make it easier for others (or even us in the future) to keep working on the game.
+
+## 7.3 Individual
+We paid attention to how our design might impact players emotionally and cognitively. Here’s what we did:
+
+- **Gentle learning curve**: The early levels are simple and include helpful hints so that younger or less experienced players can ease into the game without frustration.
+- **Easy restart**: If you die, you can restart instantly—and skip the tutorial if you’ve already seen it. This gives players more control over how they experience the game.
+
+These choices show our commitment to accessibility, and long-term enjoyment, and reflect the kind of responsibility we believe game developers should take seriously.
+
+[Back to Table of Contents](#table-of-contents)
+
+---
 # 8 Process 
 
 
@@ -465,7 +504,7 @@ In conclusion, this project has provided us with solid development experience an
 | Yichen Zhang  | 1.00         |
 | Guojie Liu    | 1.00         |
 | Chen Zhang    | 1.00         |
-| Mengqiu Liu   | 1.00         |
+| Mengqiu Yan   | 1.00         |
 
 [Back to Table of Contents](#table-of-contents)
 # 11 Additional Marks
