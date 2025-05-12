@@ -793,7 +793,7 @@ function updateStealthSpawn(max) {
     let pos = generateStealthEnemyAhead(player.pos, dir);
     enemies.push(new StealthEnemy(pos.x, pos.y));
     stealthSpawnedCount++; // ✅ 每生成一个就增加
-    console.log(`生成隐形敌人 ${stealthSpawnedCount}/${max}`, pos);
+    console.log(`生成隐形敌人 ${stealthSpawnedCount}/${max}`, pos); 
   }
 }
   
@@ -1387,8 +1387,6 @@ class Level2 extends BaseLevel {
     this.tip = "Marked for death...The ambush is coming fast - stay alert!";
     this.tipExpireTime = millis() + 10000;  // 初始提示显示10秒
 
-    // 刷敌人（正常血量）
-    let minSpawnDistance = player.r * 10;
 
     this.pauseTimer = millis() + 10000;  // 10秒后触发黑洞暂停提示
 
@@ -2048,7 +2046,6 @@ class Enemy {
   
   }
 
- 
 
   
   updateDeath() {
@@ -2275,45 +2272,6 @@ if (distance < this.chaseRange) {
 } else {
   this.visibility = 0; // 超出感应范围，完全隐身
 }
-/*
-  // ✅ 行为逻辑（控制移动）
-  let dir;
-  if (distance < this.chaseRange) {
-    this.isChasing = true;
-    this.needsRepositioned = false;
-     let minDist = this.r + player.r;
-    if (distance >= minDist) {
-    let dir = p5.Vector.sub(player.pos, this.pos);
-    dir.setMag(this.stealthSpeed); // 快速追击
-    this.pos.add(dir);
-    }
-  } else if (distance < this.detectRange) {
-    this.isChasing = false;
-    this.needsRepositioned = false;
-    // 慢速跟随
-    dir = p5.Vector.sub(player.pos, this.pos);
-    dir.setMag(this.slowSpeed); 
-    this.pos.add(dir);
-  } else {
-    this.isChasing = false;
-    // 如果需要重新定位，就生成伏击点
-  if (!this.needsRepositioned) {
-  this.visibility -= 10;
-  if (this.visibility <= 0) {
-    let playerDir = player.getDirection?.() || createVector(1, 0);
-    if (playerDir.mag() < 0.01) playerDir = createVector(1, 0);
-    let newPos = generateStealthEnemyAhead(player.pos, playerDir);
-    this.pos = newPos.copy();
-    this.needsRepositioned = true;
-    
-     // ✅ 控制台打印新位置
-    console.log(`隐身敌人重新定位至：(${newPos.x.toFixed(2)}, ${newPos.y.toFixed(2)})`); 
-}
-}
-  }
-  this.flip = (player.pos.x > this.pos.x); // 玩家在右边就翻转
-  super.update();
-}*/
 
 // ✅ 行为逻辑（控制移动）
 let dir;
@@ -2574,7 +2532,7 @@ class Boss extends Enemy {
 
     /* ───── 基本属性 ───── */
     this.r  = 115;
-    this.hp = new HPSystem(2800);
+    this.hp = new HPSystem(28);
     this.contactDamage = 40;
 
     /* ───── idle / 召唤图片 ───── */
