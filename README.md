@@ -68,7 +68,18 @@ Add a group photo here!
 
 # 1 Introduction
 - 5% ~250 words 
-- Describe your game, what is based on, what makes it novel? 
+- Describe your game, what is based on, what makes it novel?
+This document outlines our software engineering practices in developing a brand-new game from scratch.
+
+Space Hunt is a side-scrolling combat game set in the forbidden depths of the universe, a realm where death and violence reign supreme. Players take on the role of a space hunter   burdened by a dark past, awakening from a long cryosleep to pursue the only mission he knows: the hunt—until all returns to nothingness.
+
+The game features two difficulty levels. While the core gameplay mechanics remain consistent across both, the higher difficulty introduces faster-paced combat, more frequent and powerful enemy spawns, and fewer healing items.
+
+The game is structured around five meticulously designed levels, integrated with a robust skill progression system. Players can switch gear and skills between levels based on combat needs, facing off against a variety of mutated enemies such as tracking beasts, stealth monsters, and bullet-hell creatures. Within a limited time, players strive to earn higher scores and gradually evolve into the ultimate hunter. Space Hunt aims to deliver a fluid, exhilarating combat experience combined with a cyberpunk/cosmic horror aesthetic and a deeply immersive narrative, offering players a thrilling journey of cosmic hunting filled with both action and atmosphere.
+
+The initial inspiration for this project came from classic .io games, especially Agar.io. We wanted to pay homage to these simple yet strategic experiences. Our early concept envisioned a survival game set in space, where players must navigate vast cosmic environments and outwit other entities to escape—a vision born from our shared passion for space horror themes.
+
+However, as the project evolved, we realized that a pure survival mechanic wouldn't provide the pacing and long-term engagement we were aiming for. Coupled with our team’s enthusiasm for traditional RPG combat systems, we decided to shift the game’s tone—from fearful escape to intense combat—allowing the player not just to be prey in the dark cosmos, but a predator striking back.
 [Back to Table of Contents](#table-of-contents)
 # 2 Art Design and Innovation
 We combine our art design with creative gameplay systems to improve player interaction and make the game more fun to play.
