@@ -79,7 +79,11 @@ Space Hunt is a side-scrolling combat game set in the forbidden depths of the un
 
 The game features two difficulty levels. While the core gameplay mechanics remain consistent across both, the higher difficulty introduces faster-paced combat, more frequent and powerful enemy spawns, and fewer healing items.
 
+![gif1](docs/Datas/1st.gif)
+
 The game is structured around five meticulously designed levels, integrated with a robust skill progression system. Players can switch gear and skills between levels based on combat needs, facing off against a variety of mutated enemies such as tracking beasts, stealth monsters, and bullet-hell creatures. Within a limited time, players strive to earn higher scores and gradually evolve into the ultimate hunter. Space Hunt aims to deliver a fluid, exhilarating combat experience combined with a cyberpunk/cosmic horror aesthetic and a deeply immersive narrative, offering players a thrilling journey of cosmic hunting filled with both action and atmosphere.
+
+![gif2](docs/Datas/2nd.gif)
 
 The initial inspiration for this project came from classic .io games, especially Agar.io. We wanted to pay homage to these simple yet strategic experiences. Our early concept envisioned a survival game set in space, where players must navigate vast cosmic environments and outwit other entities to escape—a vision born from our shared passion for space horror themes.
 
