@@ -2040,7 +2040,7 @@ vel: createVector(random(-1, 1), random(-2, -1)), // ← 更强的上飘速度
     
      if (isHardMode){
        modeDamage = 1.5 * dmg;
-       console.log("伤害变为", modeDamage);
+       console.log("hardmode下伤害变为", modeDamage);
     }
     const damage = floor(modeDamage * this.damageMultiplier);
     this.hp.takeDamage(damage);
