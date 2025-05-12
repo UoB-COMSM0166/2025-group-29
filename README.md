@@ -315,6 +315,9 @@ Within the gameplay logic domain, the challenges further divide into two key sub
 ## 5.1 Challenge 1: Skill Tree System and Animation Management
 The goal of our skill tree design is to provide players with more personalized growth paths and strategic options, thereby enhancing the game’s depth and replayability. Initially, we introduced three skill slots, and through skill combinations, players can experience a faction-based active skill system, encouraging them to build unique playstyles.
 Later in development, to further differentiate these factions, we converted faction bonuses into three new passive skills that enhance corresponding active skills, reinforcing each faction's unique style and increasing immersion. At the same time, we retained the “three-color skill combination” mechanic, which means players can select one skill from each of the three factions, allowing for non-faction-based builds and greatly expanding the possibilities for creative experimentation.
+
+![gif3](docs/Datas/3rd.gif)
+
 For character sprite management, we adopted a three-level nested object structure called GIF_POOL to index GIF animations based on faction, status, and skill state. The function applyFactionFromSkills() dynamically determines the current faction based on the equipped skills and triggers a corresponding visual update to reflect the faction’s aesthetic.
 To correctly display skill state animations, we implemented an Overlay Queue system. This queue uses push() to add animation requests, then uses sort() (based on timestamp and priority) to select the most appropriate animation to play, and filter() to remove expired overlays. This mechanism ensures that character animations always accurately reflect the player's current state.
 ________________________________________
