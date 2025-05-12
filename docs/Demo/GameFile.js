@@ -152,6 +152,22 @@ let gifImg;
 let bgmNormal, bgmBoss;
 let currentBGM = null;
 
+
+const SFX = {
+  attack     : null,
+  dash       : null,
+  charge     : null,
+  lifesteal  : null,
+  reflect    : null,
+  
+
+  play(name) {
+    if (this[name] && this[name].isLoaded()) {
+      this[name].play();
+    }
+  }
+};
+
 function preload() {
 
   minecraftFont = loadFont('assets/font/Minecraft.ttf');
@@ -242,6 +258,18 @@ function preload() {
   bgmBoss   = loadSound("assets/media/audio/finalboss.wav"); // 用于第5关
   bgmNormal.setVolume(0.1);
   bgmBoss.setVolume(0.1);
+
+  SFX.attack     = loadSound("assets/media/audio/attack.mp3");
+  SFX.dash       = loadSound("assets/media/audio/dash.mp3");
+  SFX.charge     = loadSound("assets/media/audio/charge.mp3");
+  // SFX.lifesteal  = loadSound("assets/media/audio/lifesteal.mp3");
+  // SFX.reflect    = loadSound("assets/media/audio/reflect.mp3");
+
+  SFX.attack.setVolume(0.1);
+  SFX.dash.setVolume(0.1);
+  SFX.charge.setVolume(0.1);
+  // SFX.lifesteal.setVolume(0.1);
+  // SFX.reflect.setVolume(0.1);
 }
 
 function playLevelBGM(levelNumber) {
@@ -256,7 +284,7 @@ function playLevelBGM(levelNumber) {
   }
 
   if (currentBGM) {
-    currentBGM.setVolume(0.4);
+    currentBGM.setVolume(0.1);
     currentBGM.loop();
   }
 }
@@ -593,6 +621,11 @@ function keyPressed() {
   if (key.toLowerCase() === 'a') {
     if (!player.isCharging) {          // 正在蓄力时禁止普通攻击
       player.meleeAttack.trigger();
+      if (!player.isCharging) {
+         player.meleeAttack.trigger();
+         SFX.play("attack");
+        }
+      
     } else {
       console.log("⚠️ 蓄力中，A 键被忽略");
     }
@@ -3347,6 +3380,7 @@ class AttackBoostSkill extends Skill {
 
   castSkillEffect() {
     if (this.isDashing) return; // 正在冲刺时不能再次触发
+    SFX.play("dash");  // ✅ 冲刺音效
 
     console.log(" 冲刺技能发动！");
     this.isDashing = true;
@@ -3497,6 +3531,7 @@ class ChargeStrikeSkill extends Skill {
 
   /* 触发 —— 开始进入蓄力状态 */
   castSkillEffect() {
+    SFX.play("charge");  // ✅ 播放蓄力启动音效
     console.log("⚡ 蓄力攻击启动");
     this.isCharging      = true;
     this.startTime       = millis();
