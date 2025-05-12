@@ -626,19 +626,29 @@ function keyReleased() {
 function generateValidEnemyPosition(minDistance) {
   let pos;
   let safe = false;
-  
+
   while (!safe) {
     pos = createVector(random(-width, width), random(-height, height));
+    safe = true;
 
-    
-    // **检查敌人与玩家的距离**
-    if (dist(pos.x, pos.y, player.pos.x, player.pos.y) >= minDistance) {
-      safe = true; // 只有当距离足够远时才接受这个位置
+    // ✅ 1. 与玩家保持足够距离
+    if (dist(pos.x, pos.y, player.pos.x, player.pos.y) < minDistance) {
+      safe = false;
+      continue;
+    }
+
+    // ✅ 2. 与其他敌人保持一定距离（避免重叠）
+    for (let other of enemies) {
+      if (dist(pos.x, pos.y, other.pos.x, other.pos.y) < minDistance) {
+        safe = false;
+        break;
+      }
     }
   }
-  
+
   return pos;
 }
+
 
 function generateOutsideViewPosition(maxAttempts = 20) {
   let attempt = 0;
@@ -3299,7 +3309,7 @@ class AttackBoostSkill extends Skill {
   class DashSkill extends Skill {
   constructor(player,enemies) {
     super("Phantom Dash", "", 1); // 冲刺技能冷却
-    this.dashDamage = 5; // 冲刺时撞敌造成5伤害
+    this.dashDamage = 20; // 冲刺时撞敌造成5伤害
     this.isDashing = false; // 冲刺中标记
     this.originalSpeed = 0; // 记录冲刺前的速度
     this.dashedEnemies = []; // 已经撞过的敌人列表
