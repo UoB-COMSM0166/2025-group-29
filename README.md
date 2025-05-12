@@ -57,8 +57,8 @@ Add a group photo here!
 - [4 Design](#4-design)
 - [5 Implementation](#5-implementation)
 - [6 Evaluation](#6-evaluation)
-  - [6.1 Think-Aloud Testing](#61-think-aloud-testing)
-  - [6.2 NASA-TLX Workload Study](#62-nasa-tlx-workload-study)
+  - [6.1 Think-Aloud Testing](#61-qualitative-evaluation)
+  - [6.2 NASA-TLX Workload Study](#62-quantitative-evaluation)
   - [6.3 Testing Methodology](#63-testing-methodology)
 - [7 Process](#7-process)
 - [8 Conclusion](#8-conclusion)
@@ -272,7 +272,9 @@ At the end of each level,  the player enters the shop screen, which displays upg
 - **One quantitative evaluation:** NASA-TLX workload analysis  
 - **Description of how code was tested**
 
-## 6.1 Qualitative Evaluation – Think-Aloud Testing: Iterative Feedback and In-Game Adjustments  
+## 6.1 Qualitative Evaluation
+
+### Think-Aloud Testing: Iterative Feedback and In-Game Adjustments  
 
 We conducted a Think-Aloud usability test with six participants (**N = 6**) who played through the first two levels while narrating their thoughts aloud. Verbal expressions were transcribed, tagged, and analyzed to extract user needs and usability pain-points. Based on repeated themes—**confusion**, **uncertainty**, **overwhelm**, and **cognitive load**—we derived a set of actionable design responses to improve player experience.
 
@@ -297,7 +299,9 @@ These real-time voice comments exposed pain-points in **navigation, clarity, pac
 
 ---
 
-## 6.2 Quantitative Evaluation – NASA-TLX Workload Analysis  
+## 6.2 Quantitative Evaluation
+
+### NASA-TLX Workload Analysis  
 
 Simply comparing two difficulty levels might not be that exciting. Long-lasting games often maintain a well-tuned balance between different characters or playstyles. This balance helps prevent any one style from feeling disproportionately demanding and avoids the dreaded “class fatigue” that arises when an option feels like too much work.
 
