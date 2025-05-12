@@ -364,33 +364,18 @@ Ultimately, this project provided valuable, hands-on experience with Agile princ
 
 - Reflect on project as a whole. Lessons learned. Reflect on challenges. Future work.
 
-- 中文
-- 本次项目为我们团队带来了极大的成长，不仅锻炼了实际开发能力，更帮助我们理解了完整游戏系统背后的设计逻辑与用户体验。
-
-我们最大的收获之一，是对 系统解耦与模块化架构 的深刻理解。在项目初期，逻辑耦合较为严重，例如技能效果直接修改全局状态，导致调试复杂。后来我们将功能逐步拆分到各自类中，例如把攻击行为从 Player 中拆为 MeleeAttack 类，把技能逻辑抽象为 Skill 类，从而大幅提升了代码的复用性与可维护性。
-
-我们也学会了如何进行 功能平衡与可玩性调试。例如在测试中发现 ReflectSkill 与 LifestealSkill 叠加时过于强大，我们通过调整冷却时间与持续时间，并限制可携带技能数量，保证游戏的挑战性和公平性。同时我们通过 HPSystem, CooldownSystem, DashResetSkill 等组件精细控制数值变化，使技能之间形成策略组合，而非堆叠无脑强。
-
-在过程中也遇到不少挑战。例如 ChargeStrikeSkill 在释放后未能正确重置 isCharging 状态，导致玩家无法恢复移动。我们引入时间判定与状态同步，在 update() 方法中统一处理技能效果结束条件。这帮助我们掌握了如何设计 状态驱动的实时逻辑系统。
-
-p5.js 提供了灵活的图形接口，但对复杂状态控制和大规模对象管理并不友好。我们主动设计了如 CollisionManager, DamageCalculator, PixelExplosion, SkillSystem 等辅助模块，提高了性能和可维护性。
-
-未来，我们计划扩展以下内容：
-	•	加入 关卡/波次机制，增加游戏节奏变化；
-	•	添加 更多技能和升级系统，支持玩家成长路径；
-	•	加入 地图障碍、陷阱，提高环境多样性；
-	•	探索 本地多人协作或竞技模式；
-	•	构建 排行榜系统，记录最高得分与生存时间。
-
-总结来说，本次项目不仅帮助我们完成了一个结构复杂、玩法丰富的完整游戏，也让我们在设计模式、协作方式、技术细节和用户体验等方面都得到了全面提升。这为我们未来参与更大型的系统开发打下了坚实基础。
-
 Looking back on the entire project, what we implemented in this game, we learnt how team members can collaborate with each other to achieve a game's output, and we also learnt solid system design through the game's design process. From the early stages of the project, we set a clear goal: to create a modular, extensible framework that could support multiple levels with different mechanics - sneak, ambush, pop-ups, boss battles, etc. - while at the same time sharing features such as player movement collision detection, skill management and remote archiving. To realise this vision, we recognised the importance of pre-planning the architectural design. We defined clear abstract classes, such as BaseLevel, Enemy, Skill, CollisionManager, etc., so that new features could be integrated smoothly and with less coupling. Through the design of SpriteManager and Skill Stacking Queue, we learned to decouple the rendering logic from the game logic, resulting in smoother character animations. The remote archiving feature uses Supabase to further understand the details of asynchronous data loading, such as how to ensure that the main game loop is not started until loadSaveData() completes, and how to provide friendly error feedback in the event of network exceptions.
 
 Throughout the development process, we faced a number of challenges that became valuable learning opportunities. In order to balance performance and visual effects in a browser-based canvas environment, we analysed and optimised the performance of the code's hotspot paths, especially the particle effects in PixelExplosion and the per-frame halo drawing in the SlowField skill. Implementing complex boss behaviours (e.g. multi-stage ring barrage, tower deployment, dash explosion attack, black hole attraction mechanic), we realised how crucial it is to build a stable state machine with a precise timing control system. When debugging collision detection between a high-speed moving sprint trajectory and an out-of-field enemy generation point, we gained a deeper grasp of the logical handling of spatial demarcation strategies independent of frame rate. In addition, managing complex interactions between skills (e.g., controlling the timing of LifestealSkill triggers or accumulating Guardian's Will shields) also taught us that the integrity of unit testing and clear logic of the cooldown mechanism are key to ensuring the stability of the system.
 
 During the course of the project, we also gained a lot of soft skills. For example, the use of bilingual (English comment structure, Chinese documented context) to write clear code comments improved the efficiency of collaboration; unified naming conventions and ES6 modular import mechanism enhanced maintainability; regular review and refactoring of shared logic effectively prevented the emergence of ‘spaghetti code’. We've also come to accept that iteration is progress: early prototypes were fragile, but as we continued to optimise, the code base became solid and reliable, providing a solid foundation for expanding functionality.
-Looking ahead, the project still has a lot of room for improvement and expansion in basic aspects. For example, more rich designs can be made on the types of enemies and their behavioural patterns, for example, there are still places worth optimizing the logic of enemy generation, which can make the player's gaming experience more refreshing and challenging; the player's skill system can be expanded more, firstly, more genres can be developed to improve the richness of the game; secondly, the skill combinations can be made more flexible in order to improve the game's Secondly, the combination of skills can be made more flexible to improve the strategy of the game; in terms of interface design, clearer game guides or tutorials can be added to help new players quickly understand the rules of the game and the way of operation; consideration can be given to the addition of a simple achievement system or a points leaderboard to stimulate the players' interest in repeated challenges and competition; moreover, basic features such as auto-save and multiple archive slots can also be added in terms of the archive function to avoid the players losing their progress due to unforeseen circumstances. In addition, there are also a lot of places that can be optimised at the code level. Structurally, the decoupling between modules can be further enhanced to reduce the complexity of the code, and the error handling mechanism can be strengthened to make the game run more stable and easy to maintain.
+
+Looking ahead, the project still has a lot of room for improvement and expansion in basic aspects. For example, more rich designs can be made on the types of enemies and their behavioural patterns, for example, there are still places worth optimizing the logic of enemy generation, which can make the player's gaming experience more refreshing and challenging; the player's skill system can be expanded more, firstly, more genres can be developed to improve the richness of the game; secondly, the skill combinations can be made more flexible in order to improve the game's Secondly, the combination of skills can be made more flexible to improve the strategy of the game; in terms of interface design, clearer game guides or tutorials can be added to help new players quickly understand the rules of the game and the way of operation; consideration can be given to the addition of a simple achievement system or a points leaderboard to stimulate the players' interest in repeated challenges and competition; moreover, basic features such as auto-save and multiple archive slots can also be added in terms of the archive function to avoid the players losing their progress due to unforeseen circumstances. 
+
+In addition, there are also a lot of places that can be optimised at the code level. Structurally, the decoupling between modules can be further enhanced to reduce the complexity of the code, and the error handling mechanism can be strengthened to make the game run more stable and easy to maintain.
+
 In conclusion, this project has provided us with solid development experience and architectural design foundation, and in the future, we can further optimise and enrich the game content from these basic directions above, and continue to improve the player experience.
+
 [Back to Table of Contents](#table-of-contents)
 # 9 Contribution Statement
 
